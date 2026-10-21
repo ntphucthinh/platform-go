@@ -1,0 +1,22 @@
+get:
+  operationId: fetchHomestays
+  tags:
+    - Homestays
+  summary: Get homestay list
+  description: Retrieve a list of homestays with their rooms and images.
+  responses:
+    "200":
+      description: Homestays retrieved successfully
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                type: array
+                items:
+                  $ref: "../../components/schemas/homestays/index.yml#/FetchHomestayResponse"
+            required:
+              - data
+    "500":
+      description: Internal server error

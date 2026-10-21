@@ -22,3 +22,11 @@ func InitializeHandler(db *gorm.DB) *controller.UserController {
 	)
 	return &controller.UserController{}
 }
+
+func InitializeHomestayHandler(db *gorm.DB) *controller.HomestayController {
+	wire.Build(
+		queryservice.NewHomestayQueryService,
+		controller.NewHomestayController,
+	)
+	return &controller.HomestayController{}
+}

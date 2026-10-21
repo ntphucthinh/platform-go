@@ -64,9 +64,11 @@ func main() {
 		log.Fatalf("invalid JWT configuration: %v", err)
 	}
 	userHandler := di.InitializeHandler(db)
+	homestayHandler := di.InitializeHomestayHandler(db)
 	authUsecase := usecases.NewAuthUsecase(repository.NewMySQLUserRepository(db), jwtService)
 	authHandler := controller.NewAuthController(authUsecase, !app.IsLocal())
-	appHandler := controller.NewHandler(userHandler, authHandler)
+	appHandler := controller.NewHandler(userHandler, authHandler, homestayHandler)
+
 
 	r := gin.Default()
 

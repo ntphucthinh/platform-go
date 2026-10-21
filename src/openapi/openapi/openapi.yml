@@ -13,6 +13,9 @@ tags:
     description: Cookie-based authentication
   - name: users
     description: User management
+  - name: homestays
+    description: Homestay management
+
 paths:
   /auth/login:
     $ref: "./paths/auth.yml#/~1login"
@@ -24,6 +27,9 @@ paths:
     $ref: "./paths/auth.yml#/~1me"
   /users:
     $ref: "./paths/users.yml"
+  /homestays:
+    $ref: "./paths/homestays/index.yml"
+
 components:
   schemas:
     User:

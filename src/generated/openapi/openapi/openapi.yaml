@@ -2,198 +2,576 @@ openapi: 3.0.3
 info:
   title: My Project API
   version: 1.0.0
-servers:
-  - url: https://api.platform.internal:8445
-    description: Local Development Server
-tags:
-  - name: auth
-    description: Cookie-based authentication
-  - name: users
-    description: User management
 externalDocs:
   description: Find out more about Swagger
   url: http://swagger.io
+servers:
+- description: Local Development Server
+  url: https://api.platform.internal:8445
+tags:
+- description: Cookie-based authentication
+  name: auth
+- description: User management
+  name: users
+- description: Homestay management
+  name: homestays
 paths:
   /auth/login:
     post:
-      summary: Sign in as an administrator
       operationId: login
-      tags:
-        - auth
       requestBody:
-        required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/LoginRequest'
+              $ref: "#/components/schemas/LoginRequest"
+        required: true
       responses:
-        '200':
-          description: Authenticated; access, refresh and CSRF cookies are set. Send csrfToken as X-CSRF-Token on authenticated requests.
+        "200":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AuthResponse'
-        '400':
+                $ref: "#/components/schemas/AuthResponse"
+          description: "Authenticated; access, refresh and CSRF cookies are set. Send\
+            \ csrfToken as X-CSRF-Token on authenticated requests."
+        "400":
           description: Invalid request
-        '401':
+        "401":
           description: Invalid credentials
+      summary: Sign in as an administrator
+      tags:
+      - auth
   /auth/refresh:
     post:
-      summary: Refresh authentication cookies
       operationId: refresh
-      tags:
-        - auth
-      security:
-        - RefreshCookie: []
       responses:
-        '200':
-          description: Access, refresh and CSRF cookies are rotated. Update the frontend CSRF token from the response.
+        "200":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AuthResponse'
-        '401':
+                $ref: "#/components/schemas/AuthResponse"
+          description: "Access, refresh and CSRF cookies are rotated. Update the frontend\
+            \ CSRF token from the response."
+        "401":
           description: Invalid refresh token
+      security:
+      - RefreshCookie: []
+      summary: Refresh authentication cookies
+      tags:
+      - auth
   /auth/logout:
     post:
-      summary: Clear authentication cookies
       operationId: logout
-      tags:
-        - auth
-      security:
-        - AccessCookie: []
       responses:
-        '204':
+        "204":
           description: Logged out
+      security:
+      - AccessCookie: []
+      summary: Clear authentication cookies
+      tags:
+      - auth
   /auth/me:
     get:
-      summary: Get the currently authenticated administrator
       operationId: me
-      tags:
-        - auth
-      security:
-        - AccessCookie: []
       responses:
-        '200':
-          description: Current user
+        "200":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/LoginUser'
-        '401':
+                $ref: "#/components/schemas/LoginUser"
+          description: Current user
+        "401":
           description: Unauthenticated
+      security:
+      - AccessCookie: []
+      summary: Get the currently authenticated administrator
+      tags:
+      - auth
   /users:
     get:
-      summary: Get users
       operationId: get-users
-      tags:
-        - users
       responses:
-        '200':
-          description: OK
+        "200":
           content:
             application/json:
               schema:
-                type: array
                 items:
-                  $ref: '#/components/schemas/User'
-    post:
-      summary: Create a user
-      operationId: create-user
+                  $ref: "#/components/schemas/User"
+                type: array
+          description: OK
+      summary: Get users
       tags:
-        - users
+      - users
+    post:
+      operationId: create-user
       requestBody:
-        required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateUser'
+              $ref: "#/components/schemas/CreateUser"
+        required: true
       responses:
-        '201':
-          description: Created
+        "201":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/User'
+                $ref: "#/components/schemas/User"
+          description: Created
+      summary: Create a user
+      tags:
+      - users
+  /homestays:
+    get:
+      description: Retrieve a list of homestays with their rooms and images.
+      operationId: fetchHomestays
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/fetchHomestays_200_response"
+          description: Homestays retrieved successfully
+        "500":
+          description: Internal server error
+      summary: Get homestay list
+      tags:
+      - Homestays
 components:
   schemas:
     User:
-      type: object
+      example:
+        id: 0
+        name: name
+        createdAt: 2000-01-23T04:56:07.000+00:00
+        updatedAt: 2000-01-23T04:56:07.000+00:00
       properties:
         id:
-          type: integer
           format: int64
+          type: integer
         name:
           type: string
         createdAt:
-          type: string
           format: date-time
+          type: string
         updatedAt:
-          type: string
           format: date-time
-    CreateUser:
+          type: string
       type: object
-      required:
-        - name
+    CreateUser:
+      example:
+        name: name
       properties:
         name:
           type: string
-    LoginRequest:
-      type: object
       required:
-        - email
-        - password
+      - name
+      type: object
+    LoginRequest:
+      example:
+        email: email
+        password: password
       properties:
         email:
-          type: string
           format: email
-        password:
           type: string
+        password:
           format: password
-    AuthResponseData:
-      type: object
+          type: string
       required:
-        - csrfToken
+      - email
+      - password
+      type: object
+    AuthResponse:
+      example:
+        data:
+          csrfToken: csrfToken
+        message: message
+      properties:
+        data:
+          $ref: "#/components/schemas/AuthResponseData"
+        message:
+          type: string
+      required:
+      - data
+      - message
+      type: object
+    AuthResponseData:
+      example:
+        csrfToken: csrfToken
       properties:
         csrfToken:
           type: string
-    AuthResponse:
-      type: object
       required:
-        - data
-        - message
-      properties:
-        data:
-          $ref: '#/components/schemas/AuthResponseData'
-        message:
-          type: string
+      - csrfToken
+      type: object
     LoginUser:
-      type: object
-      required:
-        - id
-        - name
-        - email
-        - accountType
+      example:
+        id: 0
+        name: name
+        email: email
+        accountType: admin
       properties:
         id:
-          type: integer
           format: int64
+          type: integer
         name:
           type: string
         email:
-          type: string
           format: email
-        accountType:
           type: string
+        accountType:
           example: admin
+          type: string
+      required:
+      - accountType
+      - email
+      - id
+      - name
+      type: object
+    FetchHomestayResponse:
+      example:
+        data:
+          id: 28
+          name: tên home
+          address: địa điểm
+          description: mô tả chung
+          google_maps_url: https://www.google.com/maps
+          homestay_rooms:
+          - id: 17
+            homestay_id: 28
+            name: Room 1
+            description: mô tả room
+            sort_order: 1
+            price_amount: 10000.0
+            price_unit: per_room_per_night
+            homestay_images:
+            - id: 178
+              homestay_id: 28
+              room_id: 17
+              image_path: homestays/28/1792554894062_zbd0lt_halo.png
+              sort_order: 1
+              is_cover: true
+            - id: 178
+              homestay_id: 28
+              room_id: 17
+              image_path: homestays/28/1792554894062_zbd0lt_halo.png
+              sort_order: 1
+              is_cover: true
+          - id: 17
+            homestay_id: 28
+            name: Room 1
+            description: mô tả room
+            sort_order: 1
+            price_amount: 10000.0
+            price_unit: per_room_per_night
+            homestay_images:
+            - id: 178
+              homestay_id: 28
+              room_id: 17
+              image_path: homestays/28/1792554894062_zbd0lt_halo.png
+              sort_order: 1
+              is_cover: true
+            - id: 178
+              homestay_id: 28
+              room_id: 17
+              image_path: homestays/28/1792554894062_zbd0lt_halo.png
+              sort_order: 1
+              is_cover: true
+      properties:
+        data:
+          $ref: "#/components/schemas/FetchHomestayResponse_data"
+      required:
+      - data
+      type: object
+    fetchHomestays_200_response:
+      example:
+        data:
+        - data:
+            id: 28
+            name: tên home
+            address: địa điểm
+            description: mô tả chung
+            google_maps_url: https://www.google.com/maps
+            homestay_rooms:
+            - id: 17
+              homestay_id: 28
+              name: Room 1
+              description: mô tả room
+              sort_order: 1
+              price_amount: 10000.0
+              price_unit: per_room_per_night
+              homestay_images:
+              - id: 178
+                homestay_id: 28
+                room_id: 17
+                image_path: homestays/28/1792554894062_zbd0lt_halo.png
+                sort_order: 1
+                is_cover: true
+              - id: 178
+                homestay_id: 28
+                room_id: 17
+                image_path: homestays/28/1792554894062_zbd0lt_halo.png
+                sort_order: 1
+                is_cover: true
+            - id: 17
+              homestay_id: 28
+              name: Room 1
+              description: mô tả room
+              sort_order: 1
+              price_amount: 10000.0
+              price_unit: per_room_per_night
+              homestay_images:
+              - id: 178
+                homestay_id: 28
+                room_id: 17
+                image_path: homestays/28/1792554894062_zbd0lt_halo.png
+                sort_order: 1
+                is_cover: true
+              - id: 178
+                homestay_id: 28
+                room_id: 17
+                image_path: homestays/28/1792554894062_zbd0lt_halo.png
+                sort_order: 1
+                is_cover: true
+        - data:
+            id: 28
+            name: tên home
+            address: địa điểm
+            description: mô tả chung
+            google_maps_url: https://www.google.com/maps
+            homestay_rooms:
+            - id: 17
+              homestay_id: 28
+              name: Room 1
+              description: mô tả room
+              sort_order: 1
+              price_amount: 10000.0
+              price_unit: per_room_per_night
+              homestay_images:
+              - id: 178
+                homestay_id: 28
+                room_id: 17
+                image_path: homestays/28/1792554894062_zbd0lt_halo.png
+                sort_order: 1
+                is_cover: true
+              - id: 178
+                homestay_id: 28
+                room_id: 17
+                image_path: homestays/28/1792554894062_zbd0lt_halo.png
+                sort_order: 1
+                is_cover: true
+            - id: 17
+              homestay_id: 28
+              name: Room 1
+              description: mô tả room
+              sort_order: 1
+              price_amount: 10000.0
+              price_unit: per_room_per_night
+              homestay_images:
+              - id: 178
+                homestay_id: 28
+                room_id: 17
+                image_path: homestays/28/1792554894062_zbd0lt_halo.png
+                sort_order: 1
+                is_cover: true
+              - id: 178
+                homestay_id: 28
+                room_id: 17
+                image_path: homestays/28/1792554894062_zbd0lt_halo.png
+                sort_order: 1
+                is_cover: true
+      properties:
+        data:
+          items:
+            $ref: "#/components/schemas/FetchHomestayResponse"
+          type: array
+      required:
+      - data
+      type: object
+    FetchHomestayResponse_data_homestay_rooms_inner_homestay_images_inner:
+      example:
+        id: 178
+        homestay_id: 28
+        room_id: 17
+        image_path: homestays/28/1792554894062_zbd0lt_halo.png
+        sort_order: 1
+        is_cover: true
+      properties:
+        id:
+          example: 178
+          format: int64
+          type: integer
+        homestay_id:
+          example: 28
+          format: int64
+          type: integer
+        room_id:
+          example: 17
+          format: int64
+          nullable: true
+          type: integer
+        image_path:
+          example: homestays/28/1792554894062_zbd0lt_halo.png
+          type: string
+        sort_order:
+          example: 1
+          format: int32
+          type: integer
+        is_cover:
+          example: true
+          type: boolean
+      required:
+      - homestay_id
+      - id
+      - image_path
+      - is_cover
+      - sort_order
+      type: object
+    FetchHomestayResponse_data_homestay_rooms_inner:
+      example:
+        id: 17
+        homestay_id: 28
+        name: Room 1
+        description: mô tả room
+        sort_order: 1
+        price_amount: 10000.0
+        price_unit: per_room_per_night
+        homestay_images:
+        - id: 178
+          homestay_id: 28
+          room_id: 17
+          image_path: homestays/28/1792554894062_zbd0lt_halo.png
+          sort_order: 1
+          is_cover: true
+        - id: 178
+          homestay_id: 28
+          room_id: 17
+          image_path: homestays/28/1792554894062_zbd0lt_halo.png
+          sort_order: 1
+          is_cover: true
+      properties:
+        id:
+          example: 17
+          format: int64
+          type: integer
+        homestay_id:
+          example: 28
+          format: int64
+          type: integer
+        name:
+          example: Room 1
+          type: string
+        description:
+          example: mô tả room
+          nullable: true
+          type: string
+        sort_order:
+          example: 1
+          format: int32
+          type: integer
+        price_amount:
+          example: 10000.0
+          format: double
+          type: number
+        price_unit:
+          example: per_room_per_night
+          type: string
+        homestay_images:
+          items:
+            $ref: "#/components/schemas/FetchHomestayResponse_data_homestay_rooms_inner_homestay_images_inner"
+          type: array
+      required:
+      - homestay_id
+      - homestay_images
+      - id
+      - name
+      - sort_order
+      type: object
+    FetchHomestayResponse_data:
+      example:
+        id: 28
+        name: tên home
+        address: địa điểm
+        description: mô tả chung
+        google_maps_url: https://www.google.com/maps
+        homestay_rooms:
+        - id: 17
+          homestay_id: 28
+          name: Room 1
+          description: mô tả room
+          sort_order: 1
+          price_amount: 10000.0
+          price_unit: per_room_per_night
+          homestay_images:
+          - id: 178
+            homestay_id: 28
+            room_id: 17
+            image_path: homestays/28/1792554894062_zbd0lt_halo.png
+            sort_order: 1
+            is_cover: true
+          - id: 178
+            homestay_id: 28
+            room_id: 17
+            image_path: homestays/28/1792554894062_zbd0lt_halo.png
+            sort_order: 1
+            is_cover: true
+        - id: 17
+          homestay_id: 28
+          name: Room 1
+          description: mô tả room
+          sort_order: 1
+          price_amount: 10000.0
+          price_unit: per_room_per_night
+          homestay_images:
+          - id: 178
+            homestay_id: 28
+            room_id: 17
+            image_path: homestays/28/1792554894062_zbd0lt_halo.png
+            sort_order: 1
+            is_cover: true
+          - id: 178
+            homestay_id: 28
+            room_id: 17
+            image_path: homestays/28/1792554894062_zbd0lt_halo.png
+            sort_order: 1
+            is_cover: true
+      properties:
+        id:
+          example: 28
+          format: int64
+          type: integer
+        name:
+          example: tên home
+          type: string
+        address:
+          example: địa điểm
+          type: string
+        description:
+          example: mô tả chung
+          nullable: true
+          type: string
+        google_maps_url:
+          example: https://www.google.com/maps
+          format: uri
+          nullable: true
+          type: string
+        homestay_rooms:
+          items:
+            $ref: "#/components/schemas/FetchHomestayResponse_data_homestay_rooms_inner"
+          type: array
+      required:
+      - address
+      - homestay_rooms
+      - id
+      - name
+      type: object
   securitySchemes:
     AccessCookie:
-      type: apiKey
+      description: Access JWT stored in an HttpOnly cookie.
       in: cookie
       name: jwt
-      description: Access JWT stored in an HttpOnly cookie.
-    RefreshCookie:
       type: apiKey
+    RefreshCookie:
+      description: Refresh JWT stored in an HttpOnly cookie.
       in: cookie
       name: refresh_token
-      description: Refresh JWT stored in an HttpOnly cookie.
+      type: apiKey

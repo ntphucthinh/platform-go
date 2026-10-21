@@ -21,6 +21,9 @@ type ServerInterface interface {
 	// Refresh authentication cookies
 	// (POST /auth/refresh)
 	Refresh(c *gin.Context)
+	// Get homestay list
+	// (GET /homestays)
+	FetchHomestays(c *gin.Context)
 	// Get users
 	// (GET /users)
 	GetUsers(c *gin.Context)
@@ -96,6 +99,19 @@ func (siw *ServerInterfaceWrapper) Refresh(c *gin.Context) {
 	siw.Handler.Refresh(c)
 }
 
+// FetchHomestays operation middleware
+func (siw *ServerInterfaceWrapper) FetchHomestays(c *gin.Context) {
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.FetchHomestays(c)
+}
+
 // GetUsers operation middleware
 func (siw *ServerInterfaceWrapper) GetUsers(c *gin.Context) {
 
@@ -153,6 +169,7 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.POST(options.BaseURL+"/auth/logout", wrapper.Logout)
 	router.GET(options.BaseURL+"/auth/me", wrapper.Me)
 	router.POST(options.BaseURL+"/auth/refresh", wrapper.Refresh)
+	router.GET(options.BaseURL+"/homestays", wrapper.FetchHomestays)
 	router.GET(options.BaseURL+"/users", wrapper.GetUsers)
 	router.POST(options.BaseURL+"/users", wrapper.CreateUser)
 }

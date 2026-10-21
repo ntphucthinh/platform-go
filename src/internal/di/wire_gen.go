@@ -23,3 +23,9 @@ func InitializeHandler(db *gorm.DB) *controller.UserController {
 	userController := controller.NewUserController(userUsecase, userQueryService)
 	return userController
 }
+
+func InitializeHomestayHandler(db *gorm.DB) *controller.HomestayController {
+	homestayQueryService := queryservice.NewHomestayQueryService(db)
+	homestayController := controller.NewHomestayController(homestayQueryService)
+	return homestayController
+}

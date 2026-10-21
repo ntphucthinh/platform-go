@@ -22,9 +22,12 @@ func TestInitializeControllers(t *testing.T, db *gorm.DB) (*TestHandlerSet, erro
 	userUsecase := usecases.NewUserUsecase(userRepository)
 	userQueryService := queryservice.NewUserQueryService(db)
 	userController := controller.NewUserController(userUsecase, userQueryService)
+	homestayQueryService := queryservice.NewHomestayQueryService(db)
+	homestayController := controller.NewHomestayController(homestayQueryService)
 	testHandlerSet := &TestHandlerSet{
-		Handler: userController,
-		DB:      db,
+		Handler:         userController,
+		HomestayHandler: homestayController,
+		DB:              db,
 	}
 	return testHandlerSet, nil
 }
@@ -32,6 +35,7 @@ func TestInitializeControllers(t *testing.T, db *gorm.DB) (*TestHandlerSet, erro
 // wire-test.go:
 
 type TestHandlerSet struct {
-	Handler *controller.UserController
-	DB      *gorm.DB
+	Handler         *controller.UserController
+	HomestayHandler *controller.HomestayController
+	DB              *gorm.DB
 }
