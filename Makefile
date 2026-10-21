@@ -63,8 +63,6 @@ tools:
 db-reset:
 	docker compose exec -T platform-db mysql -uroot -proot -e "DROP DATABASE IF EXISTS platform_db; CREATE DATABASE platform_db;"
 
-migrate-up:
-	migrate -path src/db/migrations -database "mysql://root:root@tcp(localhost:3309)/platform_db" up
 
 # run:
 # 	air -c .air.toml
