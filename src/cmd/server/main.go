@@ -13,12 +13,9 @@ import (
 
 	api "platform-go/generated/api"
 	"platform-go/internal/di"
-	"platform-go/internal/infrastructure/repository"
 	"platform-go/internal/infrastructure/security"
-	"platform-go/internal/interfaces/controller"
 	"platform-go/internal/middleware"
 	"platform-go/internal/pkg/app"
-	"platform-go/internal/usecases"
 )
 
 func main() {
@@ -63,12 +60,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("invalid JWT configuration: %v", err)
 	}
-	userHandler := di.InitializeHandler(db)
-	homestayHandler := di.InitializeHomestayHandler(db)
-	authUsecase := usecases.NewAuthUsecase(repository.NewMySQLUserRepository(db), jwtService)
-	authHandler := controller.NewAuthController(authUsecase, !app.IsLocal())
-	appHandler := controller.NewHandler(userHandler, authHandler, homestayHandler)
-
+	application := di.InitializeApplication(db, jwtService, !app.IsLocal())
 
 	r := gin.Default()
 
@@ -91,16 +83,16 @@ func main() {
 
 		c.Next()
 	})
-	r.Use(middleware.JWTAuth(authUsecase), middleware.CSRFProtection())
+	r.Use(middleware.JWTAuth(application.AuthUsecase), middleware.CSRFProtection())
 
 	r.GET("/health", func(c *gin.Context) { c.Status(http.StatusNoContent) })
 	// Register generated routes to the gin router
-	api.RegisterHandlers(r, appHandler)
+	api.RegisterHandlers(r, application.Controller)
 	// Keep the former unprefixed endpoints available while clients migrate to /auth/*.
-	r.POST("/login", appHandler.Login)
-	r.POST("/logout", appHandler.Logout)
-	r.GET("/me", appHandler.Me)
-	r.POST("/refresh", appHandler.Refresh)
+	r.POST("/login", application.Controller.Login)
+	r.POST("/logout", application.Controller.Logout)
+	r.GET("/me", application.Controller.Me)
+	r.POST("/refresh", application.Controller.Refresh)
 
 	port := os.Getenv("PORT")
 	if port == "" {
@@ -131,4 +123,3 @@ func loadEnv() {
 		}
 	}
 }
-

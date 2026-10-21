@@ -15,14 +15,7 @@ import (
 	"platform-go/internal/usecases"
 )
 
-type AuthController interface {
-	Login(c *gin.Context)
-	Logout(c *gin.Context)
-	Me(c *gin.Context)
-	Refresh(c *gin.Context)
-}
-
-type authController struct {
+type AuthController struct {
 	usecase       *usecases.AuthUsecase
 	secureCookies bool
 }

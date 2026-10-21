@@ -9,24 +9,30 @@ import (
 
 	"platform-go/internal/infrastructure/queryservice"
 	"platform-go/internal/infrastructure/repository"
+	"platform-go/internal/infrastructure/security"
 	"platform-go/internal/interfaces/controller"
 	"platform-go/internal/usecases"
 )
 
-func InitializeHandler(db *gorm.DB) *controller.UserController {
+// Application contains the HTTP endpoint controller and middleware dependencies.
+// It is assembled by the application's composition root.
+type Application struct {
+	Controller  *controller.BaseController
+	AuthUsecase *usecases.AuthUsecase
+}
+
+func InitializeApplication(db *gorm.DB, jwtService *security.JWTService, secureCookies bool) *Application {
 	wire.Build(
 		repository.NewMySQLUserRepository,
 		queryservice.NewUserQueryService,
-		usecases.NewUserUsecase,
-		controller.NewUserController,
-	)
-	return &controller.UserController{}
-}
-
-func InitializeHomestayHandler(db *gorm.DB) *controller.HomestayController {
-	wire.Build(
 		queryservice.NewHomestayQueryService,
+		usecases.NewUserUsecase,
+		usecases.NewAuthUsecase,
+		controller.NewUserController,
+		controller.NewAuthController,
 		controller.NewHomestayController,
+		controller.NewBaseController,
+		wire.Struct(new(Application), "*"),
 	)
-	return &controller.HomestayController{}
+	return nil
 }

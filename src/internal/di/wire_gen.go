@@ -10,22 +10,35 @@ import (
 	"gorm.io/gorm"
 	"platform-go/internal/infrastructure/queryservice"
 	"platform-go/internal/infrastructure/repository"
+	"platform-go/internal/infrastructure/security"
 	"platform-go/internal/interfaces/controller"
 	"platform-go/internal/usecases"
 )
 
 // Injectors from wire.go:
 
-func InitializeHandler(db *gorm.DB) *controller.UserController {
+func InitializeApplication(db *gorm.DB, jwtService *security.JWTService, secureCookies bool) *Application {
 	userRepository := repository.NewMySQLUserRepository(db)
 	userUsecase := usecases.NewUserUsecase(userRepository)
 	userQueryService := queryservice.NewUserQueryService(db)
 	userController := controller.NewUserController(userUsecase, userQueryService)
-	return userController
-}
-
-func InitializeHomestayHandler(db *gorm.DB) *controller.HomestayController {
+	authUsecase := usecases.NewAuthUsecase(userRepository, jwtService)
+	authController := controller.NewAuthController(authUsecase, secureCookies)
 	homestayQueryService := queryservice.NewHomestayQueryService(db)
 	homestayController := controller.NewHomestayController(homestayQueryService)
-	return homestayController
+	baseController := controller.NewBaseController(userController, authController, homestayController)
+	application := &Application{
+		Controller:  baseController,
+		AuthUsecase: authUsecase,
+	}
+	return application
+}
+
+// wire.go:
+
+// Application contains the HTTP endpoint controller and middleware dependencies.
+// It is assembled by the application's composition root.
+type Application struct {
+	Controller  *controller.BaseController
+	AuthUsecase *usecases.AuthUsecase
 }
