@@ -13,6 +13,7 @@ import (
 	"platform-go/internal/infrastructure/security"
 	"platform-go/internal/interfaces/controller"
 	"platform-go/internal/usecases"
+	"platform-go/internal/usecases/homestays/usecase"
 )
 
 // Injectors from wire.go:
@@ -25,7 +26,8 @@ func InitializeApplication(db *gorm.DB, jwtService *security.JWTService, secureC
 	authUsecase := usecases.NewAuthUsecase(userRepository, jwtService)
 	authController := controller.NewAuthController(authUsecase, secureCookies)
 	homestayQueryService := queryservice.NewHomestayQueryService(db)
-	homestayController := controller.NewHomestayController(homestayQueryService)
+	fetchHomestaysUseCase := usecase.NewFetchHomestaysUseCase(homestayQueryService)
+	homestayController := controller.NewHomestayController(fetchHomestaysUseCase)
 	baseController := controller.NewBaseController(userController, authController, homestayController)
 	application := &Application{
 		Controller:  baseController,

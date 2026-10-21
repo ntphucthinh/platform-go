@@ -12,6 +12,7 @@ import (
 	"platform-go/internal/infrastructure/repository"
 	"platform-go/internal/interfaces/controller"
 	"platform-go/internal/usecases"
+	"platform-go/internal/usecases/homestays/usecase"
 	"testing"
 )
 
@@ -23,7 +24,8 @@ func TestInitializeControllers(t *testing.T, db *gorm.DB) (*TestHandlerSet, erro
 	userQueryService := queryservice.NewUserQueryService(db)
 	userController := controller.NewUserController(userUsecase, userQueryService)
 	homestayQueryService := queryservice.NewHomestayQueryService(db)
-	homestayController := controller.NewHomestayController(homestayQueryService)
+	fetchHomestaysUseCase := usecase.NewFetchHomestaysUseCase(homestayQueryService)
+	homestayController := controller.NewHomestayController(fetchHomestaysUseCase)
 	testHandlerSet := &TestHandlerSet{
 		Handler:         userController,
 		HomestayHandler: homestayController,

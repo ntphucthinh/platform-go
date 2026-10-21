@@ -12,6 +12,8 @@ import (
 	"platform-go/internal/infrastructure/security"
 	"platform-go/internal/interfaces/controller"
 	"platform-go/internal/usecases"
+	homestayqueryservice "platform-go/internal/usecases/homestays/queryservice"
+	homestayusecase "platform-go/internal/usecases/homestays/usecase"
 )
 
 // Application contains the HTTP endpoint controller and middleware dependencies.
@@ -26,8 +28,10 @@ func InitializeApplication(db *gorm.DB, jwtService *security.JWTService, secureC
 		repository.NewMySQLUserRepository,
 		queryservice.NewUserQueryService,
 		queryservice.NewHomestayQueryService,
+		wire.Bind(new(homestayqueryservice.HomestayQueryService), new(*queryservice.HomestayQueryService)),
 		usecases.NewUserUsecase,
 		usecases.NewAuthUsecase,
+		homestayusecase.NewFetchHomestaysUseCase,
 		controller.NewUserController,
 		controller.NewAuthController,
 		controller.NewHomestayController,

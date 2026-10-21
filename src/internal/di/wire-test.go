@@ -13,6 +13,8 @@ import (
 	"platform-go/internal/infrastructure/repository"
 	"platform-go/internal/interfaces/controller"
 	"platform-go/internal/usecases"
+	homestayqueryservice "platform-go/internal/usecases/homestays/queryservice"
+	homestayusecase "platform-go/internal/usecases/homestays/usecase"
 )
 
 type TestHandlerSet struct {
@@ -26,7 +28,9 @@ func TestInitializeControllers(t *testing.T, db *gorm.DB) (*TestHandlerSet, erro
 		repository.NewMySQLUserRepository,
 		queryservice.NewUserQueryService,
 		queryservice.NewHomestayQueryService,
+		wire.Bind(new(homestayqueryservice.HomestayQueryService), new(*queryservice.HomestayQueryService)),
 		usecases.NewUserUsecase,
+		homestayusecase.NewFetchHomestaysUseCase,
 		controller.NewUserController,
 		controller.NewHomestayController,
 		wire.Struct(new(TestHandlerSet), "*"),
