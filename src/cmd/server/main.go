@@ -113,10 +113,20 @@ func main() {
 
 func loadEnv() {
 	if app.IsLocal() {
-		// Nạp file .env.local tương tự như dự án store của bạn
+		// Nạp file .env.local
 		err := godotenv.Overload(".env.local")
 		if err != nil {
 			log.Println("Không thể nạp file .env.local, sử dụng biến môi trường hệ thống")
 		}
+	} else if app.IsStaging() {
+		// Nạp file .env.staging hoặc env.staging nếu có
+		err := godotenv.Overload(".env.staging")
+		if err != nil {
+			err = godotenv.Overload("env.staging")
+		}
+		if err != nil {
+			log.Println("Không thể nạp file .env.staging/env.staging, sử dụng biến môi trường hệ thống")
+		}
 	}
 }
+

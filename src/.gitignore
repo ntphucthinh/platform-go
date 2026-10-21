@@ -1,4 +1,7 @@
 # env file
 .env*
+env.*
+!.env*.sample
+!.sample.env
 
 tmp/

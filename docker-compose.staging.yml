@@ -1,0 +1,73 @@
+networks:
+  platform-staging-network:
+    name: platform-staging-network
+
+services:
+  platform-db:
+    build:
+      context: .
+      dockerfile: dockerfiles/mysql/Dockerfile
+    restart: unless-stopped
+    env_file:
+      - path: .env.staging
+        required: false
+      - path: env.staging
+        required: false
+      - path: src/.env.staging
+        required: false
+      - path: src/env.staging
+        required: false
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-platform_db}
+      MYSQL_USER: ${MYSQL_USER:-platform_user}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-staging_password}
+    ports:
+      - "${DB_PORT_MAPPING:-3306}:3306"
+    volumes:
+      - db_staging_data:/var/lib/mysql
+      - ./dockerfiles/mysql/my.cnf:/etc/my.cnf
+      - ./dockerfiles/mysql/init:/docker-entrypoint-initdb.d
+    networks:
+      platform-staging-network:
+        aliases:
+          - platform-db
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Go API Service (Staging)
+  platform-api:
+    build:
+      context: .
+      dockerfile: dockerfiles/go/platform/Dockerfile.staging
+    restart: unless-stopped
+    ports:
+      - "${PORT:-8080}:8080"
+    env_file:
+      - path: .env.staging
+        required: false
+      - path: env.staging
+        required: false
+      - path: src/.env.staging
+        required: false
+      - path: src/env.staging
+        required: false
+    environment:
+      APP_ENV: staging
+      PORT: "8080"
+      DB_HOST: platform-db
+      DB_PORT: "3306"
+    depends_on:
+      platform-db:
+        condition: service_healthy
+    networks:
+      platform-staging-network:
+        aliases:
+          - platform-api
+          - backend.platform.internal
+
+volumes:
+  db_staging_data:

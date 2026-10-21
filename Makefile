@@ -19,9 +19,35 @@ restart:
 ps:
 	docker compose ps
 
+# --- Staging Server Commands ---
+build-staging:
+	docker compose -f docker-compose.staging.yml build
+
+build-staging-nc:
+	docker compose -f docker-compose.staging.yml build --no-cache
+
+up-staging:
+	docker compose -f docker-compose.staging.yml up -d
+
+down-staging:
+	docker compose -f docker-compose.staging.yml down
+
+restart-staging:
+	docker compose -f docker-compose.staging.yml restart
+
+ps-staging:
+	docker compose -f docker-compose.staging.yml ps
+
+logs-staging:
+	docker compose -f docker-compose.staging.yml logs -f platform-api
+
+migrate-staging-up:
+	docker compose -f docker-compose.staging.yml exec platform-api migrate -path db/migrations -database "mysql://root:root@tcp(platform-db)/platform_db" up
+
 set-up-githooks:
 	git config --local core.hooksPath .githooks
 	chmod -R +x .githooks/
+
 
 # Generate backend + frontend (Alias for codegen)
 gen:

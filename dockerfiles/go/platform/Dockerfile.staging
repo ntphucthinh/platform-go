@@ -1,0 +1,37 @@
+# Stage 1: Build stage
+FROM golang:1.24-alpine AS builder
+
+WORKDIR /app
+
+RUN apk add --no-cache git ca-certificates tzdata
+
+# Cache dependencies
+COPY src/go.mod src/go.sum ./
+RUN go mod download
+
+# Copy source code
+COPY src/ .
+
+# Install migrate CLI tool in builder stage
+RUN go install -tags 'mysql' github.com/golang-migrate/migrate/v4/cmd/migrate@v4.18.1
+
+# Build optimized binary
+RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-w -s" -o /app/main ./cmd/server
+
+# Stage 2: Runtime stage
+FROM alpine:3.21
+
+RUN apk add --no-cache ca-certificates tzdata
+
+WORKDIR /app
+
+# Copy binary and migrate tool
+COPY --from=builder /app/main .
+COPY --from=builder /go/bin/migrate /usr/local/bin/migrate
+
+# Copy migration files for database updates
+COPY src/db/migrations ./db/migrations
+
+EXPOSE 8080
+
+CMD ["./main"]

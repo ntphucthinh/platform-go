@@ -21,8 +21,15 @@ type User struct {
 }
 
 func main() {
-	// Nạp env từ file .env.local trong src/
-	godotenv.Load(".env.local")
+	// Nạp env từ file tương ứng theo môi trường
+	if os.Getenv("APP_ENV") == "staging" {
+		if err := godotenv.Load(".env.staging"); err != nil {
+			_ = godotenv.Load("env.staging")
+		}
+	} else {
+		_ = godotenv.Load(".env.local")
+	}
+
 
 	dsn := os.Getenv("DB_DSN")
 	if dsn == "" {
