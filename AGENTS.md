@@ -67,7 +67,7 @@ Use GORM with MySQL and propagate the request context through `db.WithContext(ct
 
 The repository does not currently centralize transaction handling; no explicit transaction pattern exists in application code. For a new atomic multi-write flow, keep the boundary explicit and close to the repository/usecase that owns it, following the surrounding implementation.
 
-Migrations use `golang-migrate`, named `<timestamp>_<description>.up.sql` and matching `.down.sql`. Supply both directions when adding a migration. The current migration history includes two duplicate `init_users_table` migrations; do not rewrite applied migration history merely to clean it up. The seed program is `db/seed/seed.go` and is run inside the API container.
+Migrations use `golang-migrate`, named `<timestamp>_<description>.up.sql` and matching `.down.sql`. Supply both directions when adding a migration. The migration history was consolidated into a single `create_users_table` migration before staging was first deployed; from now on, do not rewrite applied migration history—add a new migration instead. The seed program is `db/seed/seed.go` and is run inside the API container.
 
 ## Dependency Injection
 
