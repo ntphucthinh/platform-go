@@ -15,77 +15,87 @@ import (
 
 var ErrInvalidCredentials = errors.New("invalid credentials")
 
+const (
+	accessTokenLifetime  = 24 * time.Hour
+	refreshTokenLifetime = 7 * 24 * time.Hour
+)
+
 type AuthUsecase struct {
 	repo user.UserRepository
 	jwt  *security.JWTService
+}
+
+type AuthTokens struct {
+	AccessToken  string
+	RefreshToken string
+	CSRFToken    string
 }
 
 func NewAuthUsecase(repo user.UserRepository, jwt *security.JWTService) *AuthUsecase {
 	return &AuthUsecase{repo: repo, jwt: jwt}
 }
 
-func (u *AuthUsecase) Login(ctx context.Context, email, password string) (user.AuthUser, string, string, string, error) {
+func (u *AuthUsecase) Login(ctx context.Context, email, password string) (AuthTokens, error) {
 	account, err := u.repo.FindAuthUserByEmail(ctx, email)
-	if err != nil || !account.Active || account.AccountType != "admin" || bcrypt.CompareHashAndPassword([]byte(account.PasswordHash), []byte(password)) != nil {
-		return user.AuthUser{}, "", "", "", ErrInvalidCredentials
+	if err != nil || !isActiveAdministrator(account) || bcrypt.CompareHashAndPassword([]byte(account.PasswordHash), []byte(password)) != nil {
+		return AuthTokens{}, ErrInvalidCredentials
 	}
-	access, err := u.createToken(account, security.AccessTokenType, 24*time.Hour)
-	if err != nil {
-		return user.AuthUser{}, "", "", "", err
-	}
-	refresh, err := u.createToken(account, security.RefreshTokenType, 7*24*time.Hour)
-	if err != nil {
-		return user.AuthUser{}, "", "", "", err
-	}
-	csrf, err := security.NewCSRFToken()
-	if err != nil {
-		return user.AuthUser{}, "", "", "", err
-	}
-	return account, access, refresh, csrf, nil
+	return u.newTokens(account)
 }
 
-func (u *AuthUsecase) Refresh(ctx context.Context, refreshToken string) (string, string, string, error) {
+func (u *AuthUsecase) Refresh(ctx context.Context, refreshToken string) (AuthTokens, error) {
 	claims, err := u.jwt.Parse(refreshToken, security.RefreshTokenType)
 	if err != nil {
-		return "", "", "", ErrInvalidCredentials
+		return AuthTokens{}, ErrInvalidCredentials
 	}
 	id, err := strconv.ParseInt(claims.Subject, 10, 64)
 	if err != nil {
-		return "", "", "", ErrInvalidCredentials
+		return AuthTokens{}, ErrInvalidCredentials
 	}
 	account, err := u.repo.FindAuthUserByID(ctx, id)
-	if err != nil || !account.Active || account.AccountType != "admin" {
-		return "", "", "", ErrInvalidCredentials
+	if err != nil || !isActiveAdministrator(account) {
+		return AuthTokens{}, ErrInvalidCredentials
 	}
-	access, err := u.createToken(account, security.AccessTokenType, 24*time.Hour)
-	if err != nil {
-		return "", "", "", err
-	}
-	refresh, err := u.createToken(account, security.RefreshTokenType, 7*24*time.Hour)
-	if err != nil {
-		return "", "", "", err
-	}
-	csrf, err := security.NewCSRFToken()
-	if err != nil {
-		return "", "", "", err
-	}
-	return access, refresh, csrf, nil
+	return u.newTokens(account)
 }
 
+// CurrentUser reloads the authenticated account to enforce its active administrator status.
 func (u *AuthUsecase) CurrentUser(ctx context.Context, subject string) (user.AuthUser, error) {
 	id, err := strconv.ParseInt(subject, 10, 64)
 	if err != nil {
 		return user.AuthUser{}, ErrInvalidCredentials
 	}
 	account, err := u.repo.FindAuthUserByID(ctx, id)
-	if errors.Is(err, gorm.ErrRecordNotFound) || !account.Active || account.AccountType != "admin" {
+	if errors.Is(err, gorm.ErrRecordNotFound) || !isActiveAdministrator(account) {
 		return user.AuthUser{}, ErrInvalidCredentials
 	}
 	return account, err
 }
+
 func (u *AuthUsecase) ParseAccess(token string) (security.Claims, error) {
 	return u.jwt.Parse(token, security.AccessTokenType)
 }
-func (u *AuthUsecase) createToken(a user.AuthUser, kind string, duration time.Duration) (string, error) {
-	return u.jwt.Create(security.Claims{Subject: strconv.FormatInt(a.ID, 10), Email: a.Email, AccountType: a.AccountType, TokenType: kind}, duration)
+
+func (u *AuthUsecase) newTokens(account user.AuthUser) (AuthTokens, error) {
+	access, err := u.createToken(account, security.AccessTokenType, accessTokenLifetime)
+	if err != nil {
+		return AuthTokens{}, err
+	}
+	refresh, err := u.createToken(account, security.RefreshTokenType, refreshTokenLifetime)
+	if err != nil {
+		return AuthTokens{}, err
+	}
+	csrf, err := security.NewCSRFToken()
+	if err != nil {
+		return AuthTokens{}, err
+	}
+	return AuthTokens{AccessToken: access, RefreshToken: refresh, CSRFToken: csrf}, nil
+}
+
+func isActiveAdministrator(account user.AuthUser) bool {
+	return account.Active && account.AccountType == "admin"
+}
+
+func (u *AuthUsecase) createToken(account user.AuthUser, kind string, duration time.Duration) (string, error) {
+	return u.jwt.Create(security.Claims{Subject: strconv.FormatInt(account.ID, 10), Email: account.Email, AccountType: account.AccountType, TokenType: kind}, duration)
 }

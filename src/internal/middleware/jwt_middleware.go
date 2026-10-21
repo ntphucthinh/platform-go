@@ -12,14 +12,8 @@ import (
 )
 
 func JWTAuth(auth *usecases.AuthUsecase) gin.HandlerFunc {
-	skipPaths := map[string]bool{
-		"/login":   true,
-		"/refresh": true,
-		"/health":  true,
-	}
-
 	return func(c *gin.Context) {
-		if skipPaths[c.Request.URL.Path] {
+		if isAccessTokenExemptPath(c.Request.URL.Path) {
 			c.Next()
 			return
 		}
@@ -45,9 +39,8 @@ func JWTAuth(auth *usecases.AuthUsecase) gin.HandlerFunc {
 
 func CSRFProtection() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		// Every authenticated API must present the CSRF token returned by login.
-		// OPTIONS is left open so browser CORS preflight requests can complete.
-		if c.Request.Method == http.MethodOptions || c.Request.URL.Path == "/login" || c.Request.URL.Path == "/health" {
+		// Refresh rotates cookies, so it remains CSRF-protected even though it does not need an access token.
+		if c.Request.Method == http.MethodOptions || isCSRFExemptPath(c.Request.URL.Path) {
 			c.Next()
 			return
 		}
@@ -60,6 +53,15 @@ func CSRFProtection() gin.HandlerFunc {
 		c.Next()
 	}
 }
+
+func isAccessTokenExemptPath(path string) bool {
+	return path == "/auth/login" || path == "/auth/refresh" || path == "/login" || path == "/refresh" || path == "/health"
+}
+
+func isCSRFExemptPath(path string) bool {
+	return path == "/auth/login" || path == "/login" || path == "/health"
+}
+
 func unauthorized(c *gin.Context) {
 	c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
 }

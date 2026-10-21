@@ -9,6 +9,22 @@ import (
 	openapi_types "github.com/oapi-codegen/runtime/types"
 )
 
+const (
+	AccessCookieScopes  = "AccessCookie.Scopes"
+	RefreshCookieScopes = "RefreshCookie.Scopes"
+)
+
+// AuthResponse defines model for AuthResponse.
+type AuthResponse struct {
+	Data    AuthResponseData `json:"data"`
+	Message string           `json:"message"`
+}
+
+// AuthResponseData defines model for AuthResponseData.
+type AuthResponseData struct {
+	CsrfToken string `json:"csrfToken"`
+}
+
 // CreateUser defines model for CreateUser.
 type CreateUser struct {
 	Name string `json:"name"`

@@ -11,11 +11,11 @@
             $ref: '../components/schemas/auth.yml#/LoginRequest'
     responses:
       '200':
-        description: Authenticated; JWT, refresh and CSRF cookies are set. Send csrfToken as X-CSRF-Token on every authenticated request.
+        description: Authenticated; access, refresh and CSRF cookies are set. Send csrfToken as X-CSRF-Token on authenticated requests.
         content:
           application/json:
             schema:
-              $ref: '../components/schemas/auth.yml#/LoginUser'
+              $ref: '../components/schemas/auth.yml#/AuthResponse'
       '400': {description: Invalid request}
       '401': {description: Invalid credentials}
 /refresh:
@@ -23,19 +23,23 @@
     summary: Refresh authentication cookies
     operationId: refresh
     tags: [auth]
+    security:
+      - RefreshCookie: []
     responses:
       '200':
-        description: Cookies refreshed. Update the frontend CSRF token from the response.
+        description: Access, refresh and CSRF cookies are rotated. Update the frontend CSRF token from the response.
         content:
           application/json:
             schema:
-              $ref: '../components/schemas/auth.yml#/AuthTokenResponse'
+              $ref: '../components/schemas/auth.yml#/AuthResponse'
       '401': {description: Invalid refresh token}
 /logout:
   post:
     summary: Clear authentication cookies
     operationId: logout
     tags: [auth]
+    security:
+      - AccessCookie: []
     responses:
       '204': {description: Logged out}
 /me:
@@ -43,6 +47,8 @@
     summary: Get the currently authenticated administrator
     operationId: me
     tags: [auth]
+    security:
+      - AccessCookie: []
     responses:
       '200':
         description: Current user

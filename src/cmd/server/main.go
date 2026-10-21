@@ -59,10 +59,6 @@ func main() {
 	}
 
 	jwtSecret := os.Getenv("JWT_SECRET")
-	if jwtSecret == "" && app.IsLocal() {
-		jwtSecret = "local-development-secret-change-me-32"
-		log.Println("JWT_SECRET is not set; using a development-only secret")
-	}
 	jwtService, err := security.NewJWTService(jwtSecret)
 	if err != nil {
 		log.Fatalf("invalid JWT configuration: %v", err)
@@ -98,6 +94,11 @@ func main() {
 	r.GET("/health", func(c *gin.Context) { c.Status(http.StatusNoContent) })
 	// Register generated routes to the gin router
 	api.RegisterHandlers(r, appHandler)
+	// Keep the former unprefixed endpoints available while clients migrate to /auth/*.
+	r.POST("/login", appHandler.Login)
+	r.POST("/logout", appHandler.Logout)
+	r.GET("/me", appHandler.Me)
+	r.POST("/refresh", appHandler.Refresh)
 
 	port := os.Getenv("PORT")
 	if port == "" {

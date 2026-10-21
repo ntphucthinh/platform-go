@@ -16,13 +16,15 @@ LoginUser:
     name: {type: string}
     email: {type: string, format: email}
     accountType: {type: string, example: admin}
-AuthTokenResponse:
+AuthResponse:
   type: object
   required: [data, message]
   properties:
     data:
-      type: object
-      required: [csrfToken]
-      properties:
-        csrfToken: {type: string}
+      $ref: '#/AuthResponseData'
     message: {type: string}
+AuthResponseData:
+  type: object
+  required: [csrfToken]
+  properties:
+    csrfToken: {type: string}
