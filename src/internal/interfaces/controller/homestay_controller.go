@@ -31,11 +31,11 @@ func (hc *HomestayController) FetchHomestays(c *gin.Context) {
 
 	items := make([]api.FetchHomestayResponse, len(homestays))
 	for i, h := range homestays {
-		rooms := make([]api.FetchHomestayResponseDataHomestayRoomsInner, len(h.Rooms))
+		rooms := make([]api.FetchHomestayResponseHomestayRoomsInner, len(h.Rooms))
 		for j, r := range h.Rooms {
-			images := make([]api.FetchHomestayResponseDataHomestayRoomsInnerHomestayImagesInner, len(r.Images))
+			images := make([]api.FetchHomestayResponseHomestayRoomsInnerHomestayImagesInner, len(r.Images))
 			for k, img := range r.Images {
-				images[k] = api.FetchHomestayResponseDataHomestayRoomsInnerHomestayImagesInner{
+				images[k] = api.FetchHomestayResponseHomestayRoomsInnerHomestayImagesInner{
 					Id:         img.ID,
 					HomestayId: img.HomestayID,
 					RoomId:     img.RoomID,
@@ -45,7 +45,7 @@ func (hc *HomestayController) FetchHomestays(c *gin.Context) {
 				}
 			}
 
-			rooms[j] = api.FetchHomestayResponseDataHomestayRoomsInner{
+			rooms[j] = api.FetchHomestayResponseHomestayRoomsInner{
 				Id:             r.ID,
 				HomestayId:     r.HomestayID,
 				Name:           r.Name,
@@ -58,14 +58,12 @@ func (hc *HomestayController) FetchHomestays(c *gin.Context) {
 		}
 
 		items[i] = api.FetchHomestayResponse{
-			Data: api.FetchHomestayResponseData{
-				Id:            h.ID,
-				Name:          h.Name,
-				Address:       h.Address,
-				Description:   h.Description,
-				GoogleMapsUrl: h.GoogleMapsURL,
-				HomestayRooms: rooms,
-			},
+			Id:            h.ID,
+			Name:          h.Name,
+			Address:       h.Address,
+			Description:   h.Description,
+			GoogleMapsUrl: h.GoogleMapsURL,
+			HomestayRooms: rooms,
 		}
 	}
 

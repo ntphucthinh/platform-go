@@ -32,33 +32,28 @@ type CreateUser struct {
 
 // FetchHomestayResponse defines model for FetchHomestayResponse.
 type FetchHomestayResponse struct {
-	Data FetchHomestayResponseData `json:"data"`
+	Address       string                                    `json:"address"`
+	Description   *string                                   `json:"description"`
+	GoogleMapsUrl *string                                   `json:"google_maps_url"`
+	HomestayRooms []FetchHomestayResponseHomestayRoomsInner `json:"homestay_rooms"`
+	Id            int64                                     `json:"id"`
+	Name          string                                    `json:"name"`
 }
 
-// FetchHomestayResponseData defines model for FetchHomestayResponse_data.
-type FetchHomestayResponseData struct {
-	Address       string                                        `json:"address"`
-	Description   *string                                       `json:"description"`
-	GoogleMapsUrl *string                                       `json:"google_maps_url"`
-	HomestayRooms []FetchHomestayResponseDataHomestayRoomsInner `json:"homestay_rooms"`
-	Id            int64                                         `json:"id"`
-	Name          string                                        `json:"name"`
+// FetchHomestayResponseHomestayRoomsInner defines model for FetchHomestayResponse_homestay_rooms_inner.
+type FetchHomestayResponseHomestayRoomsInner struct {
+	Description    *string                                                      `json:"description"`
+	HomestayId     int64                                                        `json:"homestay_id"`
+	HomestayImages []FetchHomestayResponseHomestayRoomsInnerHomestayImagesInner `json:"homestay_images"`
+	Id             int64                                                        `json:"id"`
+	Name           string                                                       `json:"name"`
+	PriceAmount    *float64                                                     `json:"price_amount,omitempty"`
+	PriceUnit      *string                                                      `json:"price_unit,omitempty"`
+	SortOrder      int32                                                        `json:"sort_order"`
 }
 
-// FetchHomestayResponseDataHomestayRoomsInner defines model for FetchHomestayResponse_data_homestay_rooms_inner.
-type FetchHomestayResponseDataHomestayRoomsInner struct {
-	Description    *string                                                          `json:"description"`
-	HomestayId     int64                                                            `json:"homestay_id"`
-	HomestayImages []FetchHomestayResponseDataHomestayRoomsInnerHomestayImagesInner `json:"homestay_images"`
-	Id             int64                                                            `json:"id"`
-	Name           string                                                           `json:"name"`
-	PriceAmount    *float64                                                         `json:"price_amount,omitempty"`
-	PriceUnit      *string                                                          `json:"price_unit,omitempty"`
-	SortOrder      int32                                                            `json:"sort_order"`
-}
-
-// FetchHomestayResponseDataHomestayRoomsInnerHomestayImagesInner defines model for FetchHomestayResponse_data_homestay_rooms_inner_homestay_images_inner.
-type FetchHomestayResponseDataHomestayRoomsInnerHomestayImagesInner struct {
+// FetchHomestayResponseHomestayRoomsInnerHomestayImagesInner defines model for FetchHomestayResponse_homestay_rooms_inner_homestay_images_inner.
+type FetchHomestayResponseHomestayRoomsInnerHomestayImagesInner struct {
 	HomestayId int64  `json:"homestay_id"`
 	Id         int64  `json:"id"`
 	ImagePath  string `json:"image_path"`

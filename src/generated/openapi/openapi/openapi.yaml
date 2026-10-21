@@ -229,265 +229,6 @@ components:
       type: object
     FetchHomestayResponse:
       example:
-        data:
-          id: 28
-          name: tên home
-          address: địa điểm
-          description: mô tả chung
-          google_maps_url: https://www.google.com/maps
-          homestay_rooms:
-          - id: 17
-            homestay_id: 28
-            name: Room 1
-            description: mô tả room
-            sort_order: 1
-            price_amount: 10000.0
-            price_unit: per_room_per_night
-            homestay_images:
-            - id: 178
-              homestay_id: 28
-              room_id: 17
-              image_path: homestays/28/1792554894062_zbd0lt_halo.png
-              sort_order: 1
-              is_cover: true
-            - id: 178
-              homestay_id: 28
-              room_id: 17
-              image_path: homestays/28/1792554894062_zbd0lt_halo.png
-              sort_order: 1
-              is_cover: true
-          - id: 17
-            homestay_id: 28
-            name: Room 1
-            description: mô tả room
-            sort_order: 1
-            price_amount: 10000.0
-            price_unit: per_room_per_night
-            homestay_images:
-            - id: 178
-              homestay_id: 28
-              room_id: 17
-              image_path: homestays/28/1792554894062_zbd0lt_halo.png
-              sort_order: 1
-              is_cover: true
-            - id: 178
-              homestay_id: 28
-              room_id: 17
-              image_path: homestays/28/1792554894062_zbd0lt_halo.png
-              sort_order: 1
-              is_cover: true
-      properties:
-        data:
-          $ref: "#/components/schemas/FetchHomestayResponse_data"
-      required:
-      - data
-      type: object
-    fetchHomestays_200_response:
-      example:
-        data:
-        - data:
-            id: 28
-            name: tên home
-            address: địa điểm
-            description: mô tả chung
-            google_maps_url: https://www.google.com/maps
-            homestay_rooms:
-            - id: 17
-              homestay_id: 28
-              name: Room 1
-              description: mô tả room
-              sort_order: 1
-              price_amount: 10000.0
-              price_unit: per_room_per_night
-              homestay_images:
-              - id: 178
-                homestay_id: 28
-                room_id: 17
-                image_path: homestays/28/1792554894062_zbd0lt_halo.png
-                sort_order: 1
-                is_cover: true
-              - id: 178
-                homestay_id: 28
-                room_id: 17
-                image_path: homestays/28/1792554894062_zbd0lt_halo.png
-                sort_order: 1
-                is_cover: true
-            - id: 17
-              homestay_id: 28
-              name: Room 1
-              description: mô tả room
-              sort_order: 1
-              price_amount: 10000.0
-              price_unit: per_room_per_night
-              homestay_images:
-              - id: 178
-                homestay_id: 28
-                room_id: 17
-                image_path: homestays/28/1792554894062_zbd0lt_halo.png
-                sort_order: 1
-                is_cover: true
-              - id: 178
-                homestay_id: 28
-                room_id: 17
-                image_path: homestays/28/1792554894062_zbd0lt_halo.png
-                sort_order: 1
-                is_cover: true
-        - data:
-            id: 28
-            name: tên home
-            address: địa điểm
-            description: mô tả chung
-            google_maps_url: https://www.google.com/maps
-            homestay_rooms:
-            - id: 17
-              homestay_id: 28
-              name: Room 1
-              description: mô tả room
-              sort_order: 1
-              price_amount: 10000.0
-              price_unit: per_room_per_night
-              homestay_images:
-              - id: 178
-                homestay_id: 28
-                room_id: 17
-                image_path: homestays/28/1792554894062_zbd0lt_halo.png
-                sort_order: 1
-                is_cover: true
-              - id: 178
-                homestay_id: 28
-                room_id: 17
-                image_path: homestays/28/1792554894062_zbd0lt_halo.png
-                sort_order: 1
-                is_cover: true
-            - id: 17
-              homestay_id: 28
-              name: Room 1
-              description: mô tả room
-              sort_order: 1
-              price_amount: 10000.0
-              price_unit: per_room_per_night
-              homestay_images:
-              - id: 178
-                homestay_id: 28
-                room_id: 17
-                image_path: homestays/28/1792554894062_zbd0lt_halo.png
-                sort_order: 1
-                is_cover: true
-              - id: 178
-                homestay_id: 28
-                room_id: 17
-                image_path: homestays/28/1792554894062_zbd0lt_halo.png
-                sort_order: 1
-                is_cover: true
-      properties:
-        data:
-          items:
-            $ref: "#/components/schemas/FetchHomestayResponse"
-          type: array
-      required:
-      - data
-      type: object
-    FetchHomestayResponse_data_homestay_rooms_inner_homestay_images_inner:
-      example:
-        id: 178
-        homestay_id: 28
-        room_id: 17
-        image_path: homestays/28/1792554894062_zbd0lt_halo.png
-        sort_order: 1
-        is_cover: true
-      properties:
-        id:
-          example: 178
-          format: int64
-          type: integer
-        homestay_id:
-          example: 28
-          format: int64
-          type: integer
-        room_id:
-          example: 17
-          format: int64
-          nullable: true
-          type: integer
-        image_path:
-          example: homestays/28/1792554894062_zbd0lt_halo.png
-          type: string
-        sort_order:
-          example: 1
-          format: int32
-          type: integer
-        is_cover:
-          example: true
-          type: boolean
-      required:
-      - homestay_id
-      - id
-      - image_path
-      - is_cover
-      - sort_order
-      type: object
-    FetchHomestayResponse_data_homestay_rooms_inner:
-      example:
-        id: 17
-        homestay_id: 28
-        name: Room 1
-        description: mô tả room
-        sort_order: 1
-        price_amount: 10000.0
-        price_unit: per_room_per_night
-        homestay_images:
-        - id: 178
-          homestay_id: 28
-          room_id: 17
-          image_path: homestays/28/1792554894062_zbd0lt_halo.png
-          sort_order: 1
-          is_cover: true
-        - id: 178
-          homestay_id: 28
-          room_id: 17
-          image_path: homestays/28/1792554894062_zbd0lt_halo.png
-          sort_order: 1
-          is_cover: true
-      properties:
-        id:
-          example: 17
-          format: int64
-          type: integer
-        homestay_id:
-          example: 28
-          format: int64
-          type: integer
-        name:
-          example: Room 1
-          type: string
-        description:
-          example: mô tả room
-          nullable: true
-          type: string
-        sort_order:
-          example: 1
-          format: int32
-          type: integer
-        price_amount:
-          example: 10000.0
-          format: double
-          type: number
-        price_unit:
-          example: per_room_per_night
-          type: string
-        homestay_images:
-          items:
-            $ref: "#/components/schemas/FetchHomestayResponse_data_homestay_rooms_inner_homestay_images_inner"
-          type: array
-      required:
-      - homestay_id
-      - homestay_images
-      - id
-      - name
-      - sort_order
-      type: object
-    FetchHomestayResponse_data:
-      example:
         id: 28
         name: tên home
         address: địa điểm
@@ -556,13 +297,215 @@ components:
           type: string
         homestay_rooms:
           items:
-            $ref: "#/components/schemas/FetchHomestayResponse_data_homestay_rooms_inner"
+            $ref: "#/components/schemas/FetchHomestayResponse_homestay_rooms_inner"
           type: array
       required:
       - address
       - homestay_rooms
       - id
       - name
+      type: object
+    fetchHomestays_200_response:
+      example:
+        data:
+        - id: 28
+          name: tên home
+          address: địa điểm
+          description: mô tả chung
+          google_maps_url: https://www.google.com/maps
+          homestay_rooms:
+          - id: 17
+            homestay_id: 28
+            name: Room 1
+            description: mô tả room
+            sort_order: 1
+            price_amount: 10000.0
+            price_unit: per_room_per_night
+            homestay_images:
+            - id: 178
+              homestay_id: 28
+              room_id: 17
+              image_path: homestays/28/1792554894062_zbd0lt_halo.png
+              sort_order: 1
+              is_cover: true
+            - id: 178
+              homestay_id: 28
+              room_id: 17
+              image_path: homestays/28/1792554894062_zbd0lt_halo.png
+              sort_order: 1
+              is_cover: true
+          - id: 17
+            homestay_id: 28
+            name: Room 1
+            description: mô tả room
+            sort_order: 1
+            price_amount: 10000.0
+            price_unit: per_room_per_night
+            homestay_images:
+            - id: 178
+              homestay_id: 28
+              room_id: 17
+              image_path: homestays/28/1792554894062_zbd0lt_halo.png
+              sort_order: 1
+              is_cover: true
+            - id: 178
+              homestay_id: 28
+              room_id: 17
+              image_path: homestays/28/1792554894062_zbd0lt_halo.png
+              sort_order: 1
+              is_cover: true
+        - id: 28
+          name: tên home
+          address: địa điểm
+          description: mô tả chung
+          google_maps_url: https://www.google.com/maps
+          homestay_rooms:
+          - id: 17
+            homestay_id: 28
+            name: Room 1
+            description: mô tả room
+            sort_order: 1
+            price_amount: 10000.0
+            price_unit: per_room_per_night
+            homestay_images:
+            - id: 178
+              homestay_id: 28
+              room_id: 17
+              image_path: homestays/28/1792554894062_zbd0lt_halo.png
+              sort_order: 1
+              is_cover: true
+            - id: 178
+              homestay_id: 28
+              room_id: 17
+              image_path: homestays/28/1792554894062_zbd0lt_halo.png
+              sort_order: 1
+              is_cover: true
+          - id: 17
+            homestay_id: 28
+            name: Room 1
+            description: mô tả room
+            sort_order: 1
+            price_amount: 10000.0
+            price_unit: per_room_per_night
+            homestay_images:
+            - id: 178
+              homestay_id: 28
+              room_id: 17
+              image_path: homestays/28/1792554894062_zbd0lt_halo.png
+              sort_order: 1
+              is_cover: true
+            - id: 178
+              homestay_id: 28
+              room_id: 17
+              image_path: homestays/28/1792554894062_zbd0lt_halo.png
+              sort_order: 1
+              is_cover: true
+      properties:
+        data:
+          items:
+            $ref: "#/components/schemas/FetchHomestayResponse"
+          type: array
+      required:
+      - data
+      type: object
+    FetchHomestayResponse_homestay_rooms_inner_homestay_images_inner:
+      example:
+        id: 178
+        homestay_id: 28
+        room_id: 17
+        image_path: homestays/28/1792554894062_zbd0lt_halo.png
+        sort_order: 1
+        is_cover: true
+      properties:
+        id:
+          example: 178
+          format: int64
+          type: integer
+        homestay_id:
+          example: 28
+          format: int64
+          type: integer
+        room_id:
+          example: 17
+          format: int64
+          nullable: true
+          type: integer
+        image_path:
+          example: homestays/28/1792554894062_zbd0lt_halo.png
+          type: string
+        sort_order:
+          example: 1
+          format: int32
+          type: integer
+        is_cover:
+          example: true
+          type: boolean
+      required:
+      - homestay_id
+      - id
+      - image_path
+      - is_cover
+      - sort_order
+      type: object
+    FetchHomestayResponse_homestay_rooms_inner:
+      example:
+        id: 17
+        homestay_id: 28
+        name: Room 1
+        description: mô tả room
+        sort_order: 1
+        price_amount: 10000.0
+        price_unit: per_room_per_night
+        homestay_images:
+        - id: 178
+          homestay_id: 28
+          room_id: 17
+          image_path: homestays/28/1792554894062_zbd0lt_halo.png
+          sort_order: 1
+          is_cover: true
+        - id: 178
+          homestay_id: 28
+          room_id: 17
+          image_path: homestays/28/1792554894062_zbd0lt_halo.png
+          sort_order: 1
+          is_cover: true
+      properties:
+        id:
+          example: 17
+          format: int64
+          type: integer
+        homestay_id:
+          example: 28
+          format: int64
+          type: integer
+        name:
+          example: Room 1
+          type: string
+        description:
+          example: mô tả room
+          nullable: true
+          type: string
+        sort_order:
+          example: 1
+          format: int32
+          type: integer
+        price_amount:
+          example: 10000.0
+          format: double
+          type: number
+        price_unit:
+          example: per_room_per_night
+          type: string
+        homestay_images:
+          items:
+            $ref: "#/components/schemas/FetchHomestayResponse_homestay_rooms_inner_homestay_images_inner"
+          type: array
+      required:
+      - homestay_id
+      - homestay_images
+      - id
+      - name
+      - sort_order
       type: object
   securitySchemes:
     AccessCookie:

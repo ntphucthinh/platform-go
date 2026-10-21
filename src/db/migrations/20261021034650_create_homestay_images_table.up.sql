@@ -1,11 +1,13 @@
 CREATE TABLE IF NOT EXISTS homestay_images (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     homestay_id BIGINT NOT NULL,
-    image_path TEXT NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     room_id BIGINT NULL,
+    image_path TEXT NOT NULL,
     sort_order INT NOT NULL DEFAULT 0,
     is_cover BOOLEAN NOT NULL DEFAULT FALSE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        ON UPDATE CURRENT_TIMESTAMP,
 
     KEY idx_homestay_images_homestay_id (homestay_id),
     KEY idx_homestay_images_room_id (room_id),
