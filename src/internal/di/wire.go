@@ -7,6 +7,7 @@ import (
 	"github.com/google/wire"
 	"gorm.io/gorm"
 
+	"platform-go/internal/infrastructure/cloudinary"
 	"platform-go/internal/infrastructure/queryservice"
 	"platform-go/internal/infrastructure/repository"
 	"platform-go/internal/infrastructure/security"
@@ -14,6 +15,7 @@ import (
 	"platform-go/internal/usecases"
 	homestayqueryservice "platform-go/internal/usecases/homestays/queryservice"
 	homestayusecase "platform-go/internal/usecases/homestays/usecase"
+	"platform-go/internal/usecases/uploads"
 )
 
 // Application contains the HTTP endpoint controller and middleware dependencies.
@@ -28,13 +30,17 @@ func InitializeApplication(db *gorm.DB, jwtService *security.JWTService, secureC
 		repository.NewMySQLUserRepository,
 		queryservice.NewUserQueryService,
 		queryservice.NewHomestayQueryService,
+		cloudinary.NewClient,
+		wire.Bind(new(uploads.AssetClient), new(*cloudinary.Client)),
 		wire.Bind(new(homestayqueryservice.HomestayQueryService), new(*queryservice.HomestayQueryService)),
 		usecases.NewUserUsecase,
 		usecases.NewAuthUsecase,
+		uploads.NewUseCase,
 		homestayusecase.NewFetchHomestaysUseCase,
 		controller.NewUserController,
 		controller.NewAuthController,
 		controller.NewHomestayController,
+		controller.NewUploadController,
 		controller.NewBaseController,
 		wire.Struct(new(Application), "*"),
 	)

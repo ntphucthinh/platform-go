@@ -14,6 +14,18 @@ const (
 	RefreshCookieScopes = "RefreshCookie.Scopes"
 )
 
+// Defines values for DeleteUploadItemResourceType.
+const (
+	Image DeleteUploadItemResourceType = "image"
+	Video DeleteUploadItemResourceType = "video"
+)
+
+// Defines values for UploadFilesRequestFolder.
+const (
+	Homestays UploadFilesRequestFolder = "homestays"
+	Travel    UploadFilesRequestFolder = "travel"
+)
+
 // AuthResponse defines model for AuthResponse.
 type AuthResponse struct {
 	Data    AuthResponseData `json:"data"`
@@ -28,6 +40,32 @@ type AuthResponseData struct {
 // CreateUser defines model for CreateUser.
 type CreateUser struct {
 	Name string `json:"name"`
+}
+
+// DeleteUploadItem defines model for DeleteUploadItem.
+type DeleteUploadItem struct {
+	Path         string                       `json:"path"`
+	ResourceType DeleteUploadItemResourceType `json:"resourceType"`
+}
+
+// DeleteUploadItemResourceType defines model for DeleteUploadItem.ResourceType.
+type DeleteUploadItemResourceType string
+
+// DeleteUploadResult defines model for DeleteUploadResult.
+type DeleteUploadResult struct {
+	Message *string `json:"message,omitempty"`
+	Path    string  `json:"path"`
+	Success bool    `json:"success"`
+}
+
+// DeleteUploadsRequest defines model for DeleteUploadsRequest.
+type DeleteUploadsRequest struct {
+	Data []DeleteUploadItem `json:"data"`
+}
+
+// DeleteUploadsResponse defines model for DeleteUploadsResponse.
+type DeleteUploadsResponse struct {
+	Data []DeleteUploadResult `json:"data"`
 }
 
 // FetchHomestayResponse defines model for FetchHomestayResponse.
@@ -76,6 +114,20 @@ type LoginUser struct {
 	Name        string              `json:"name"`
 }
 
+// UploadItem defines model for UploadItem.
+type UploadItem struct {
+	FileName        string            `json:"fileName"`
+	MimeType        string            `json:"mimeType"`
+	Path            string            `json:"path"`
+	RequiredHeaders map[string]string `json:"requiredHeaders"`
+	Url             string            `json:"url"`
+}
+
+// UploadResponse defines model for UploadResponse.
+type UploadResponse struct {
+	Data []UploadItem `json:"data"`
+}
+
 // User defines model for User.
 type User struct {
 	CreatedAt *time.Time `json:"createdAt,omitempty"`
@@ -89,8 +141,23 @@ type FetchHomestays200Response struct {
 	Data []FetchHomestayResponse `json:"data"`
 }
 
+// UploadFilesRequest defines model for uploadFiles_request.
+type UploadFilesRequest struct {
+	Files  []openapi_types.File     `json:"files"`
+	Folder UploadFilesRequestFolder `json:"folder"`
+}
+
+// UploadFilesRequestFolder defines model for UploadFilesRequest.Folder.
+type UploadFilesRequestFolder string
+
 // LoginJSONRequestBody defines body for Login for application/json ContentType.
 type LoginJSONRequestBody = LoginRequest
+
+// DeleteUploadsJSONRequestBody defines body for DeleteUploads for application/json ContentType.
+type DeleteUploadsJSONRequestBody = DeleteUploadsRequest
+
+// UploadFilesMultipartRequestBody defines body for UploadFiles for multipart/form-data ContentType.
+type UploadFilesMultipartRequestBody = UploadFilesRequest
 
 // CreateUserJSONRequestBody defines body for CreateUser for application/json ContentType.
 type CreateUserJSONRequestBody = CreateUser

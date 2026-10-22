@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
@@ -63,6 +64,9 @@ func main() {
 	application := di.InitializeApplication(db, jwtService, !app.IsLocal())
 
 	r := gin.Default()
+	if err := r.SetTrustedProxies(trustedProxies()); err != nil {
+		log.Fatalf("invalid TRUSTED_PROXIES configuration: %v", err)
+	}
 
 	// CORS Middleware
 	r.Use(func(c *gin.Context) {
@@ -103,6 +107,18 @@ func main() {
 	if err := r.Run(":" + port); err != nil {
 		log.Fatalf("server failed: %v", err)
 	}
+}
+
+// trustedProxies returns no trusted proxies by default. Configure explicit proxy
+// IPs/CIDRs only when the application is deployed behind a trusted proxy.
+func trustedProxies() []string {
+	raw := strings.TrimSpace(os.Getenv("TRUSTED_PROXIES"))
+	if raw == "" {
+		return nil
+	}
+	return strings.FieldsFunc(raw, func(r rune) bool {
+		return r == ',' || r == ' ' || r == '\t' || r == '\n'
+	})
 }
 
 func loadEnv() {

@@ -15,6 +15,8 @@ tags:
   name: users
 - description: Homestay management
   name: homestays
+- description: Generic media upload management
+  name: uploads
 paths:
   /auth/login:
     post:
@@ -135,6 +137,63 @@ paths:
       summary: Get homestay list
       tags:
       - Homestays
+  /uploads:
+    delete:
+      operationId: deleteUploads
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DeleteUploadsRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeleteUploadsResponse"
+          description: Deletion results
+        "400":
+          description: Invalid delete request
+        "401":
+          description: Unauthenticated
+        "403":
+          description: CSRF validation failed
+        "502":
+          description: Upload provider failure
+      security:
+      - AccessCookie: []
+      summary: Delete unused uploaded files
+      tags:
+      - uploads
+    post:
+      operationId: uploadFiles
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/uploadFiles_request"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UploadResponse"
+          description: Files uploaded successfully
+        "400":
+          description: Invalid upload request
+        "401":
+          description: Unauthenticated
+        "403":
+          description: CSRF validation failed
+        "502":
+          description: Upload provider failure
+      security:
+      - AccessCookie: []
+      summary: "Upload images, GIFs, or videos"
+      tags:
+      - uploads
 components:
   schemas:
     User:
@@ -164,6 +223,62 @@ components:
           type: string
       required:
       - name
+      type: object
+    UploadResponse:
+      example:
+        data:
+        - fileName: my-room.png
+          mimeType: image/png
+          requiredHeaders:
+            Content-Type: image/png
+          path: homestays/550e8400-e29b-41d4-a716-446655440000.png
+          url: https://res.cloudinary.com/example/image/upload/v123/homestays/550e8400-e29b-41d4-a716-446655440000.png
+        - fileName: my-room.png
+          mimeType: image/png
+          requiredHeaders:
+            Content-Type: image/png
+          path: homestays/550e8400-e29b-41d4-a716-446655440000.png
+          url: https://res.cloudinary.com/example/image/upload/v123/homestays/550e8400-e29b-41d4-a716-446655440000.png
+      properties:
+        data:
+          items:
+            $ref: "#/components/schemas/UploadItem"
+          type: array
+      required:
+      - data
+      type: object
+    DeleteUploadsRequest:
+      example:
+        data:
+        - path: homestays/550e8400-e29b-41d4-a716-446655440000.png
+          resourceType: image
+        - path: homestays/550e8400-e29b-41d4-a716-446655440000.png
+          resourceType: image
+      properties:
+        data:
+          items:
+            $ref: "#/components/schemas/DeleteUploadItem"
+          minItems: 1
+          type: array
+      required:
+      - data
+      type: object
+    DeleteUploadsResponse:
+      example:
+        data:
+        - path: path
+          success: true
+          message: message
+        - path: path
+          success: true
+          message: message
+      properties:
+        data:
+          items:
+            $ref: "#/components/schemas/DeleteUploadResult"
+          type: array
+      required:
+      - data
       type: object
     LoginRequest:
       example:
@@ -305,6 +420,74 @@ components:
       - id
       - name
       type: object
+    UploadItem:
+      example:
+        fileName: my-room.png
+        mimeType: image/png
+        requiredHeaders:
+          Content-Type: image/png
+        path: homestays/550e8400-e29b-41d4-a716-446655440000.png
+        url: https://res.cloudinary.com/example/image/upload/v123/homestays/550e8400-e29b-41d4-a716-446655440000.png
+      properties:
+        fileName:
+          example: my-room.png
+          type: string
+        mimeType:
+          example: image/png
+          type: string
+        requiredHeaders:
+          additionalProperties:
+            type: string
+          example:
+            Content-Type: image/png
+          type: object
+        path:
+          example: homestays/550e8400-e29b-41d4-a716-446655440000.png
+          type: string
+        url:
+          example: https://res.cloudinary.com/example/image/upload/v123/homestays/550e8400-e29b-41d4-a716-446655440000.png
+          format: uri
+          type: string
+      required:
+      - fileName
+      - mimeType
+      - path
+      - requiredHeaders
+      - url
+      type: object
+    DeleteUploadItem:
+      example:
+        path: homestays/550e8400-e29b-41d4-a716-446655440000.png
+        resourceType: image
+      properties:
+        path:
+          example: homestays/550e8400-e29b-41d4-a716-446655440000.png
+          type: string
+        resourceType:
+          enum:
+          - image
+          - video
+          type: string
+      required:
+      - path
+      - resourceType
+      type: object
+    DeleteUploadResult:
+      example:
+        path: path
+        success: true
+        message: message
+      properties:
+        path:
+          type: string
+        success:
+          type: boolean
+        message:
+          type: string
+      required:
+      - path
+      - success
+      type: object
     fetchHomestays_200_response:
       example:
         data:
@@ -407,6 +590,22 @@ components:
           type: array
       required:
       - data
+      type: object
+    uploadFiles_request:
+      properties:
+        files:
+          items:
+            format: binary
+            type: string
+          type: array
+        folder:
+          enum:
+          - homestays
+          - travel
+          type: string
+      required:
+      - files
+      - folder
       type: object
     FetchHomestayResponse_homestay_rooms_inner_homestay_images_inner:
       example:

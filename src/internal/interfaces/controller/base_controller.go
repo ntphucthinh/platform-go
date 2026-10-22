@@ -12,15 +12,21 @@ type BaseController struct {
 	users     *UserController
 	auth      *AuthController
 	homestays *HomestayController
+	uploads   *UploadController
 }
 
-func NewBaseController(users *UserController, auth *AuthController, homestays *HomestayController) *BaseController {
+func NewBaseController(users *UserController, auth *AuthController, homestays *HomestayController, uploads *UploadController) *BaseController {
 	return &BaseController{
 		users:     users,
 		auth:      auth,
 		homestays: homestays,
+		uploads:   uploads,
 	}
 }
+
+func (bc *BaseController) UploadFiles(c *gin.Context) { bc.uploads.UploadFiles(c) }
+
+func (bc *BaseController) DeleteUploads(c *gin.Context) { bc.uploads.DeleteUploads(c) }
 
 func (bc *BaseController) Login(c *gin.Context) {
 	bc.auth.Login(c)

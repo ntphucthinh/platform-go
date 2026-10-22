@@ -1,0 +1,68 @@
+UploadResponse:
+  type: object
+  required: [data]
+  properties:
+    data:
+      type: array
+      items:
+        $ref: '#/UploadItem'
+UploadItem:
+  type: object
+  required: [fileName, mimeType, requiredHeaders, path, url]
+  properties:
+    fileName:
+      type: string
+      example: my-room.png
+    mimeType:
+      type: string
+      example: image/png
+    requiredHeaders:
+      type: object
+      additionalProperties:
+        type: string
+      example:
+        Content-Type: image/png
+    path:
+      type: string
+      example: homestays/550e8400-e29b-41d4-a716-446655440000.png
+    url:
+      type: string
+      format: uri
+      example: https://res.cloudinary.com/example/image/upload/v123/homestays/550e8400-e29b-41d4-a716-446655440000.png
+DeleteUploadsRequest:
+  type: object
+  required: [data]
+  properties:
+    data:
+      type: array
+      minItems: 1
+      items:
+        $ref: '#/DeleteUploadItem'
+DeleteUploadItem:
+  type: object
+  required: [path, resourceType]
+  properties:
+    path:
+      type: string
+      example: homestays/550e8400-e29b-41d4-a716-446655440000.png
+    resourceType:
+      type: string
+      enum: [image, video]
+DeleteUploadsResponse:
+  type: object
+  required: [data]
+  properties:
+    data:
+      type: array
+      items:
+        $ref: '#/DeleteUploadResult'
+DeleteUploadResult:
+  type: object
+  required: [path, success]
+  properties:
+    path:
+      type: string
+    success:
+      type: boolean
+    message:
+      type: string

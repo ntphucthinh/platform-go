@@ -8,12 +8,14 @@ package di
 
 import (
 	"gorm.io/gorm"
+	"platform-go/internal/infrastructure/cloudinary"
 	"platform-go/internal/infrastructure/queryservice"
 	"platform-go/internal/infrastructure/repository"
 	"platform-go/internal/infrastructure/security"
 	"platform-go/internal/interfaces/controller"
 	"platform-go/internal/usecases"
 	"platform-go/internal/usecases/homestays/usecase"
+	"platform-go/internal/usecases/uploads"
 )
 
 // Injectors from wire.go:
@@ -28,7 +30,10 @@ func InitializeApplication(db *gorm.DB, jwtService *security.JWTService, secureC
 	homestayQueryService := queryservice.NewHomestayQueryService(db)
 	fetchHomestaysUseCase := usecase.NewFetchHomestaysUseCase(homestayQueryService)
 	homestayController := controller.NewHomestayController(fetchHomestaysUseCase)
-	baseController := controller.NewBaseController(userController, authController, homestayController)
+	client := cloudinary.NewClient()
+	useCase := uploads.NewUseCase(client)
+	uploadController := controller.NewUploadController(useCase)
+	baseController := controller.NewBaseController(userController, authController, homestayController, uploadController)
 	application := &Application{
 		Controller:  baseController,
 		AuthUsecase: authUsecase,

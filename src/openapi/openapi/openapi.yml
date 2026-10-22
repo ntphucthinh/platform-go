@@ -15,6 +15,8 @@ tags:
     description: User management
   - name: homestays
     description: Homestay management
+  - name: uploads
+    description: Generic media upload management
 
 paths:
   /auth/login:
@@ -29,6 +31,8 @@ paths:
     $ref: "./paths/users.yml"
   /homestays:
     $ref: "./paths/homestays/index.yml"
+  /uploads:
+    $ref: "./paths/uploads.yml"
 
 components:
   schemas:
@@ -36,6 +40,12 @@ components:
       $ref: "./components/schemas/user.yml#/User"
     CreateUser:
       $ref: "./components/schemas/user.yml#/CreateUser"
+    UploadResponse:
+      $ref: "./components/schemas/uploads.yml#/UploadResponse"
+    DeleteUploadsRequest:
+      $ref: "./components/schemas/uploads.yml#/DeleteUploadsRequest"
+    DeleteUploadsResponse:
+      $ref: "./components/schemas/uploads.yml#/DeleteUploadsResponse"
   securitySchemes:
     AccessCookie:
       type: apiKey

@@ -24,6 +24,12 @@ type ServerInterface interface {
 	// Get homestay list
 	// (GET /homestays)
 	FetchHomestays(c *gin.Context)
+	// Delete unused uploaded files
+	// (DELETE /uploads)
+	DeleteUploads(c *gin.Context)
+	// Upload images, GIFs, or videos
+	// (POST /uploads)
+	UploadFiles(c *gin.Context)
 	// Get users
 	// (GET /users)
 	GetUsers(c *gin.Context)
@@ -112,6 +118,36 @@ func (siw *ServerInterfaceWrapper) FetchHomestays(c *gin.Context) {
 	siw.Handler.FetchHomestays(c)
 }
 
+// DeleteUploads operation middleware
+func (siw *ServerInterfaceWrapper) DeleteUploads(c *gin.Context) {
+
+	c.Set(AccessCookieScopes, []string{})
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.DeleteUploads(c)
+}
+
+// UploadFiles operation middleware
+func (siw *ServerInterfaceWrapper) UploadFiles(c *gin.Context) {
+
+	c.Set(AccessCookieScopes, []string{})
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.UploadFiles(c)
+}
+
 // GetUsers operation middleware
 func (siw *ServerInterfaceWrapper) GetUsers(c *gin.Context) {
 
@@ -170,6 +206,8 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.GET(options.BaseURL+"/auth/me", wrapper.Me)
 	router.POST(options.BaseURL+"/auth/refresh", wrapper.Refresh)
 	router.GET(options.BaseURL+"/homestays", wrapper.FetchHomestays)
+	router.DELETE(options.BaseURL+"/uploads", wrapper.DeleteUploads)
+	router.POST(options.BaseURL+"/uploads", wrapper.UploadFiles)
 	router.GET(options.BaseURL+"/users", wrapper.GetUsers)
 	router.POST(options.BaseURL+"/users", wrapper.CreateUser)
 }
