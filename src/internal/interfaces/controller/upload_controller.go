@@ -44,8 +44,8 @@ func (uc *UploadController) DeleteUploads(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid request body"})
 		return
 	}
-	items := make([]uploads.DeleteItem, len(body.Data))
-	for i, item := range body.Data {
+	items := make([]uploads.DeleteItem, len(body))
+	for i, item := range body {
 		items[i] = uploads.DeleteItem{Path: item.Path, ResourceType: uploads.ResourceType(item.ResourceType)}
 	}
 	results := uc.usecase.Delete(c.Request.Context(), items)

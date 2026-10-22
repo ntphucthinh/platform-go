@@ -59,9 +59,7 @@ type DeleteUploadResult struct {
 }
 
 // DeleteUploadsRequest defines model for DeleteUploadsRequest.
-type DeleteUploadsRequest struct {
-	Data []DeleteUploadItem `json:"data"`
-}
+type DeleteUploadsRequest = []DeleteUploadItem
 
 // DeleteUploadsResponse defines model for DeleteUploadsResponse.
 type DeleteUploadsResponse struct {

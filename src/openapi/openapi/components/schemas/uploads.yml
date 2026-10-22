@@ -30,14 +30,10 @@ UploadItem:
       format: uri
       example: https://res.cloudinary.com/example/image/upload/v123/homestays/550e8400-e29b-41d4-a716-446655440000.png
 DeleteUploadsRequest:
-  type: object
-  required: [data]
-  properties:
-    data:
-      type: array
-      minItems: 1
-      items:
-        $ref: '#/DeleteUploadItem'
+  type: array
+  minItems: 1
+  items:
+    $ref: '#/DeleteUploadItem'
 DeleteUploadItem:
   type: object
   required: [path, resourceType]

@@ -248,21 +248,10 @@ components:
       - data
       type: object
     DeleteUploadsRequest:
-      example:
-        data:
-        - path: homestays/550e8400-e29b-41d4-a716-446655440000.png
-          resourceType: image
-        - path: homestays/550e8400-e29b-41d4-a716-446655440000.png
-          resourceType: image
-      properties:
-        data:
-          items:
-            $ref: "#/components/schemas/DeleteUploadItem"
-          minItems: 1
-          type: array
-      required:
-      - data
-      type: object
+      items:
+        $ref: "#/components/schemas/DeleteUploadItem"
+      minItems: 1
+      type: array
     DeleteUploadsResponse:
       example:
         data:
