@@ -21,7 +21,7 @@ import (
 // Application contains the HTTP endpoint controller and middleware dependencies.
 // It is assembled by the application's composition root.
 type Application struct {
-	Controller  *controller.BaseController
+	Controller  *controller.ServerController
 	AuthUsecase *usecases.AuthUsecase
 }
 
@@ -41,7 +41,7 @@ func InitializeApplication(db *gorm.DB, jwtService *security.JWTService, secureC
 		controller.NewAuthController,
 		controller.NewHomestayController,
 		controller.NewUploadController,
-		controller.NewBaseController,
+		controller.NewServerController,
 		wire.Struct(new(Application), "*"),
 	)
 	return nil

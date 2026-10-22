@@ -33,9 +33,9 @@ func InitializeApplication(db *gorm.DB, jwtService *security.JWTService, secureC
 	client := cloudinary.NewClient()
 	useCase := uploads.NewUseCase(client)
 	uploadController := controller.NewUploadController(useCase)
-	baseController := controller.NewBaseController(userController, authController, homestayController, uploadController)
+	serverController := controller.NewServerController(userController, authController, homestayController, uploadController)
 	application := &Application{
-		Controller:  baseController,
+		Controller:  serverController,
 		AuthUsecase: authUsecase,
 	}
 	return application
@@ -46,6 +46,6 @@ func InitializeApplication(db *gorm.DB, jwtService *security.JWTService, secureC
 // Application contains the HTTP endpoint controller and middleware dependencies.
 // It is assembled by the application's composition root.
 type Application struct {
-	Controller  *controller.BaseController
+	Controller  *controller.ServerController
 	AuthUsecase *usecases.AuthUsecase
 }
