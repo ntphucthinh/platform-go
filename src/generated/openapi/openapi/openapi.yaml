@@ -137,6 +137,86 @@ paths:
       summary: Get homestay list
       tags:
       - Homestays
+    post:
+      description: |
+        Create a homestay together with its rooms and images in a single transaction.
+        Image paths must be obtained beforehand via `POST /uploads` (folder `homestays`).
+      operationId: createHomestay
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateHomestayRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageOnlyResponse"
+          description: Homestay created successfully
+      security:
+      - AccessCookie: []
+      summary: Create a homestay
+      tags:
+      - Homestays
+  /homestays/{homestayID}:
+    get:
+      description: Retrieve a single homestay with its rooms and images.
+      operationId: fetchHomestayByID
+      parameters:
+      - example: 28
+        in: path
+        name: homestayID
+        required: true
+        schema:
+          format: int64
+          minimum: 1
+          type: integer
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FetchHomestayByIDResponse"
+          description: Homestay retrieved successfully
+      summary: Get homestay detail
+      tags:
+      - Homestays
+    put:
+      description: |
+        Replace a homestay together with its rooms and images (full-state sync).
+        - Room / image with `id` → updated.
+        - Room / image without `id` → created.
+        - Existing room / image not present in the request → deleted.
+      operationId: updateHomestay
+      parameters:
+      - example: 28
+        in: path
+        name: homestayID
+        required: true
+        schema:
+          format: int64
+          minimum: 1
+          type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateHomestayRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageOnlyResponse"
+          description: Homestay updated successfully
+      security:
+      - AccessCookie: []
+      summary: Update a homestay
+      tags:
+      - Homestays
   /uploads:
     delete:
       operationId: deleteUploads
@@ -195,6 +275,45 @@ paths:
       tags:
       - uploads
 components:
+  responses:
+    BadRequest:
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ValidationErrorResponse"
+      description: Bad Request
+    Unauthorized:
+      content:
+        application/json:
+          example:
+            message: Authentication error
+          schema:
+            $ref: "#/components/schemas/MessageErrorResponse"
+      description: Unauthorized
+    Forbidden:
+      content:
+        application/json:
+          example:
+            message: Permission denied
+          schema:
+            $ref: "#/components/schemas/MessageErrorResponse"
+      description: Forbidden
+    NotFound:
+      content:
+        application/json:
+          example:
+            message: Resource not found
+          schema:
+            $ref: "#/components/schemas/MessageErrorResponse"
+      description: Not Found
+    InternalServerError:
+      content:
+        application/json:
+          example:
+            message: An error occurred
+          schema:
+            $ref: "#/components/schemas/MessageErrorResponse"
+      description: Internal Server Error
   schemas:
     User:
       example:
@@ -269,6 +388,254 @@ components:
       required:
       - data
       type: object
+    FetchHomestayByIDResponse:
+      example:
+        data:
+          id: 28
+          name: Green Pine Homestay
+          address: "12 Tran Phu, Da Lat"
+          description: Cozy homestay with garden view
+          google_maps_url: https://www.google.com/maps
+          homestay_rooms:
+          - id: 17
+            homestay_id: 28
+            name: Room 1
+            description: Deluxe double room with balcony
+            sort_order: 1
+            price_amount: 10000.0
+            price_unit: per_room_per_night
+            homestay_images:
+            - id: 178
+              room_id: 17
+              image_path: homestays/28/1792554894062_zbd0lt_halo.png
+              sort_order: 1
+              is_cover: true
+            - id: 178
+              room_id: 17
+              image_path: homestays/28/1792554894062_zbd0lt_halo.png
+              sort_order: 1
+              is_cover: true
+          - id: 17
+            homestay_id: 28
+            name: Room 1
+            description: Deluxe double room with balcony
+            sort_order: 1
+            price_amount: 10000.0
+            price_unit: per_room_per_night
+            homestay_images:
+            - id: 178
+              room_id: 17
+              image_path: homestays/28/1792554894062_zbd0lt_halo.png
+              sort_order: 1
+              is_cover: true
+            - id: 178
+              room_id: 17
+              image_path: homestays/28/1792554894062_zbd0lt_halo.png
+              sort_order: 1
+              is_cover: true
+      properties:
+        data:
+          $ref: "#/components/schemas/FetchHomestayResponse"
+      required:
+      - data
+      type: object
+    CreateHomestayRequest:
+      example:
+        name: Homestay
+        address: "12 Tran Phu, Da Lat"
+        description: Cozy homestay with mountain view
+        googleMapsUrl: https://www.google.com/maps
+        rooms:
+        - name: Room 1
+          description: Deluxe room with garden view
+          priceAmount: 10000.0
+          priceUnit: per_room_per_night
+          sortOrder: 1
+          images:
+          - imagePath: homestays/550e8400-e29b-41d4-a716-446655440000.png
+            sortOrder: 1
+            isCover: true
+          - imagePath: homestays/550e8400-e29b-41d4-a716-446655440000.png
+            sortOrder: 1
+            isCover: true
+        - name: Room 1
+          description: Deluxe room with garden view
+          priceAmount: 10000.0
+          priceUnit: per_room_per_night
+          sortOrder: 1
+          images:
+          - imagePath: homestays/550e8400-e29b-41d4-a716-446655440000.png
+            sortOrder: 1
+            isCover: true
+          - imagePath: homestays/550e8400-e29b-41d4-a716-446655440000.png
+            sortOrder: 1
+            isCover: true
+      properties:
+        name:
+          description: Homestay name
+          example: Homestay
+          maxLength: 255
+          minLength: 1
+          type: string
+          x-order: 1
+          x-go-name: Name
+          x-oapi-codegen-extra-tags:
+            binding: "required,min=1,max=255"
+        address:
+          description: Homestay address
+          example: "12 Tran Phu, Da Lat"
+          maxLength: 255
+          minLength: 1
+          type: string
+          x-order: 2
+          x-go-name: Address
+          x-oapi-codegen-extra-tags:
+            binding: "required,min=1,max=255"
+        description:
+          description: General description
+          example: Cozy homestay with mountain view
+          nullable: true
+          type: string
+          x-order: 3
+          x-go-name: Description
+          x-oapi-codegen-extra-tags:
+            binding: omitempty
+        googleMapsUrl:
+          description: Google Maps URL
+          example: https://www.google.com/maps
+          format: uri
+          nullable: true
+          type: string
+          x-order: 4
+          x-go-name: GoogleMapsUrl
+          x-oapi-codegen-extra-tags:
+            binding: omitempty
+        rooms:
+          description: List of rooms
+          items:
+            $ref: "#/components/schemas/CreateHomestayRoomInput"
+          type: array
+          x-oapi-codegen-extra-tags:
+            binding: omitempty
+      required:
+      - address
+      - name
+      type: object
+    UpdateHomestayRequest:
+      example:
+        name: Halo Homestay
+        address: "12 Tran Phu, Da Lat"
+        description: Cozy homestay with mountain view
+        googleMapsUrl: https://www.google.com/maps
+        rooms:
+        - id: 17
+          name: Room 1
+          description: Deluxe room with garden view
+          priceAmount: 10000.0
+          priceUnit: per_room_per_night
+          sortOrder: 1
+          images:
+          - id: 178
+            imagePath: homestays/550e8400-e29b-41d4-a716-446655440000.png
+            sortOrder: 1
+            isCover: true
+          - id: 178
+            imagePath: homestays/550e8400-e29b-41d4-a716-446655440000.png
+            sortOrder: 1
+            isCover: true
+        - id: 17
+          name: Room 1
+          description: Deluxe room with garden view
+          priceAmount: 10000.0
+          priceUnit: per_room_per_night
+          sortOrder: 1
+          images:
+          - id: 178
+            imagePath: homestays/550e8400-e29b-41d4-a716-446655440000.png
+            sortOrder: 1
+            isCover: true
+          - id: 178
+            imagePath: homestays/550e8400-e29b-41d4-a716-446655440000.png
+            sortOrder: 1
+            isCover: true
+      properties:
+        name:
+          description: Homestay name
+          example: Halo Homestay
+          maxLength: 255
+          minLength: 1
+          type: string
+          x-order: 1
+          x-go-name: Name
+          x-oapi-codegen-extra-tags:
+            binding: "required,min=1,max=255"
+        address:
+          description: Homestay address
+          example: "12 Tran Phu, Da Lat"
+          maxLength: 255
+          minLength: 1
+          type: string
+          x-order: 2
+          x-go-name: Address
+          x-oapi-codegen-extra-tags:
+            binding: "required,min=1,max=255"
+        description:
+          description: General description
+          example: Cozy homestay with mountain view
+          nullable: true
+          type: string
+          x-order: 3
+          x-go-name: Description
+          x-oapi-codegen-extra-tags:
+            binding: omitempty
+        googleMapsUrl:
+          description: Google Maps URL
+          example: https://www.google.com/maps
+          format: uri
+          nullable: true
+          type: string
+          x-order: 4
+          x-go-name: GoogleMapsUrl
+          x-oapi-codegen-extra-tags:
+            binding: omitempty
+        rooms:
+          description: List of rooms
+          items:
+            $ref: "#/components/schemas/UpdateHomestayRoomInput"
+          type: array
+          x-order: 5
+          x-go-name: Rooms
+          x-oapi-codegen-extra-tags:
+            binding: omitempty
+      required:
+      - address
+      - name
+      type: object
+    MessageOnlyResponse:
+      example:
+        message: Create new successfully
+      properties:
+        message:
+          description: Message
+          example: Create new successfully
+          type: string
+      required:
+      - message
+      type: object
+    ValidationErrorResponse:
+      properties:
+        message:
+          type: string
+        errors:
+          items:
+            $ref: "#/components/schemas/ValidationErrorResponse_errors_inner"
+          type: array
+      type: object
+    MessageErrorResponse:
+      properties:
+        message:
+          type: string
+      type: object
     LoginRequest:
       example:
         email: email
@@ -334,27 +701,25 @@ components:
     FetchHomestayResponse:
       example:
         id: 28
-        name: tên home
-        address: địa điểm
-        description: mô tả chung
+        name: Green Pine Homestay
+        address: "12 Tran Phu, Da Lat"
+        description: Cozy homestay with garden view
         google_maps_url: https://www.google.com/maps
         homestay_rooms:
         - id: 17
           homestay_id: 28
           name: Room 1
-          description: mô tả room
+          description: Deluxe double room with balcony
           sort_order: 1
           price_amount: 10000.0
           price_unit: per_room_per_night
           homestay_images:
           - id: 178
-            homestay_id: 28
             room_id: 17
             image_path: homestays/28/1792554894062_zbd0lt_halo.png
             sort_order: 1
             is_cover: true
           - id: 178
-            homestay_id: 28
             room_id: 17
             image_path: homestays/28/1792554894062_zbd0lt_halo.png
             sort_order: 1
@@ -362,19 +727,17 @@ components:
         - id: 17
           homestay_id: 28
           name: Room 1
-          description: mô tả room
+          description: Deluxe double room with balcony
           sort_order: 1
           price_amount: 10000.0
           price_unit: per_room_per_night
           homestay_images:
           - id: 178
-            homestay_id: 28
             room_id: 17
             image_path: homestays/28/1792554894062_zbd0lt_halo.png
             sort_order: 1
             is_cover: true
           - id: 178
-            homestay_id: 28
             room_id: 17
             image_path: homestays/28/1792554894062_zbd0lt_halo.png
             sort_order: 1
@@ -385,13 +748,13 @@ components:
           format: int64
           type: integer
         name:
-          example: tên home
+          example: Green Pine Homestay
           type: string
         address:
-          example: địa điểm
+          example: "12 Tran Phu, Da Lat"
           type: string
         description:
-          example: mô tả chung
+          example: Cozy homestay with garden view
           nullable: true
           type: string
         google_maps_url:
@@ -408,6 +771,254 @@ components:
       - homestay_rooms
       - id
       - name
+      type: object
+    CreateHomestayRoomInput:
+      example:
+        name: Room 1
+        description: Deluxe room with garden view
+        priceAmount: 10000.0
+        priceUnit: per_room_per_night
+        sortOrder: 1
+        images:
+        - imagePath: homestays/550e8400-e29b-41d4-a716-446655440000.png
+          sortOrder: 1
+          isCover: true
+        - imagePath: homestays/550e8400-e29b-41d4-a716-446655440000.png
+          sortOrder: 1
+          isCover: true
+      properties:
+        name:
+          description: Room name
+          example: Room 1
+          maxLength: 255
+          minLength: 1
+          type: string
+          x-order: 1
+          x-go-name: Name
+          x-oapi-codegen-extra-tags:
+            binding: "required,min=1,max=255"
+        description:
+          description: Room description
+          example: Deluxe room with garden view
+          nullable: true
+          type: string
+          x-order: 2
+          x-go-name: Description
+          x-oapi-codegen-extra-tags:
+            binding: omitempty
+        priceAmount:
+          description: Price amount
+          example: 10000.0
+          format: double
+          minimum: 0
+          nullable: true
+          type: number
+          x-order: 3
+          x-go-name: PriceAmount
+          x-oapi-codegen-extra-tags:
+            binding: omitempty
+        priceUnit:
+          description: Price unit
+          example: per_room_per_night
+          maxLength: 50
+          nullable: true
+          type: string
+          x-order: 4
+          x-go-name: PriceUnit
+          x-oapi-codegen-extra-tags:
+            binding: omitempty
+        sortOrder:
+          description: Display order
+          example: 1
+          format: int32
+          minimum: 0
+          type: integer
+          x-order: 5
+          x-go-name: SortOrder
+          x-oapi-codegen-extra-tags:
+            binding: "required,min=0"
+        images:
+          description: List of images
+          items:
+            $ref: "#/components/schemas/HomestayImageInput"
+          type: array
+          x-order: 6
+          x-go-name: Images
+          x-oapi-codegen-extra-tags:
+            binding: omitempty
+      required:
+      - name
+      - sortOrder
+      type: object
+    HomestayImageInput:
+      example:
+        imagePath: homestays/550e8400-e29b-41d4-a716-446655440000.png
+        sortOrder: 1
+        isCover: true
+      properties:
+        imagePath:
+          description: Path returned by `POST /uploads`.
+          example: homestays/550e8400-e29b-41d4-a716-446655440000.png
+          type: string
+          x-order: 1
+          x-go-name: ImagePath
+          x-oapi-codegen-extra-tags:
+            binding: omitempty
+        sortOrder:
+          description: Display order
+          example: 1
+          format: int32
+          minimum: 0
+          type: integer
+          x-order: 2
+          x-go-name: SortOrder
+          x-oapi-codegen-extra-tags:
+            binding: "required,min=0"
+        isCover:
+          description: Cover image flag
+          example: true
+          type: boolean
+          x-order: 3
+          x-go-name: IsCover
+          x-oapi-codegen-extra-tags:
+            binding: required
+      required:
+      - isCover
+      - sortOrder
+      type: object
+    UpdateHomestayRoomInput:
+      example:
+        id: 17
+        name: Room 1
+        description: Deluxe room with garden view
+        priceAmount: 10000.0
+        priceUnit: per_room_per_night
+        sortOrder: 1
+        images:
+        - id: 178
+          imagePath: homestays/550e8400-e29b-41d4-a716-446655440000.png
+          sortOrder: 1
+          isCover: true
+        - id: 178
+          imagePath: homestays/550e8400-e29b-41d4-a716-446655440000.png
+          sortOrder: 1
+          isCover: true
+      properties:
+        id:
+          description: Existing room ID. Omit or set to null to create a new room.
+          example: 17
+          format: int64
+          nullable: true
+          type: integer
+          x-order: 1
+          x-go-name: Id
+        name:
+          description: Room name
+          example: Room 1
+          maxLength: 255
+          minLength: 1
+          type: string
+          x-order: 2
+          x-go-name: Name
+          x-oapi-codegen-extra-tags:
+            binding: "required,min=1,max=255"
+        description:
+          description: Room description
+          example: Deluxe room with garden view
+          nullable: true
+          type: string
+          x-order: 3
+          x-go-name: Description
+          x-oapi-codegen-extra-tags:
+            binding: omitempty
+        priceAmount:
+          description: Price amount
+          example: 10000.0
+          format: double
+          minimum: 0
+          nullable: true
+          type: number
+          x-order: 4
+          x-go-name: PriceAmount
+          x-oapi-codegen-extra-tags:
+            binding: omitempty
+        priceUnit:
+          description: Price unit
+          example: per_room_per_night
+          maxLength: 50
+          nullable: true
+          type: string
+          x-order: 5
+          x-go-name: PriceUnit
+          x-oapi-codegen-extra-tags:
+            binding: omitempty
+        sortOrder:
+          description: Display order
+          example: 1
+          format: int32
+          minimum: 0
+          type: integer
+          x-order: 6
+          x-go-name: SortOrder
+          x-oapi-codegen-extra-tags:
+            binding: "required,min=0"
+        images:
+          description: List of images
+          items:
+            $ref: "#/components/schemas/UpdateHomestayImageInput"
+          type: array
+          x-order: 7
+          x-go-name: Images
+          x-oapi-codegen-extra-tags:
+            binding: omitempty
+      required:
+      - name
+      - sortOrder
+      type: object
+    UpdateHomestayImageInput:
+      example:
+        id: 178
+        imagePath: homestays/550e8400-e29b-41d4-a716-446655440000.png
+        sortOrder: 1
+        isCover: true
+      properties:
+        id:
+          description: Existing image ID. Omit or set to null to create a new image.
+          example: 178
+          format: int64
+          nullable: true
+          type: integer
+          x-order: 1
+          x-go-name: Id
+        imagePath:
+          description: Path returned by POST /uploads. Can be empty string.
+          example: homestays/550e8400-e29b-41d4-a716-446655440000.png
+          type: string
+          x-order: 2
+          x-go-name: ImagePath
+          x-oapi-codegen-extra-tags:
+            binding: omitempty
+        sortOrder:
+          description: Display order
+          example: 1
+          format: int32
+          minimum: 0
+          type: integer
+          x-order: 3
+          x-go-name: SortOrder
+          x-oapi-codegen-extra-tags:
+            binding: "required,min=0"
+        isCover:
+          description: Cover image flag
+          example: true
+          type: boolean
+          x-order: 4
+          x-go-name: IsCover
+          x-oapi-codegen-extra-tags:
+            binding: required
+      required:
+      - isCover
+      - sortOrder
       type: object
     UploadItem:
       example:
@@ -481,27 +1092,25 @@ components:
       example:
         data:
         - id: 28
-          name: tên home
-          address: địa điểm
-          description: mô tả chung
+          name: Green Pine Homestay
+          address: "12 Tran Phu, Da Lat"
+          description: Cozy homestay with garden view
           google_maps_url: https://www.google.com/maps
           homestay_rooms:
           - id: 17
             homestay_id: 28
             name: Room 1
-            description: mô tả room
+            description: Deluxe double room with balcony
             sort_order: 1
             price_amount: 10000.0
             price_unit: per_room_per_night
             homestay_images:
             - id: 178
-              homestay_id: 28
               room_id: 17
               image_path: homestays/28/1792554894062_zbd0lt_halo.png
               sort_order: 1
               is_cover: true
             - id: 178
-              homestay_id: 28
               room_id: 17
               image_path: homestays/28/1792554894062_zbd0lt_halo.png
               sort_order: 1
@@ -509,45 +1118,41 @@ components:
           - id: 17
             homestay_id: 28
             name: Room 1
-            description: mô tả room
+            description: Deluxe double room with balcony
             sort_order: 1
             price_amount: 10000.0
             price_unit: per_room_per_night
             homestay_images:
             - id: 178
-              homestay_id: 28
               room_id: 17
               image_path: homestays/28/1792554894062_zbd0lt_halo.png
               sort_order: 1
               is_cover: true
             - id: 178
-              homestay_id: 28
               room_id: 17
               image_path: homestays/28/1792554894062_zbd0lt_halo.png
               sort_order: 1
               is_cover: true
         - id: 28
-          name: tên home
-          address: địa điểm
-          description: mô tả chung
+          name: Green Pine Homestay
+          address: "12 Tran Phu, Da Lat"
+          description: Cozy homestay with garden view
           google_maps_url: https://www.google.com/maps
           homestay_rooms:
           - id: 17
             homestay_id: 28
             name: Room 1
-            description: mô tả room
+            description: Deluxe double room with balcony
             sort_order: 1
             price_amount: 10000.0
             price_unit: per_room_per_night
             homestay_images:
             - id: 178
-              homestay_id: 28
               room_id: 17
               image_path: homestays/28/1792554894062_zbd0lt_halo.png
               sort_order: 1
               is_cover: true
             - id: 178
-              homestay_id: 28
               room_id: 17
               image_path: homestays/28/1792554894062_zbd0lt_halo.png
               sort_order: 1
@@ -555,19 +1160,17 @@ components:
           - id: 17
             homestay_id: 28
             name: Room 1
-            description: mô tả room
+            description: Deluxe double room with balcony
             sort_order: 1
             price_amount: 10000.0
             price_unit: per_room_per_night
             homestay_images:
             - id: 178
-              homestay_id: 28
               room_id: 17
               image_path: homestays/28/1792554894062_zbd0lt_halo.png
               sort_order: 1
               is_cover: true
             - id: 178
-              homestay_id: 28
               room_id: 17
               image_path: homestays/28/1792554894062_zbd0lt_halo.png
               sort_order: 1
@@ -596,10 +1199,16 @@ components:
       - files
       - folder
       type: object
+    ValidationErrorResponse_errors_inner:
+      properties:
+        field:
+          type: string
+        message:
+          type: string
+      type: object
     FetchHomestayResponse_homestay_rooms_inner_homestay_images_inner:
       example:
         id: 178
-        homestay_id: 28
         room_id: 17
         image_path: homestays/28/1792554894062_zbd0lt_halo.png
         sort_order: 1
@@ -609,14 +1218,9 @@ components:
           example: 178
           format: int64
           type: integer
-        homestay_id:
-          example: 28
-          format: int64
-          type: integer
         room_id:
           example: 17
           format: int64
-          nullable: true
           type: integer
         image_path:
           example: homestays/28/1792554894062_zbd0lt_halo.png
@@ -629,10 +1233,10 @@ components:
           example: true
           type: boolean
       required:
-      - homestay_id
       - id
       - image_path
       - is_cover
+      - room_id
       - sort_order
       type: object
     FetchHomestayResponse_homestay_rooms_inner:
@@ -640,19 +1244,17 @@ components:
         id: 17
         homestay_id: 28
         name: Room 1
-        description: mô tả room
+        description: Deluxe double room with balcony
         sort_order: 1
         price_amount: 10000.0
         price_unit: per_room_per_night
         homestay_images:
         - id: 178
-          homestay_id: 28
           room_id: 17
           image_path: homestays/28/1792554894062_zbd0lt_halo.png
           sort_order: 1
           is_cover: true
         - id: 178
-          homestay_id: 28
           room_id: 17
           image_path: homestays/28/1792554894062_zbd0lt_halo.png
           sort_order: 1
@@ -670,7 +1272,7 @@ components:
           example: Room 1
           type: string
         description:
-          example: mô tả room
+          example: Deluxe double room with balcony
           nullable: true
           type: string
         sort_order:

@@ -27,6 +27,7 @@ type Application struct {
 
 func InitializeApplication(db *gorm.DB, jwtService *security.JWTService, secureCookies bool) *Application {
 	wire.Build(
+		repository.NewSchemaDB,
 		repository.NewMySQLUserRepository,
 		queryservice.NewUserQueryService,
 		queryservice.NewHomestayQueryService,
@@ -37,6 +38,7 @@ func InitializeApplication(db *gorm.DB, jwtService *security.JWTService, secureC
 		usecases.NewAuthUsecase,
 		uploads.NewUseCase,
 		homestayusecase.NewFetchHomestaysUseCase,
+		homestayusecase.NewCreateHomestayUsecase,
 		controller.NewUserController,
 		controller.NewAuthController,
 		controller.NewHomestayController,

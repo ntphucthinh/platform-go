@@ -19,18 +19,20 @@ import (
 
 type TestHandlerSet struct {
 	Handler         *controller.UserController
-	HomestayHandler *controller.HomestayController
+	HomestayHandler controller.HomestayController
 	DB              *gorm.DB
 }
 
 func TestInitializeControllers(t *testing.T, db *gorm.DB) (*TestHandlerSet, error) {
 	wire.Build(
+		repository.NewSchemaDB,
 		repository.NewMySQLUserRepository,
 		queryservice.NewUserQueryService,
 		queryservice.NewHomestayQueryService,
 		wire.Bind(new(homestayqueryservice.HomestayQueryService), new(*queryservice.HomestayQueryService)),
 		usecases.NewUserUsecase,
 		homestayusecase.NewFetchHomestaysUseCase,
+		homestayusecase.NewCreateHomestayUsecase,
 		controller.NewUserController,
 		controller.NewHomestayController,
 		wire.Struct(new(TestHandlerSet), "*"),

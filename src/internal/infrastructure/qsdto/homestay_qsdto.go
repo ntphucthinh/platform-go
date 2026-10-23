@@ -21,10 +21,9 @@ type HomestayRoomDto struct {
 }
 
 type HomestayImageDto struct {
-	ID         int64  `gorm:"column:id"`
-	HomestayID int64  `gorm:"column:homestay_id"`
-	RoomID     *int64 `gorm:"column:room_id"`
-	ImagePath  string `gorm:"column:image_path"`
-	SortOrder  int32  `gorm:"column:sort_order"`
-	IsCover    bool   `gorm:"column:is_cover"`
+	ID        int64  `gorm:"column:id"`
+	RoomID    int64  `gorm:"column:room_id"`
+	ImagePath string `gorm:"column:image_path"`
+	SortOrder int32  `gorm:"column:sort_order"`
+	IsCover   bool   `gorm:"column:is_cover"`
 }

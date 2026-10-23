@@ -1,4 +1,4 @@
 FROM mysql:8-oracle
 
-# Bạn có thể thiết lập múi giờ mặc định cho database tại đây nếu muốn
+# You can set the default database timezone here if needed
 # ENV TZ=Asia/Ho_Chi_Minh

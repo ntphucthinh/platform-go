@@ -10,10 +10,10 @@ RUN npm install -g @openapitools/openapi-generator-cli
 # 
 RUN openapi-generator-cli version
 
-# Thêm openapi2aspida vì bạn muốn chạy make codegen
+# Add openapi2aspida for make codegen
 RUN npm install -g openapi2aspida typescript ts-node
 
 WORKDIR /app
 
-# Giữ container chạy ngầm
+# Keep container running in background
 CMD ["sh"]

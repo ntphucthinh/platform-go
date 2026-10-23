@@ -37,6 +37,45 @@ type AuthResponseData struct {
 	CsrfToken string `json:"csrfToken"`
 }
 
+// CreateHomestayRequest defines model for CreateHomestayRequest.
+type CreateHomestayRequest struct {
+	// Name Homestay name
+	Name string `binding:"required,min=1,max=255" json:"name"`
+
+	// Address Homestay address
+	Address string `binding:"required,min=1,max=255" json:"address"`
+
+	// Description General description
+	Description *string `binding:"omitempty" json:"description"`
+
+	// GoogleMapsUrl Google Maps URL
+	GoogleMapsUrl *string `binding:"omitempty" json:"googleMapsUrl"`
+
+	// Rooms List of rooms
+	Rooms *[]CreateHomestayRoomInput `binding:"omitempty" json:"rooms,omitempty"`
+}
+
+// CreateHomestayRoomInput defines model for CreateHomestayRoomInput.
+type CreateHomestayRoomInput struct {
+	// Name Room name
+	Name string `binding:"required,min=1,max=255" json:"name"`
+
+	// Description Room description
+	Description *string `binding:"omitempty" json:"description"`
+
+	// PriceAmount Price amount
+	PriceAmount *float64 `binding:"omitempty" json:"priceAmount"`
+
+	// PriceUnit Price unit
+	PriceUnit *string `binding:"omitempty" json:"priceUnit"`
+
+	// SortOrder Display order
+	SortOrder int32 `binding:"required,min=0" json:"sortOrder"`
+
+	// Images List of images
+	Images *[]HomestayImageInput `binding:"omitempty" json:"images,omitempty"`
+}
+
 // CreateUser defines model for CreateUser.
 type CreateUser struct {
 	Name string `json:"name"`
@@ -66,6 +105,11 @@ type DeleteUploadsResponse struct {
 	Data []DeleteUploadResult `json:"data"`
 }
 
+// FetchHomestayByIDResponse defines model for FetchHomestayByIDResponse.
+type FetchHomestayByIDResponse struct {
+	Data FetchHomestayResponse `json:"data"`
+}
+
 // FetchHomestayResponse defines model for FetchHomestayResponse.
 type FetchHomestayResponse struct {
 	Address       string                                    `json:"address"`
@@ -90,12 +134,23 @@ type FetchHomestayResponseHomestayRoomsInner struct {
 
 // FetchHomestayResponseHomestayRoomsInnerHomestayImagesInner defines model for FetchHomestayResponse_homestay_rooms_inner_homestay_images_inner.
 type FetchHomestayResponseHomestayRoomsInnerHomestayImagesInner struct {
-	HomestayId int64  `json:"homestay_id"`
-	Id         int64  `json:"id"`
-	ImagePath  string `json:"image_path"`
-	IsCover    bool   `json:"is_cover"`
-	RoomId     *int64 `json:"room_id"`
-	SortOrder  int32  `json:"sort_order"`
+	Id        int64  `json:"id"`
+	ImagePath string `json:"image_path"`
+	IsCover   bool   `json:"is_cover"`
+	RoomId    int64  `json:"room_id"`
+	SortOrder int32  `json:"sort_order"`
+}
+
+// HomestayImageInput defines model for HomestayImageInput.
+type HomestayImageInput struct {
+	// ImagePath Path returned by `POST /uploads`.
+	ImagePath *string `binding:"omitempty" json:"imagePath,omitempty"`
+
+	// SortOrder Display order
+	SortOrder int32 `binding:"required,min=0" json:"sortOrder"`
+
+	// IsCover Cover image flag
+	IsCover bool `binding:"required" json:"isCover"`
 }
 
 // LoginRequest defines model for LoginRequest.
@@ -110,6 +165,74 @@ type LoginUser struct {
 	Email       openapi_types.Email `json:"email"`
 	Id          int64               `json:"id"`
 	Name        string              `json:"name"`
+}
+
+// MessageErrorResponse defines model for MessageErrorResponse.
+type MessageErrorResponse struct {
+	Message *string `json:"message,omitempty"`
+}
+
+// MessageOnlyResponse defines model for MessageOnlyResponse.
+type MessageOnlyResponse struct {
+	// Message Message
+	Message string `json:"message"`
+}
+
+// UpdateHomestayImageInput defines model for UpdateHomestayImageInput.
+type UpdateHomestayImageInput struct {
+	// Id Existing image ID. Omit or set to null to create a new image.
+	Id *int64 `json:"id"`
+
+	// ImagePath Path returned by POST /uploads. Can be empty string.
+	ImagePath *string `binding:"omitempty" json:"imagePath,omitempty"`
+
+	// SortOrder Display order
+	SortOrder int32 `binding:"required,min=0" json:"sortOrder"`
+
+	// IsCover Cover image flag
+	IsCover bool `binding:"required" json:"isCover"`
+}
+
+// UpdateHomestayRequest defines model for UpdateHomestayRequest.
+type UpdateHomestayRequest struct {
+	// Name Homestay name
+	Name string `binding:"required,min=1,max=255" json:"name"`
+
+	// Address Homestay address
+	Address string `binding:"required,min=1,max=255" json:"address"`
+
+	// Description General description
+	Description *string `binding:"omitempty" json:"description"`
+
+	// GoogleMapsUrl Google Maps URL
+	GoogleMapsUrl *string `binding:"omitempty" json:"googleMapsUrl"`
+
+	// Rooms List of rooms
+	Rooms *[]UpdateHomestayRoomInput `binding:"omitempty" json:"rooms,omitempty"`
+}
+
+// UpdateHomestayRoomInput defines model for UpdateHomestayRoomInput.
+type UpdateHomestayRoomInput struct {
+	// Id Existing room ID. Omit or set to null to create a new room.
+	Id *int64 `json:"id"`
+
+	// Name Room name
+	Name string `binding:"required,min=1,max=255" json:"name"`
+
+	// Description Room description
+	Description *string `binding:"omitempty" json:"description"`
+
+	// PriceAmount Price amount
+	PriceAmount *float64 `binding:"omitempty" json:"priceAmount"`
+
+	// PriceUnit Price unit
+	PriceUnit *string `binding:"omitempty" json:"priceUnit"`
+
+	// SortOrder Display order
+	SortOrder int32 `binding:"required,min=0" json:"sortOrder"`
+
+	// Images List of images
+	Images *[]UpdateHomestayImageInput `binding:"omitempty" json:"images,omitempty"`
 }
 
 // UploadItem defines model for UploadItem.
@@ -134,6 +257,18 @@ type User struct {
 	UpdatedAt *time.Time `json:"updatedAt,omitempty"`
 }
 
+// ValidationErrorResponse defines model for ValidationErrorResponse.
+type ValidationErrorResponse struct {
+	Errors  *[]ValidationErrorResponseErrorsInner `json:"errors,omitempty"`
+	Message *string                               `json:"message,omitempty"`
+}
+
+// ValidationErrorResponseErrorsInner defines model for ValidationErrorResponse_errors_inner.
+type ValidationErrorResponseErrorsInner struct {
+	Field   *string `json:"field,omitempty"`
+	Message *string `json:"message,omitempty"`
+}
+
 // FetchHomestays200Response defines model for fetchHomestays_200_response.
 type FetchHomestays200Response struct {
 	Data []FetchHomestayResponse `json:"data"`
@@ -148,8 +283,29 @@ type UploadFilesRequest struct {
 // UploadFilesRequestFolder defines model for UploadFilesRequest.Folder.
 type UploadFilesRequestFolder string
 
+// BadRequest defines model for BadRequest.
+type BadRequest = ValidationErrorResponse
+
+// Forbidden defines model for Forbidden.
+type Forbidden = MessageErrorResponse
+
+// InternalServerError defines model for InternalServerError.
+type InternalServerError = MessageErrorResponse
+
+// NotFound defines model for NotFound.
+type NotFound = MessageErrorResponse
+
+// Unauthorized defines model for Unauthorized.
+type Unauthorized = MessageErrorResponse
+
 // LoginJSONRequestBody defines body for Login for application/json ContentType.
 type LoginJSONRequestBody = LoginRequest
+
+// CreateHomestayJSONRequestBody defines body for CreateHomestay for application/json ContentType.
+type CreateHomestayJSONRequestBody = CreateHomestayRequest
+
+// UpdateHomestayJSONRequestBody defines body for UpdateHomestay for application/json ContentType.
+type UpdateHomestayJSONRequestBody = UpdateHomestayRequest
 
 // DeleteUploadsJSONRequestBody defines body for DeleteUploads for application/json ContentType.
 type DeleteUploadsJSONRequestBody = DeleteUploadsRequest

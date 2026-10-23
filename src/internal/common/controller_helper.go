@@ -1,21 +1,48 @@
 package common
 
 import (
+	"context"
 	"net/http"
+	"platform-go/internal/common/ctxkeys"
+	"platform-go/internal/middleware"
+	"platform-go/internal/pkg/cvalidator"
+	"platform-go/internal/pkg/log"
 
 	"github.com/gin-gonic/gin"
 )
 
-// BindJSON là helper để bind JSON và trả về lỗi 400 nếu thất bại
+func requestID(c *gin.Context) string {
+	return middleware.RequestID(c)
+}
+
+// BindJSON binds JSON request body and returns 400 Bad Request if validation fails
 func BindJSON(c *gin.Context, req interface{}) error {
 	if err := c.ShouldBindJSON(req); err != nil {
-		IsErrorCustom(c, err, http.StatusBadRequest, "Invalid request body")
+		errMessages := cvalidator.TranslateError(err)
+		log.Warn(err.Error(), "request_id", requestID(c), "errors", errMessages)
+
+		c.JSON(http.StatusBadRequest, gin.H{
+			"errors": errMessages,
+		})
 		return err
 	}
+
+	v := cvalidator.Validator()
+	ctx := context.WithValue(c.Request.Context(), ctxkeys.GinContextKey{}, c)
+	if err := v.StructCtx(ctx, req); err != nil {
+		errMessages := cvalidator.TranslateError(err)
+		log.Warn(err.Error(), "request_id", requestID(c), "errors", errMessages)
+
+		c.JSON(http.StatusBadRequest, gin.H{
+			"errors": errMessages,
+		})
+		return err
+	}
+
 	return nil
 }
 
-// IsErrorCustom trả về lỗi với status code và message tùy chỉnh
+// IsErrorCustom returns an error response with custom HTTP status code and message
 func IsErrorCustom(c *gin.Context, err error, status int, message string) {
 	c.JSON(status, gin.H{
 		"error":   message,
@@ -23,7 +50,7 @@ func IsErrorCustom(c *gin.Context, err error, status int, message string) {
 	})
 }
 
-// IsErrorWithMessage trả về lỗi 500 với message tùy chỉnh
+// IsErrorWithMessage returns a 500 Internal Server Error with custom message
 func IsErrorWithMessage(c *gin.Context, err error, message string) {
 	c.JSON(http.StatusInternalServerError, gin.H{
 		"error":   message,
@@ -31,8 +58,8 @@ func IsErrorWithMessage(c *gin.Context, err error, message string) {
 	})
 }
 
-// IsValidationError trả về true nếu là lỗi validation (ví dụ đơn giản)
+// IsValidationError checks whether an error is a validation error
 func IsValidationError(err error) bool {
-	// Trong thực tế bạn có thể check type của error (ví dụ validator.ValidationErrors)
+	// In practice, check the error type (e.g. validator.ValidationErrors)
 	return err != nil
 }

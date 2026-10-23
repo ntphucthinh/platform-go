@@ -1,0 +1,56 @@
+get:
+  operationId: fetchHomestayByID
+  parameters:
+    - name: homestayID
+      in: path
+      required: true
+      schema:
+        type: integer
+        format: int64
+        minimum: 1
+      example: 28
+  tags:
+    - Homestays
+  summary: Get homestay detail
+  description: Retrieve a single homestay with its rooms and images.
+  responses:
+    "200":
+      description: Homestay retrieved successfully
+      content:
+        application/json:
+          schema:
+            $ref: "../../components/schemas/homestays/:homestayID.yml#/FetchHomestayByIDResponse"
+put:
+  operationId: updateHomestay
+  parameters:
+    - name: homestayID
+      in: path
+      required: true
+      schema:
+        type: integer
+        format: int64
+        minimum: 1
+      example: 28
+  tags:
+    - Homestays
+  summary: Update a homestay
+  description: |
+    Replace a homestay together with its rooms and images (full-state sync).
+    - Room / image with `id` → updated.
+    - Room / image without `id` → created.
+    - Existing room / image not present in the request → deleted.
+  security:
+    - AccessCookie: []
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: "../../components/schemas/homestays/:homestayID.yml#/UpdateHomestayRequest"
+  responses:
+    "200":
+      description: Homestay updated successfully
+      content:
+        application/json:
+          schema:
+            $ref: "../../components/schemas/common/message.yml#/MessageOnlyResponse"

@@ -1,4 +1,6 @@
 package: api
 generate:
   models: true
+output-options:
+  skip-prune: true
 output: generated/api/models.gen.go

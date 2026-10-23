@@ -1,0 +1,28 @@
+ValidationErrorResponse:
+  type: object
+  required: [errors]
+  properties:
+    errors:
+      type: array
+      items:
+        type: object
+        required: [field, message]
+        properties:
+          field:
+            type: string
+            description: "Field name where the error occurred"
+            example: "shopId"
+          message:
+            type: string
+            description: "Detailed error content"
+            example: "Must be a number."
+
+# Message only error response
+MessageErrorResponse:
+  type: object
+  required: [message]
+  properties:
+    message:
+      type: string
+      description: "Error message"
+      example: "No data found."

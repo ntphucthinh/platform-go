@@ -1,0 +1,9 @@
+MessageOnlyResponse:
+  type: object
+  properties:
+    message:
+      type: string
+      description: "Message"
+      example: "Create new successfully"
+  required:
+    - message

@@ -28,12 +28,11 @@ func (uc *FetchHomestaysUseCase) Execute(ctx context.Context) ([]api.FetchHomest
 			images := make([]api.FetchHomestayResponseHomestayRoomsInnerHomestayImagesInner, len(r.Images))
 			for k, img := range r.Images {
 				images[k] = api.FetchHomestayResponseHomestayRoomsInnerHomestayImagesInner{
-					Id:         img.ID,
-					HomestayId: img.HomestayID,
-					RoomId:     img.RoomID,
-					ImagePath:  img.ImagePath,
-					SortOrder:  img.SortOrder,
-					IsCover:    img.IsCover,
+					Id:        img.ID,
+					RoomId:    img.RoomID,
+					ImagePath: img.ImagePath,
+					SortOrder: img.SortOrder,
+					IsCover:   img.IsCover,
 				}
 			}
 

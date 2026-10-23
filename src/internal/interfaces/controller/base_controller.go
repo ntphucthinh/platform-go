@@ -15,11 +15,11 @@ var _ api.ServerInterface = (*ServerController)(nil)
 type ServerController struct {
 	userController     *UserController
 	authController     *AuthController
-	homestayController *HomestayController
+	homestayController HomestayController
 	uploadController   *UploadController
 }
 
-func NewServerController(userController *UserController, authController *AuthController, homestayController *HomestayController, uploadController *UploadController) *ServerController {
+func NewServerController(userController *UserController, authController *AuthController, homestayController HomestayController, uploadController *UploadController) *ServerController {
 	return &ServerController{
 		userController:     userController,
 		authController:     authController,
@@ -54,9 +54,7 @@ func (con *ServerController) FetchHomestays(c *gin.Context) {
 
 // TODO: delegate to HomestayController once the create use case is implemented.
 func (con *ServerController) CreateHomestay(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{
-		"message": "ok",
-	})
+	con.homestayController.CreateHomestay(c)
 }
 
 // TODO: delegate to HomestayController once the detail use case is implemented.

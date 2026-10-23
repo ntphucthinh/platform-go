@@ -7,14 +7,14 @@ FetchHomestayResponse:
       example: 28
     name:
       type: string
-      example: tên home
+      example: Green Pine Homestay
     address:
       type: string
-      example: địa điểm
+      example: 12 Tran Phu, Da Lat
     description:
       type: string
       nullable: true
-      example: mô tả chung
+      example: Cozy homestay with garden view
     google_maps_url:
       type: string
       nullable: true
@@ -39,7 +39,7 @@ FetchHomestayResponse:
           description:
             type: string
             nullable: true
-            example: mô tả room
+            example: Deluxe double room with balcony
           sort_order:
             type: integer
             format: int32
@@ -60,14 +60,9 @@ FetchHomestayResponse:
                   type: integer
                   format: int64
                   example: 178
-                homestay_id:
-                  type: integer
-                  format: int64
-                  example: 28
                 room_id:
                   type: integer
                   format: int64
-                  nullable: true
                   example: 17
                 image_path:
                   type: string
@@ -81,7 +76,7 @@ FetchHomestayResponse:
                   example: true
               required:
                 - id
-                - homestay_id
+                - room_id
                 - image_path
                 - sort_order
                 - is_cover
@@ -96,3 +91,158 @@ FetchHomestayResponse:
     - name
     - address
     - homestay_rooms
+
+# ---------------------------------------------------------------------------
+# Create homestay (POST /homestays)
+# ---------------------------------------------------------------------------
+CreateHomestayRequest:
+  type: object
+  properties:
+    name:
+      type: string
+      minLength: 1
+      maxLength: 255
+      x-order: 1
+      x-go-name: Name
+      description: "Homestay name"
+      example: Homestay
+      x-oapi-codegen-extra-tags:
+        binding: "required,min=1,max=255"
+    address:
+      type: string
+      minLength: 1
+      maxLength: 255
+      x-order: 2
+      x-go-name: Address
+      description: "Homestay address"
+      example: 12 Tran Phu, Da Lat
+      x-oapi-codegen-extra-tags:
+        binding: "required,min=1,max=255"
+    description:
+      type: string
+      nullable: true
+      x-order: 3
+      x-go-name: Description
+      description: "General description"
+      example: Cozy homestay with mountain view
+      x-oapi-codegen-extra-tags:
+        binding: "omitempty"
+    googleMapsUrl:
+      type: string
+      format: uri
+      nullable: true
+      x-order: 4
+      x-go-name: GoogleMapsUrl
+      description: "Google Maps URL"
+      example: https://www.google.com/maps
+      x-oapi-codegen-extra-tags:
+        binding: "omitempty"
+    rooms:
+      type: array
+      description: "List of rooms"
+      items:
+        $ref: "#/CreateHomestayRoomInput"
+      x-oapi-codegen-extra-tags:
+        binding: "omitempty"
+  required:
+    - name
+    - address
+
+CreateHomestayRoomInput:
+  type: object
+  properties:
+    name:
+      type: string
+      minLength: 1
+      maxLength: 255
+      x-order: 1
+      x-go-name: Name
+      description: "Room name"
+      example: Room 1
+      x-oapi-codegen-extra-tags:
+        binding: "required,min=1,max=255"
+    description:
+      type: string
+      nullable: true
+      x-order: 2
+      x-go-name: Description
+      description: "Room description"
+      example: Deluxe room with garden view
+      x-oapi-codegen-extra-tags:
+        binding: "omitempty"
+    priceAmount:
+      type: number
+      format: double
+      minimum: 0
+      nullable: true
+      x-order: 3
+      x-go-name: PriceAmount
+      description: "Price amount"
+      example: 10000.00
+      x-oapi-codegen-extra-tags:
+        binding: "omitempty"
+    priceUnit:
+      type: string
+      maxLength: 50
+      nullable: true
+      x-order: 4
+      x-go-name: PriceUnit
+      description: "Price unit"
+      example: per_room_per_night
+      x-oapi-codegen-extra-tags:
+        binding: "omitempty"
+    sortOrder:
+      type: integer
+      format: int32
+      minimum: 0
+      x-order: 5
+      x-go-name: SortOrder
+      description: "Display order"
+      example: 1
+      x-oapi-codegen-extra-tags:
+        binding: "required,min=0"
+    images:
+      type: array
+      x-order: 6
+      x-go-name: Images
+      description: "List of images"
+      x-oapi-codegen-extra-tags:
+        binding: "omitempty"
+      items:
+        $ref: "#/HomestayImageInput"
+  required:
+    - name
+    - sortOrder
+
+HomestayImageInput:
+  type: object
+  properties:
+    imagePath:
+      type: string
+      description: Path returned by `POST /uploads`.
+      x-order: 1
+      x-go-name: ImagePath
+      example: homestays/550e8400-e29b-41d4-a716-446655440000.png
+      x-oapi-codegen-extra-tags:
+        binding: "omitempty"
+    sortOrder:
+      type: integer
+      format: int32
+      minimum: 0
+      x-order: 2
+      x-go-name: SortOrder
+      description: "Display order"
+      example: 1
+      x-oapi-codegen-extra-tags:
+        binding: "required,min=0"
+    isCover:
+      type: boolean
+      x-order: 3
+      x-go-name: IsCover
+      description: "Cover image flag"
+      example: true
+      x-oapi-codegen-extra-tags:
+        binding: "required"
+  required:
+    - sortOrder
+    - isCover

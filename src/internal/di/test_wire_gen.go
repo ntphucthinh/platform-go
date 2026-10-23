@@ -25,7 +25,9 @@ func TestInitializeControllers(t *testing.T, db *gorm.DB) (*TestHandlerSet, erro
 	userController := controller.NewUserController(userUsecase, userQueryService)
 	homestayQueryService := queryservice.NewHomestayQueryService(db)
 	fetchHomestaysUseCase := usecase.NewFetchHomestaysUseCase(homestayQueryService)
-	homestayController := controller.NewHomestayController(fetchHomestaysUseCase)
+	dbInterface := repository.NewSchemaDB(db)
+	createHomestayUsecase := usecase.NewCreateHomestayUsecase(dbInterface)
+	homestayController := controller.NewHomestayController(fetchHomestaysUseCase, createHomestayUsecase)
 	testHandlerSet := &TestHandlerSet{
 		Handler:         userController,
 		HomestayHandler: homestayController,
@@ -38,6 +40,6 @@ func TestInitializeControllers(t *testing.T, db *gorm.DB) (*TestHandlerSet, erro
 
 type TestHandlerSet struct {
 	Handler         *controller.UserController
-	HomestayHandler *controller.HomestayController
+	HomestayHandler controller.HomestayController
 	DB              *gorm.DB
 }

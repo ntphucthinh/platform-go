@@ -1,0 +1,50 @@
+OK:
+  type: object
+  properties:
+    message:
+      type: string
+      example: "Success"
+    data:
+      type: object
+      nullable: true
+      description: Response data
+      example: {}
+
+BadRequest:
+  type: object
+  properties:
+    errors:
+      type: object
+      additionalProperties:
+        type: string
+        example: "Invalid field"
+
+Unauthorized:
+  type: object
+  properties:
+    message:
+      type: string
+      example: "Unauthorized"
+
+Forbidden:
+  type: object
+  properties:
+    message:
+      type: string
+      example: "Forbidden"
+
+MethodNotAllowed:
+  type: object
+  properties:
+    message:
+      type: string
+      example: "Method Not Allowed"
+
+# Return only the 'message' field for responses other than 200
+# Rely on the status code for interpretation
+InternalServerError:
+  type: object
+  properties:
+    message:
+      type: string
+      example: "Internal Server Error"

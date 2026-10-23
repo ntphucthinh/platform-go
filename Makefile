@@ -7,7 +7,7 @@ build-nc:
 	docker compose build --no-cache
 
 up:
-	@make set-up-githooks
+# 	@make set-up-githooks
 	docker compose up -d
 
 down:

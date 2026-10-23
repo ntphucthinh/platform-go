@@ -54,9 +54,7 @@ func (qs *HomestayQueryService) FetchHomestays(ctx context.Context) ([]qsdto.Hom
 
 		imagesByRoomID := make(map[int64][]qsdto.HomestayImageDto)
 		for _, img := range images {
-			if img.RoomID != nil {
-				imagesByRoomID[*img.RoomID] = append(imagesByRoomID[*img.RoomID], img)
-			}
+			imagesByRoomID[img.RoomID] = append(imagesByRoomID[img.RoomID], img)
 		}
 
 		for i := range rooms {

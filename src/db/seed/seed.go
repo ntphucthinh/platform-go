@@ -21,7 +21,7 @@ type User struct {
 }
 
 func main() {
-	// Nạp env từ file tương ứng theo môi trường
+	// Load env from the corresponding file based on environment
 	if os.Getenv("APP_ENV") == "staging" {
 		if err := godotenv.Load(".env.staging"); err != nil {
 			_ = godotenv.Load("env.staging")
@@ -39,7 +39,7 @@ func main() {
 		dbPort := os.Getenv("DB_PORT")
 		dbName := os.Getenv("DB_NAME")
 
-		// Fallback nếu chạy bên ngoài Docker hoặc thiếu biến lẻ
+		// Fallback defaults if running outside Docker or missing individual variables
 		if user == "" {
 			user = "root"
 		}
@@ -48,7 +48,7 @@ func main() {
 		}
 		if host == "" {
 			host = "localhost"
-		} // Nếu chạy từ host thì trỏ localhost
+		} // Point to localhost if running from host
 		if dbPort == "" {
 			dbPort = "3309"
 		}

@@ -17,12 +17,17 @@ import (
 	"platform-go/internal/infrastructure/security"
 	"platform-go/internal/middleware"
 	"platform-go/internal/pkg/app"
+	"platform-go/internal/pkg/cvalidator"
 )
 
 func main() {
 	loadEnv()
 
-	// Ưu tiên dùng DB_DSN nếu có, nếu không thì build từ từng biến lẻ
+	cvalidator.NewValidate()
+	v := cvalidator.Validator()
+	cvalidator.CustomTagName(v)
+
+	// Prefer DB_DSN if set; otherwise build from individual environment variables
 	dsn := os.Getenv("DB_DSN")
 	if dsn == "" {
 		user := os.Getenv("DB_USER")
@@ -31,7 +36,7 @@ func main() {
 		dbPort := os.Getenv("DB_PORT")
 		dbName := os.Getenv("DB_NAME")
 
-		// Fallback mặc định nếu thiếu biến môi trường lẻ
+		// Fallback defaults if individual variables are missing
 		if user == "" {
 			user = "root"
 		}
@@ -123,19 +128,19 @@ func trustedProxies() []string {
 
 func loadEnv() {
 	if app.IsLocal() {
-		// Nạp file .env.local
+		// Load .env.local
 		err := godotenv.Overload(".env.local")
 		if err != nil {
-			log.Println("Không thể nạp file .env.local, sử dụng biến môi trường hệ thống")
+			log.Println("Could not load .env.local, using system environment variables")
 		}
 	} else if app.IsStaging() {
-		// Nạp file .env.staging hoặc env.staging nếu có
+		// Load .env.staging or env.staging if present
 		err := godotenv.Overload(".env.staging")
 		if err != nil {
 			err = godotenv.Overload("env.staging")
 		}
 		if err != nil {
-			log.Println("Không thể nạp file .env.staging/env.staging, sử dụng biến môi trường hệ thống")
+			log.Println("Could not load .env.staging/env.staging, using system environment variables")
 		}
 	}
 }

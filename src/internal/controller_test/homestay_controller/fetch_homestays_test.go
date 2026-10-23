@@ -36,7 +36,7 @@ func TestFetchHomestays(t *testing.T) {
 		ID: 1, Name: "Homestay", Address: "Da Nang",
 		Rooms: []qsdto.HomestayRoomDto{{
 			ID: 11, HomestayID: 1, Name: "Room 1", Description: &description, PriceAmount: &price, PriceUnit: &priceUnit, SortOrder: 1,
-			Images: []qsdto.HomestayImageDto{{ID: 3, HomestayID: 1, RoomID: &roomID, ImagePath: "homestays/image.png", SortOrder: 1, IsCover: true}},
+			Images: []qsdto.HomestayImageDto{{ID: 3, RoomID: roomID, ImagePath: "homestays/image.png", SortOrder: 1, IsCover: true}},
 		}},
 	}}}
 	router := newHomestayRouter(t, queryService)
@@ -72,8 +72,9 @@ func TestFetchHomestaysReturnsError(t *testing.T) {
 
 func newHomestayRouter(t *testing.T, queryService homestayqueryservice.HomestayQueryService) http.Handler {
 	t.Helper()
-	usecase := homestayusecase.NewFetchHomestaysUseCase(queryService)
-	handler := controller.NewHomestayController(usecase)
+	fetchUsecase := homestayusecase.NewFetchHomestaysUseCase(queryService)
+	createUsecase := homestayusecase.NewCreateHomestayUsecase(nil)
+	handler := controller.NewHomestayController(fetchUsecase, createUsecase)
 	router := shared.NewSetupRouter(t)
 	router.GET("/homestays", handler.FetchHomestays)
 	return router

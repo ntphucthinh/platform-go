@@ -1,23 +1,23 @@
-FROM golang:1.24-alpine
+FROM golang:1.25-alpine
 
-# Cài đặt thêm các package cần thiết của OS
+# Install required OS packages
 RUN apk add --no-cache git gcc musl-dev
 
 WORKDIR /go/app
 
-# Cài đặt Delve để hỗ trợ debug
+# Install Delve for debugging
 RUN go install github.com/go-delve/delve/cmd/dlv@v1.24.0
 
-# Cài đặt Air để live-reload code khi dev
+# Install Air for live-reload during development
 RUN go install github.com/air-verse/air@v1.61.1
 
-# Cài đặt các công cụ sinh code
+# Install code generation tools
 RUN go install github.com/oapi-codegen/oapi-codegen/v2/cmd/oapi-codegen@v2.4.1
-RUN go install github.com/google/wire/cmd/wire@v0.6.0
+RUN go install github.com/google/wire/cmd/wire@latest
 RUN go install -tags 'mysql' github.com/golang-migrate/migrate/v4/cmd/migrate@v4.18.1
 
-# Mở sẵn 2 port: 8080 cho app và 2345 cho dlv debugger
+# Expose ports: 8080 for application, 2345 for dlv debugger
 EXPOSE 8080 2345
 
-# Chạy terminal giữ cho container sống để bạn có thể vào bash chạy lệnh
+# Keep container running for shell access
 CMD ["sh"]

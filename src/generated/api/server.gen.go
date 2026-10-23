@@ -4,7 +4,11 @@
 package api
 
 import (
+	"fmt"
+	"net/http"
+
 	"github.com/gin-gonic/gin"
+	"github.com/oapi-codegen/runtime"
 )
 
 // ServerInterface represents all server handlers.
@@ -24,6 +28,15 @@ type ServerInterface interface {
 	// Get homestay list
 	// (GET /homestays)
 	FetchHomestays(c *gin.Context)
+	// Create a homestay
+	// (POST /homestays)
+	CreateHomestay(c *gin.Context)
+	// Get homestay detail
+	// (GET /homestays/{homestayID})
+	FetchHomestayByID(c *gin.Context, homestayID int64)
+	// Update a homestay
+	// (PUT /homestays/{homestayID})
+	UpdateHomestay(c *gin.Context, homestayID int64)
 	// Delete unused uploaded files
 	// (DELETE /uploads)
 	DeleteUploads(c *gin.Context)
@@ -118,6 +131,71 @@ func (siw *ServerInterfaceWrapper) FetchHomestays(c *gin.Context) {
 	siw.Handler.FetchHomestays(c)
 }
 
+// CreateHomestay operation middleware
+func (siw *ServerInterfaceWrapper) CreateHomestay(c *gin.Context) {
+
+	c.Set(AccessCookieScopes, []string{})
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.CreateHomestay(c)
+}
+
+// FetchHomestayByID operation middleware
+func (siw *ServerInterfaceWrapper) FetchHomestayByID(c *gin.Context) {
+
+	var err error
+
+	// ------------- Path parameter "homestayID" -------------
+	var homestayID int64
+
+	err = runtime.BindStyledParameterWithOptions("simple", "homestayID", c.Param("homestayID"), &homestayID, runtime.BindStyledParameterOptions{Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter homestayID: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.FetchHomestayByID(c, homestayID)
+}
+
+// UpdateHomestay operation middleware
+func (siw *ServerInterfaceWrapper) UpdateHomestay(c *gin.Context) {
+
+	var err error
+
+	// ------------- Path parameter "homestayID" -------------
+	var homestayID int64
+
+	err = runtime.BindStyledParameterWithOptions("simple", "homestayID", c.Param("homestayID"), &homestayID, runtime.BindStyledParameterOptions{Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter homestayID: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	c.Set(AccessCookieScopes, []string{})
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.UpdateHomestay(c, homestayID)
+}
+
 // DeleteUploads operation middleware
 func (siw *ServerInterfaceWrapper) DeleteUploads(c *gin.Context) {
 
@@ -206,6 +284,9 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.GET(options.BaseURL+"/auth/me", wrapper.Me)
 	router.POST(options.BaseURL+"/auth/refresh", wrapper.Refresh)
 	router.GET(options.BaseURL+"/homestays", wrapper.FetchHomestays)
+	router.POST(options.BaseURL+"/homestays", wrapper.CreateHomestay)
+	router.GET(options.BaseURL+"/homestays/:homestayID", wrapper.FetchHomestayByID)
+	router.PUT(options.BaseURL+"/homestays/:homestayID", wrapper.UpdateHomestay)
 	router.DELETE(options.BaseURL+"/uploads", wrapper.DeleteUploads)
 	router.POST(options.BaseURL+"/uploads", wrapper.UploadFiles)
 	router.GET(options.BaseURL+"/users", wrapper.GetUsers)

@@ -20,3 +20,26 @@ get:
               - data
     "500":
       description: Internal server error
+post:
+  operationId: createHomestay
+  tags:
+    - Homestays
+  summary: Create a homestay
+  description: |
+    Create a homestay together with its rooms and images in a single transaction.
+    Image paths must be obtained beforehand via `POST /uploads` (folder `homestays`).
+  security:
+    - AccessCookie: []
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: "../../components/schemas/homestays/index.yml#/CreateHomestayRequest"
+  responses:
+    "200":
+      description: Homestay created successfully
+      content:
+        application/json:
+          schema:
+            $ref: "../../components/schemas/common/message.yml#/MessageOnlyResponse"
