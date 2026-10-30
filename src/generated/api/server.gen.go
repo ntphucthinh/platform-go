@@ -27,10 +27,13 @@ type ServerInterface interface {
 	Refresh(c *gin.Context)
 	// Get homestay list
 	// (GET /homestays)
-	FetchHomestays(c *gin.Context)
+	FetchHomestays(c *gin.Context, params FetchHomestaysParams)
 	// Create a homestay
 	// (POST /homestays)
 	CreateHomestay(c *gin.Context)
+	// Delete a homestay
+	// (DELETE /homestays/{homestayID})
+	DeleteHomestay(c *gin.Context, homestayID int64)
 	// Get homestay detail
 	// (GET /homestays/{homestayID})
 	FetchHomestayByID(c *gin.Context, homestayID int64)
@@ -121,6 +124,41 @@ func (siw *ServerInterfaceWrapper) Refresh(c *gin.Context) {
 // FetchHomestays operation middleware
 func (siw *ServerInterfaceWrapper) FetchHomestays(c *gin.Context) {
 
+	var err error
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params FetchHomestaysParams
+
+	// ------------- Required query parameter "page" -------------
+
+	if paramValue := c.Query("page"); paramValue != "" {
+
+	} else {
+		siw.ErrorHandler(c, fmt.Errorf("Query argument page is required, but not found"), http.StatusBadRequest)
+		return
+	}
+
+	err = runtime.BindQueryParameter("form", true, true, "page", c.Request.URL.Query(), &params.Page)
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter page: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	// ------------- Required query parameter "perPage" -------------
+
+	if paramValue := c.Query("perPage"); paramValue != "" {
+
+	} else {
+		siw.ErrorHandler(c, fmt.Errorf("Query argument perPage is required, but not found"), http.StatusBadRequest)
+		return
+	}
+
+	err = runtime.BindQueryParameter("form", true, true, "perPage", c.Request.URL.Query(), &params.PerPage)
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter perPage: %w", err), http.StatusBadRequest)
+		return
+	}
+
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
 		if c.IsAborted() {
@@ -128,7 +166,7 @@ func (siw *ServerInterfaceWrapper) FetchHomestays(c *gin.Context) {
 		}
 	}
 
-	siw.Handler.FetchHomestays(c)
+	siw.Handler.FetchHomestays(c, params)
 }
 
 // CreateHomestay operation middleware
@@ -144,6 +182,32 @@ func (siw *ServerInterfaceWrapper) CreateHomestay(c *gin.Context) {
 	}
 
 	siw.Handler.CreateHomestay(c)
+}
+
+// DeleteHomestay operation middleware
+func (siw *ServerInterfaceWrapper) DeleteHomestay(c *gin.Context) {
+
+	var err error
+
+	// ------------- Path parameter "homestayID" -------------
+	var homestayID int64
+
+	err = runtime.BindStyledParameterWithOptions("simple", "homestayID", c.Param("homestayID"), &homestayID, runtime.BindStyledParameterOptions{Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter homestayID: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	c.Set(AccessCookieScopes, []string{})
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.DeleteHomestay(c, homestayID)
 }
 
 // FetchHomestayByID operation middleware
@@ -285,6 +349,7 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.POST(options.BaseURL+"/auth/refresh", wrapper.Refresh)
 	router.GET(options.BaseURL+"/homestays", wrapper.FetchHomestays)
 	router.POST(options.BaseURL+"/homestays", wrapper.CreateHomestay)
+	router.DELETE(options.BaseURL+"/homestays/:homestayID", wrapper.DeleteHomestay)
 	router.GET(options.BaseURL+"/homestays/:homestayID", wrapper.FetchHomestayByID)
 	router.PUT(options.BaseURL+"/homestays/:homestayID", wrapper.UpdateHomestay)
 	router.DELETE(options.BaseURL+"/uploads", wrapper.DeleteUploads)

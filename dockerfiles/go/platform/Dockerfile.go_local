@@ -6,7 +6,7 @@ RUN apk add --no-cache git gcc musl-dev
 WORKDIR /go/app
 
 # Install Delve for debugging
-RUN go install github.com/go-delve/delve/cmd/dlv@v1.24.0
+RUN go install github.com/go-delve/delve/cmd/dlv@v1.26.3
 
 # Install Air for live-reload during development
 RUN go install github.com/air-verse/air@v1.61.1
@@ -15,6 +15,7 @@ RUN go install github.com/air-verse/air@v1.61.1
 RUN go install github.com/oapi-codegen/oapi-codegen/v2/cmd/oapi-codegen@v2.4.1
 RUN go install github.com/google/wire/cmd/wire@latest
 RUN go install -tags 'mysql' github.com/golang-migrate/migrate/v4/cmd/migrate@v4.18.1
+RUN go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.64.8
 
 # Expose ports: 8080 for application, 2345 for dlv debugger
 EXPOSE 8080 2345

@@ -1,8 +1,6 @@
 package controller
 
 import (
-	"net/http"
-
 	"github.com/gin-gonic/gin"
 
 	api "platform-go/generated/api"
@@ -28,53 +26,96 @@ func NewServerController(userController *UserController, authController *AuthCon
 	}
 }
 
-func (con *ServerController) UploadFiles(c *gin.Context) { con.uploadController.UploadFiles(c) }
+// -----------------------------------------------------------------------------
+// Uploads APIs (UploadController)
+// -----------------------------------------------------------------------------
 
-func (con *ServerController) DeleteUploads(c *gin.Context) { con.uploadController.DeleteUploads(c) }
+// UploadFiles handles uploading files to cloud storage.
+// (POST /uploads)
+func (con *ServerController) UploadFiles(c *gin.Context) {
+	con.uploadController.UploadFiles(c)
+}
 
+// DeleteUploads handles deleting unused uploaded files from cloud storage.
+// (DELETE /uploads)
+func (con *ServerController) DeleteUploads(c *gin.Context) {
+	con.uploadController.DeleteUploads(c)
+}
+
+// -----------------------------------------------------------------------------
+// Authentication APIs (AuthController)
+// -----------------------------------------------------------------------------
+
+// Login handles user authentication and issues JWT tokens.
+// (POST /auth/login)
 func (con *ServerController) Login(c *gin.Context) {
 	con.authController.Login(c)
 }
 
+// Logout handles clearing authentication cookies/session.
+// (POST /auth/logout)
 func (con *ServerController) Logout(c *gin.Context) {
 	con.authController.Logout(c)
 }
 
+// Me retrieves the currently authenticated user's profile.
+// (GET /auth/me)
 func (con *ServerController) Me(c *gin.Context) {
 	con.authController.Me(c)
 }
 
+// Refresh handles refreshing the JWT access token using the refresh token.
+// (POST /auth/refresh)
 func (con *ServerController) Refresh(c *gin.Context) {
 	con.authController.Refresh(c)
 }
 
-func (con *ServerController) FetchHomestays(c *gin.Context) {
-	con.homestayController.FetchHomestays(c)
+// -----------------------------------------------------------------------------
+// Homestays APIs (HomestayController)
+// -----------------------------------------------------------------------------
+
+// FetchHomestays retrieves a list of homestays with their rooms and images.
+// (GET /homestays)
+func (con *ServerController) FetchHomestays(c *gin.Context, params api.FetchHomestaysParams) {
+	con.homestayController.FetchHomestays(c, params)
 }
 
-// TODO: delegate to HomestayController once the create use case is implemented.
+// CreateHomestay creates a new homestay along with its rooms and images.
+// (POST /homestays)
 func (con *ServerController) CreateHomestay(c *gin.Context) {
 	con.homestayController.CreateHomestay(c)
 }
 
-// TODO: delegate to HomestayController once the detail use case is implemented.
+// FetchHomestayByID retrieves details of a single homestay by ID.
+// (GET /homestays/{homestayID})
 func (con *ServerController) FetchHomestayByID(c *gin.Context, homestayID int64) {
-	c.JSON(http.StatusNotImplemented, gin.H{
-		"message": "not implemented",
-	})
+	con.homestayController.FetchHomestayByID(c, homestayID)
 }
 
-// TODO: delegate to HomestayController once the update use case is implemented.
+// UpdateHomestay updates a homestay and synchronizes its rooms and images.
+// (PUT /homestays/{homestayID})
 func (con *ServerController) UpdateHomestay(c *gin.Context, homestayID int64) {
-	c.JSON(http.StatusNotImplemented, gin.H{
-		"message": "not implemented",
-	})
+	con.homestayController.UpdateHomestay(c, homestayID)
 }
 
+// DeleteHomestay removes a homestay and all its associated rooms and images.
+// (DELETE /homestays/{homestayID})
+func (con *ServerController) DeleteHomestay(c *gin.Context, homestayID int64) {
+	con.homestayController.DeleteHomestay(c, homestayID)
+}
+
+// -----------------------------------------------------------------------------
+// Users APIs (UserController)
+// -----------------------------------------------------------------------------
+
+// GetUsers retrieves a list of users.
+// (GET /users)
 func (con *ServerController) GetUsers(c *gin.Context) {
 	con.userController.GetUsers(c)
 }
 
+// CreateUser creates a new user account.
+// (POST /users)
 func (con *ServerController) CreateUser(c *gin.Context) {
 	con.userController.CreateUser(c)
 }

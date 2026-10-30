@@ -54,3 +54,27 @@ put:
         application/json:
           schema:
             $ref: "../../components/schemas/common/message.yml#/MessageOnlyResponse"
+delete:
+  operationId: deleteHomestay
+  parameters:
+    - name: homestayID
+      in: path
+      required: true
+      schema:
+        type: integer
+        format: int64
+        minimum: 1
+      example: 28
+  tags:
+    - Homestays
+  summary: Delete a homestay
+  description: Delete a homestay together with all its associated rooms and images.
+  security:
+    - AccessCookie: []
+  responses:
+    "200":
+      description: Homestay deleted successfully
+      content:
+        application/json:
+          schema:
+            $ref: "../../components/schemas/common/message.yml#/MessageOnlyResponse"

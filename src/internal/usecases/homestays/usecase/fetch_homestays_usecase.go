@@ -15,19 +15,19 @@ func NewFetchHomestaysUseCase(queryService homestayqueryservice.HomestayQuerySer
 	return &FetchHomestaysUseCase{queryService: queryService}
 }
 
-func (uc *FetchHomestaysUseCase) Execute(ctx context.Context) ([]api.FetchHomestayResponse, error) {
-	homestays, err := uc.queryService.FetchHomestays(ctx)
+func (uc *FetchHomestaysUseCase) Execute(ctx context.Context, page, perPage int) (*api.FetchHomestayResponse, error) {
+	paginated, err := uc.queryService.FetchHomestays(ctx, page, perPage)
 	if err != nil {
 		return nil, err
 	}
 
-	items := make([]api.FetchHomestayResponse, len(homestays))
-	for i, h := range homestays {
-		rooms := make([]api.FetchHomestayResponseHomestayRoomsInner, len(h.Rooms))
+	items := make([]api.FetchHomestayResponseDataInner, len(paginated.Data))
+	for i, h := range paginated.Data {
+		rooms := make([]api.FetchHomestayResponseDataInnerHomestayRoomsInner, len(h.Rooms))
 		for j, r := range h.Rooms {
-			images := make([]api.FetchHomestayResponseHomestayRoomsInnerHomestayImagesInner, len(r.Images))
+			images := make([]api.FetchHomestayResponseDataInnerHomestayRoomsInnerHomestayImagesInner, len(r.Images))
 			for k, img := range r.Images {
-				images[k] = api.FetchHomestayResponseHomestayRoomsInnerHomestayImagesInner{
+				images[k] = api.FetchHomestayResponseDataInnerHomestayRoomsInnerHomestayImagesInner{
 					Id:        img.ID,
 					RoomId:    img.RoomID,
 					ImagePath: img.ImagePath,
@@ -36,7 +36,7 @@ func (uc *FetchHomestaysUseCase) Execute(ctx context.Context) ([]api.FetchHomest
 				}
 			}
 
-			rooms[j] = api.FetchHomestayResponseHomestayRoomsInner{
+			rooms[j] = api.FetchHomestayResponseDataInnerHomestayRoomsInner{
 				Id:             r.ID,
 				HomestayId:     r.HomestayID,
 				Name:           r.Name,
@@ -48,7 +48,7 @@ func (uc *FetchHomestaysUseCase) Execute(ctx context.Context) ([]api.FetchHomest
 			}
 		}
 
-		items[i] = api.FetchHomestayResponse{
+		items[i] = api.FetchHomestayResponseDataInner{
 			Id:            h.ID,
 			Name:          h.Name,
 			Address:       h.Address,
@@ -58,5 +58,8 @@ func (uc *FetchHomestaysUseCase) Execute(ctx context.Context) ([]api.FetchHomest
 		}
 	}
 
-	return items, nil
+	return &api.FetchHomestayResponse{
+		Data:          items,
+		PaginatorInfo: paginated.PaginatorInfo,
+	}, nil
 }

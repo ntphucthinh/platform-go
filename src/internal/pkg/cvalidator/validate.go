@@ -1,6 +1,8 @@
 package cvalidator
 
 import (
+	"reflect"
+
 	"github.com/gin-gonic/gin/binding"
 	"github.com/go-playground/locales/en"
 	ut "github.com/go-playground/universal-translator"
@@ -15,7 +17,34 @@ type customValidator struct {
 }
 
 func (cv *customValidator) ValidateStruct(obj any) error {
-	return cv.v.Struct(obj)
+	if obj == nil {
+		return nil
+	}
+
+	value := reflect.ValueOf(obj)
+	switch value.Kind() {
+	case reflect.Ptr:
+		if value.Elem().Kind() != reflect.Struct {
+			return cv.ValidateStruct(value.Elem().Interface())
+		}
+		return cv.v.Struct(obj)
+	case reflect.Struct:
+		return cv.v.Struct(obj)
+	case reflect.Slice, reflect.Array:
+		count := value.Len()
+		validateRet := make(binding.SliceValidationError, 0)
+		for i := 0; i < count; i++ {
+			if err := cv.ValidateStruct(value.Index(i).Interface()); err != nil {
+				validateRet = append(validateRet, err)
+			}
+		}
+		if len(validateRet) == 0 {
+			return nil
+		}
+		return validateRet
+	default:
+		return nil
+	}
 }
 
 func (cv *customValidator) Engine() any {

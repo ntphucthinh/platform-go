@@ -24,7 +24,9 @@ func (uc *UploadController) UploadFiles(c *gin.Context) {
 		uc.writeUploadError(c, err)
 		return
 	}
-	defer c.Request.MultipartForm.RemoveAll()
+	defer func() {
+		_ = c.Request.MultipartForm.RemoveAll()
+	}()
 	files := c.Request.MultipartForm.File["files"]
 	items, err := uc.usecase.Upload(c.Request.Context(), c.Request.FormValue("folder"), multipartFiles(files))
 	if err != nil {

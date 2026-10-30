@@ -1,0 +1,40 @@
+type: object
+description: Pagination information used in the response
+properties:
+  count:
+    type: integer
+    example: 1
+    minimum: 0
+    description: Number of records actually retrieved on a single page
+  currentPage:
+    type: integer
+    example: 1
+    minimum: 1
+    description: Current page
+  hasMorePages:
+    type: boolean
+    example: false
+    description: Has more pages
+  lastPage:
+    type: integer
+    example: 1
+    minimum: 1
+    description: Last page
+  perPage:
+    type: integer
+    example: 1
+    minimum: 1
+    description: Number of records per page
+  total:
+    type: integer
+    format: int64
+    example: 1
+    minimum: 0
+    description: Total number of records
+required:
+  - count
+  - currentPage
+  - hasMorePages
+  - lastPage
+  - perPage
+  - total

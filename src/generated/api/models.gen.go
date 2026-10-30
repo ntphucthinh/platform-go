@@ -107,33 +107,41 @@ type DeleteUploadsResponse struct {
 
 // FetchHomestayByIDResponse defines model for FetchHomestayByIDResponse.
 type FetchHomestayByIDResponse struct {
-	Data FetchHomestayResponse `json:"data"`
+	Data FetchHomestayResponseDataInner `json:"data"`
 }
 
 // FetchHomestayResponse defines model for FetchHomestayResponse.
 type FetchHomestayResponse struct {
-	Address       string                                    `json:"address"`
-	Description   *string                                   `json:"description"`
-	GoogleMapsUrl *string                                   `json:"google_maps_url"`
-	HomestayRooms []FetchHomestayResponseHomestayRoomsInner `json:"homestay_rooms"`
-	Id            int64                                     `json:"id"`
-	Name          string                                    `json:"name"`
+	Data []FetchHomestayResponseDataInner `json:"data"`
+
+	// PaginatorInfo Pagination information used in the response
+	PaginatorInfo PaginatorInfo `json:"paginatorInfo"`
 }
 
-// FetchHomestayResponseHomestayRoomsInner defines model for FetchHomestayResponse_homestay_rooms_inner.
-type FetchHomestayResponseHomestayRoomsInner struct {
-	Description    *string                                                      `json:"description"`
-	HomestayId     int64                                                        `json:"homestay_id"`
-	HomestayImages []FetchHomestayResponseHomestayRoomsInnerHomestayImagesInner `json:"homestay_images"`
-	Id             int64                                                        `json:"id"`
-	Name           string                                                       `json:"name"`
-	PriceAmount    *float64                                                     `json:"price_amount,omitempty"`
-	PriceUnit      *string                                                      `json:"price_unit,omitempty"`
-	SortOrder      int32                                                        `json:"sort_order"`
+// FetchHomestayResponseDataInner defines model for FetchHomestayResponse_data_inner.
+type FetchHomestayResponseDataInner struct {
+	Address       string                                             `json:"address"`
+	Description   *string                                            `json:"description"`
+	GoogleMapsUrl *string                                            `json:"google_maps_url"`
+	HomestayRooms []FetchHomestayResponseDataInnerHomestayRoomsInner `json:"homestay_rooms"`
+	Id            int64                                              `json:"id"`
+	Name          string                                             `json:"name"`
 }
 
-// FetchHomestayResponseHomestayRoomsInnerHomestayImagesInner defines model for FetchHomestayResponse_homestay_rooms_inner_homestay_images_inner.
-type FetchHomestayResponseHomestayRoomsInnerHomestayImagesInner struct {
+// FetchHomestayResponseDataInnerHomestayRoomsInner defines model for FetchHomestayResponse_data_inner_homestay_rooms_inner.
+type FetchHomestayResponseDataInnerHomestayRoomsInner struct {
+	Description    *string                                                               `json:"description"`
+	HomestayId     int64                                                                 `json:"homestay_id"`
+	HomestayImages []FetchHomestayResponseDataInnerHomestayRoomsInnerHomestayImagesInner `json:"homestay_images"`
+	Id             int64                                                                 `json:"id"`
+	Name           string                                                                `json:"name"`
+	PriceAmount    *float64                                                              `json:"price_amount,omitempty"`
+	PriceUnit      *string                                                               `json:"price_unit,omitempty"`
+	SortOrder      int32                                                                 `json:"sort_order"`
+}
+
+// FetchHomestayResponseDataInnerHomestayRoomsInnerHomestayImagesInner defines model for FetchHomestayResponse_data_inner_homestay_rooms_inner_homestay_images_inner.
+type FetchHomestayResponseDataInnerHomestayRoomsInnerHomestayImagesInner struct {
 	Id        int64  `json:"id"`
 	ImagePath string `json:"image_path"`
 	IsCover   bool   `json:"is_cover"`
@@ -269,9 +277,25 @@ type ValidationErrorResponseErrorsInner struct {
 	Message *string `json:"message,omitempty"`
 }
 
-// FetchHomestays200Response defines model for fetchHomestays_200_response.
-type FetchHomestays200Response struct {
-	Data []FetchHomestayResponse `json:"data"`
+// PaginatorInfo Pagination information used in the response
+type PaginatorInfo struct {
+	// Count Number of records actually retrieved on a single page
+	Count int `json:"count"`
+
+	// CurrentPage Current page
+	CurrentPage int `json:"currentPage"`
+
+	// HasMorePages Has more pages
+	HasMorePages bool `json:"hasMorePages"`
+
+	// LastPage Last page
+	LastPage int `json:"lastPage"`
+
+	// PerPage Number of records per page
+	PerPage int `json:"perPage"`
+
+	// Total Total number of records
+	Total int64 `json:"total"`
 }
 
 // UploadFilesRequest defines model for uploadFiles_request.
@@ -282,6 +306,12 @@ type UploadFilesRequest struct {
 
 // UploadFilesRequestFolder defines model for UploadFilesRequest.Folder.
 type UploadFilesRequestFolder string
+
+// Page defines model for Page.
+type Page = int
+
+// PerPage defines model for PerPage.
+type PerPage = int
 
 // BadRequest defines model for BadRequest.
 type BadRequest = ValidationErrorResponse
@@ -297,6 +327,15 @@ type NotFound = MessageErrorResponse
 
 // Unauthorized defines model for Unauthorized.
 type Unauthorized = MessageErrorResponse
+
+// FetchHomestaysParams defines parameters for FetchHomestays.
+type FetchHomestaysParams struct {
+	// Page Number of pages
+	Page int `binding:"required,number,min=1" form:"page" json:"page" label:"Number of pages"`
+
+	// PerPage Number of records per page
+	PerPage int `binding:"required,number,min=2,max=20" form:"perPage" json:"perPage" label:"Number of records per page"`
+}
 
 // LoginJSONRequestBody defines body for Login for application/json ContentType.
 type LoginJSONRequestBody = LoginRequest

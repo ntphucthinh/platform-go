@@ -59,6 +59,7 @@ tools:
 	go install github.com/google/wire/cmd/wire@latest
 	go install github.com/air-verse/air@v1.61.1
 	go install -tags 'mysql' github.com/golang-migrate/migrate/v4/cmd/migrate@latest
+	go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.64.8
 
 db-reset:
 	docker compose exec -T platform-db mysql -uroot -proot -e "DROP DATABASE IF EXISTS platform_db; CREATE DATABASE platform_db;"
@@ -121,3 +122,36 @@ migrate-fresh:
 
 seeder:
 	docker compose exec platform-api go run db/seed/seed.go
+
+#--------------------- test & test-db start
+test:
+	docker compose exec platform-api go test -v ./...
+
+test-controller:
+	@if [ -z "$(controller)" ]; then \
+		docker compose exec platform-api go test -v ./internal/controller_test/...; \
+	else \
+		docker compose exec platform-api go test -v ./internal/controller_test/$(controller)/...; \
+	fi
+
+test-migrate-up:
+	docker compose exec platform-api migrate -path db/migrations -database "mysql://root:root@tcp(platform-db-test)/platform_db_test" up
+
+test-migrate-down:
+	docker compose exec platform-api migrate -path db/migrations -database "mysql://root:root@tcp(platform-db-test)/platform_db_test" down -all
+
+test-migrate-refresh:
+	@make test-migrate-down
+	@make test-migrate-up
+
+test-migrate-fresh:
+	docker compose exec platform-db-test mysql --user=root --password=root -e 'DROP DATABASE IF EXISTS `platform_db_test`;'
+	docker compose exec platform-db-test mysql --user=root --password=root -e 'CREATE DATABASE `platform_db_test`;'
+	@make test-migrate-up
+
+test-reset-db:
+	docker compose exec platform-db-test mysql --user=root --password=root -e 'DROP DATABASE IF EXISTS `platform_db_test`; CREATE DATABASE `platform_db_test`;'
+	@make test-migrate-up
+
+db-test:
+	docker compose exec platform-db-test mysql -uroot -proot platform_db_test

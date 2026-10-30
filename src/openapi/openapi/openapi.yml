@@ -59,6 +59,8 @@ components:
       $ref: "./components/schemas/uploads.yml#/DeleteUploadsRequest"
     DeleteUploadsResponse:
       $ref: "./components/schemas/uploads.yml#/DeleteUploadsResponse"
+    FetchHomestayResponse:
+      $ref: "./components/schemas/homestays/index.yml#/FetchHomestayResponse"
     FetchHomestayByIDResponse:
       $ref: "./components/schemas/homestays/:homestayID.yml#/FetchHomestayByIDResponse"
     CreateHomestayRequest:

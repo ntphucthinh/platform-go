@@ -7,10 +7,8 @@ import (
 	"errors"
 	"net/http"
 	"net/http/httptest"
-	"os"
 	"testing"
 
-	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 
 	api "platform-go/generated/api"
@@ -38,7 +36,10 @@ func newCreateHomestayRouter(t *testing.T, db repository.DBInterface) http.Handl
 	t.Helper()
 	fetchUsecase := homestayusecase.NewFetchHomestaysUseCase(nil)
 	createUsecase := homestayusecase.NewCreateHomestayUsecase(db)
-	handler := controller.NewHomestayController(fetchUsecase, createUsecase)
+	fetchByIDUsecase := homestayusecase.NewFetchHomestayByIDUseCase(nil)
+	updateUsecase := homestayusecase.NewUpdateHomestayUsecase(db)
+	deleteUsecase := homestayusecase.NewDeleteHomestayUsecase(db)
+	handler := controller.NewHomestayController(fetchUsecase, createUsecase, fetchByIDUsecase, updateUsecase, deleteUsecase)
 	router := shared.NewSetupRouter(t)
 	router.POST("/homestays", handler.CreateHomestay)
 	return router
@@ -91,19 +92,7 @@ func TestCreateHomestay_DatabaseError(t *testing.T) {
 }
 
 func TestCreateHomestay_SuccessWithRealDB(t *testing.T) {
-	dsn := os.Getenv("DB_DSN")
-	if dsn == "" {
-		dsn = "root:root@tcp(platform-db:3306)/platform_db?parseTime=true"
-	}
-	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
-	if err != nil {
-		t.Skip("skipping integration test: database unavailable")
-	}
-	sqlDB, err := db.DB()
-	if err != nil || sqlDB.Ping() != nil {
-		t.Skip("skipping integration test: database unreachable")
-	}
-
+	db := shared.SetupTestDB(t)
 	schemaDB := repository.NewSchemaDB(db)
 	router := newCreateHomestayRouter(t, schemaDB)
 

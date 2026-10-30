@@ -1,0 +1,27 @@
+Page:
+  name: page
+  in: query
+  description: Number of pages
+  required: true
+  x-oapi-codegen-extra-tags:
+    binding: "required,number,min=1"
+    label: "Number of pages"
+  schema:
+    type: integer
+    minimum: 1
+    default: 1
+  example: 1
+PerPage:
+  name: perPage
+  in: query
+  description: Number of records per page
+  required: true
+  x-oapi-codegen-extra-tags:
+    binding: "required,number,min=2,max=20"
+    label: "Number of records per page"
+  schema:
+    type: integer
+    minimum: 2
+    maximum: 20
+    default: 20
+  example: 20

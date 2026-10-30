@@ -125,15 +125,39 @@ paths:
     get:
       description: Retrieve a list of homestays with their rooms and images.
       operationId: fetchHomestays
+      parameters:
+      - description: Number of pages
+        example: 1
+        in: query
+        name: page
+        required: true
+        schema:
+          default: 1
+          minimum: 1
+          type: integer
+        x-oapi-codegen-extra-tags:
+          binding: "required,number,min=1"
+          label: Number of pages
+      - description: Number of records per page
+        example: 20
+        in: query
+        name: perPage
+        required: true
+        schema:
+          default: 20
+          maximum: 20
+          minimum: 2
+          type: integer
+        x-oapi-codegen-extra-tags:
+          binding: "required,number,min=2,max=20"
+          label: Number of records per page
       responses:
         "200":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/fetchHomestays_200_response"
+                $ref: "#/components/schemas/FetchHomestayResponse"
           description: Homestays retrieved successfully
-        "500":
-          description: Internal server error
       summary: Get homestay list
       tags:
       - Homestays
@@ -161,6 +185,30 @@ paths:
       tags:
       - Homestays
   /homestays/{homestayID}:
+    delete:
+      description: Delete a homestay together with all its associated rooms and images.
+      operationId: deleteHomestay
+      parameters:
+      - example: 28
+        in: path
+        name: homestayID
+        required: true
+        schema:
+          format: int64
+          minimum: 1
+          type: integer
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageOnlyResponse"
+          description: Homestay deleted successfully
+      security:
+      - AccessCookie: []
+      summary: Delete a homestay
+      tags:
+      - Homestays
     get:
       description: Retrieve a single homestay with its rooms and images.
       operationId: fetchHomestayByID
@@ -233,14 +281,6 @@ paths:
               schema:
                 $ref: "#/components/schemas/DeleteUploadsResponse"
           description: Deletion results
-        "400":
-          description: Invalid delete request
-        "401":
-          description: Unauthenticated
-        "403":
-          description: CSRF validation failed
-        "502":
-          description: Upload provider failure
       security:
       - AccessCookie: []
       summary: Delete unused uploaded files
@@ -261,20 +301,40 @@ paths:
               schema:
                 $ref: "#/components/schemas/UploadResponse"
           description: Files uploaded successfully
-        "400":
-          description: Invalid upload request
-        "401":
-          description: Unauthenticated
-        "403":
-          description: CSRF validation failed
-        "502":
-          description: Upload provider failure
       security:
       - AccessCookie: []
       summary: "Upload images, GIFs, or videos"
       tags:
       - uploads
 components:
+  parameters:
+    Page:
+      description: Number of pages
+      example: 1
+      in: query
+      name: page
+      required: true
+      schema:
+        default: 1
+        minimum: 1
+        type: integer
+      x-oapi-codegen-extra-tags:
+        binding: "required,number,min=1"
+        label: Number of pages
+    PerPage:
+      description: Number of records per page
+      example: 20
+      in: query
+      name: perPage
+      required: true
+      schema:
+        default: 20
+        maximum: 20
+        minimum: 2
+        type: integer
+      x-oapi-codegen-extra-tags:
+        binding: "required,number,min=2,max=20"
+        label: Number of records per page
   responses:
     BadRequest:
       content:
@@ -388,6 +448,111 @@ components:
       required:
       - data
       type: object
+    FetchHomestayResponse:
+      example:
+        data:
+        - id: 28
+          name: Green Pine Homestay
+          address: "12 Tran Phu, Da Lat"
+          description: Cozy homestay with garden view
+          google_maps_url: https://www.google.com/maps
+          homestay_rooms:
+          - id: 17
+            homestay_id: 28
+            name: Room 1
+            description: Deluxe double room with balcony
+            sort_order: 1
+            price_amount: 10000.0
+            price_unit: per_room_per_night
+            homestay_images:
+            - id: 178
+              room_id: 17
+              image_path: homestays/28/1792554894062_zbd0lt_halo.png
+              sort_order: 1
+              is_cover: true
+            - id: 178
+              room_id: 17
+              image_path: homestays/28/1792554894062_zbd0lt_halo.png
+              sort_order: 1
+              is_cover: true
+          - id: 17
+            homestay_id: 28
+            name: Room 1
+            description: Deluxe double room with balcony
+            sort_order: 1
+            price_amount: 10000.0
+            price_unit: per_room_per_night
+            homestay_images:
+            - id: 178
+              room_id: 17
+              image_path: homestays/28/1792554894062_zbd0lt_halo.png
+              sort_order: 1
+              is_cover: true
+            - id: 178
+              room_id: 17
+              image_path: homestays/28/1792554894062_zbd0lt_halo.png
+              sort_order: 1
+              is_cover: true
+        - id: 28
+          name: Green Pine Homestay
+          address: "12 Tran Phu, Da Lat"
+          description: Cozy homestay with garden view
+          google_maps_url: https://www.google.com/maps
+          homestay_rooms:
+          - id: 17
+            homestay_id: 28
+            name: Room 1
+            description: Deluxe double room with balcony
+            sort_order: 1
+            price_amount: 10000.0
+            price_unit: per_room_per_night
+            homestay_images:
+            - id: 178
+              room_id: 17
+              image_path: homestays/28/1792554894062_zbd0lt_halo.png
+              sort_order: 1
+              is_cover: true
+            - id: 178
+              room_id: 17
+              image_path: homestays/28/1792554894062_zbd0lt_halo.png
+              sort_order: 1
+              is_cover: true
+          - id: 17
+            homestay_id: 28
+            name: Room 1
+            description: Deluxe double room with balcony
+            sort_order: 1
+            price_amount: 10000.0
+            price_unit: per_room_per_night
+            homestay_images:
+            - id: 178
+              room_id: 17
+              image_path: homestays/28/1792554894062_zbd0lt_halo.png
+              sort_order: 1
+              is_cover: true
+            - id: 178
+              room_id: 17
+              image_path: homestays/28/1792554894062_zbd0lt_halo.png
+              sort_order: 1
+              is_cover: true
+        paginatorInfo:
+          count: 1
+          currentPage: 1
+          hasMorePages: false
+          lastPage: 1
+          perPage: 1
+          total: 1
+      properties:
+        data:
+          items:
+            $ref: "#/components/schemas/FetchHomestayResponse_data_inner"
+          type: array
+        paginatorInfo:
+          $ref: "#/components/schemas/paginator_info"
+      required:
+      - data
+      - paginatorInfo
+      type: object
     FetchHomestayByIDResponse:
       example:
         data:
@@ -435,7 +600,7 @@ components:
               is_cover: true
       properties:
         data:
-          $ref: "#/components/schemas/FetchHomestayResponse"
+          $ref: "#/components/schemas/FetchHomestayResponse_data_inner"
       required:
       - data
       type: object
@@ -695,80 +860,6 @@ components:
       required:
       - accountType
       - email
-      - id
-      - name
-      type: object
-    FetchHomestayResponse:
-      example:
-        id: 28
-        name: Green Pine Homestay
-        address: "12 Tran Phu, Da Lat"
-        description: Cozy homestay with garden view
-        google_maps_url: https://www.google.com/maps
-        homestay_rooms:
-        - id: 17
-          homestay_id: 28
-          name: Room 1
-          description: Deluxe double room with balcony
-          sort_order: 1
-          price_amount: 10000.0
-          price_unit: per_room_per_night
-          homestay_images:
-          - id: 178
-            room_id: 17
-            image_path: homestays/28/1792554894062_zbd0lt_halo.png
-            sort_order: 1
-            is_cover: true
-          - id: 178
-            room_id: 17
-            image_path: homestays/28/1792554894062_zbd0lt_halo.png
-            sort_order: 1
-            is_cover: true
-        - id: 17
-          homestay_id: 28
-          name: Room 1
-          description: Deluxe double room with balcony
-          sort_order: 1
-          price_amount: 10000.0
-          price_unit: per_room_per_night
-          homestay_images:
-          - id: 178
-            room_id: 17
-            image_path: homestays/28/1792554894062_zbd0lt_halo.png
-            sort_order: 1
-            is_cover: true
-          - id: 178
-            room_id: 17
-            image_path: homestays/28/1792554894062_zbd0lt_halo.png
-            sort_order: 1
-            is_cover: true
-      properties:
-        id:
-          example: 28
-          format: int64
-          type: integer
-        name:
-          example: Green Pine Homestay
-          type: string
-        address:
-          example: "12 Tran Phu, Da Lat"
-          type: string
-        description:
-          example: Cozy homestay with garden view
-          nullable: true
-          type: string
-        google_maps_url:
-          example: https://www.google.com/maps
-          format: uri
-          nullable: true
-          type: string
-        homestay_rooms:
-          items:
-            $ref: "#/components/schemas/FetchHomestayResponse_homestay_rooms_inner"
-          type: array
-      required:
-      - address
-      - homestay_rooms
       - id
       - name
       type: object
@@ -1088,100 +1179,53 @@ components:
       - path
       - success
       type: object
-    fetchHomestays_200_response:
+    paginator_info:
+      description: Pagination information used in the response
       example:
-        data:
-        - id: 28
-          name: Green Pine Homestay
-          address: "12 Tran Phu, Da Lat"
-          description: Cozy homestay with garden view
-          google_maps_url: https://www.google.com/maps
-          homestay_rooms:
-          - id: 17
-            homestay_id: 28
-            name: Room 1
-            description: Deluxe double room with balcony
-            sort_order: 1
-            price_amount: 10000.0
-            price_unit: per_room_per_night
-            homestay_images:
-            - id: 178
-              room_id: 17
-              image_path: homestays/28/1792554894062_zbd0lt_halo.png
-              sort_order: 1
-              is_cover: true
-            - id: 178
-              room_id: 17
-              image_path: homestays/28/1792554894062_zbd0lt_halo.png
-              sort_order: 1
-              is_cover: true
-          - id: 17
-            homestay_id: 28
-            name: Room 1
-            description: Deluxe double room with balcony
-            sort_order: 1
-            price_amount: 10000.0
-            price_unit: per_room_per_night
-            homestay_images:
-            - id: 178
-              room_id: 17
-              image_path: homestays/28/1792554894062_zbd0lt_halo.png
-              sort_order: 1
-              is_cover: true
-            - id: 178
-              room_id: 17
-              image_path: homestays/28/1792554894062_zbd0lt_halo.png
-              sort_order: 1
-              is_cover: true
-        - id: 28
-          name: Green Pine Homestay
-          address: "12 Tran Phu, Da Lat"
-          description: Cozy homestay with garden view
-          google_maps_url: https://www.google.com/maps
-          homestay_rooms:
-          - id: 17
-            homestay_id: 28
-            name: Room 1
-            description: Deluxe double room with balcony
-            sort_order: 1
-            price_amount: 10000.0
-            price_unit: per_room_per_night
-            homestay_images:
-            - id: 178
-              room_id: 17
-              image_path: homestays/28/1792554894062_zbd0lt_halo.png
-              sort_order: 1
-              is_cover: true
-            - id: 178
-              room_id: 17
-              image_path: homestays/28/1792554894062_zbd0lt_halo.png
-              sort_order: 1
-              is_cover: true
-          - id: 17
-            homestay_id: 28
-            name: Room 1
-            description: Deluxe double room with balcony
-            sort_order: 1
-            price_amount: 10000.0
-            price_unit: per_room_per_night
-            homestay_images:
-            - id: 178
-              room_id: 17
-              image_path: homestays/28/1792554894062_zbd0lt_halo.png
-              sort_order: 1
-              is_cover: true
-            - id: 178
-              room_id: 17
-              image_path: homestays/28/1792554894062_zbd0lt_halo.png
-              sort_order: 1
-              is_cover: true
+        count: 1
+        currentPage: 1
+        hasMorePages: false
+        lastPage: 1
+        perPage: 1
+        total: 1
       properties:
-        data:
-          items:
-            $ref: "#/components/schemas/FetchHomestayResponse"
-          type: array
+        count:
+          description: Number of records actually retrieved on a single page
+          example: 1
+          minimum: 0
+          type: integer
+        currentPage:
+          description: Current page
+          example: 1
+          minimum: 1
+          type: integer
+        hasMorePages:
+          description: Has more pages
+          example: false
+          type: boolean
+        lastPage:
+          description: Last page
+          example: 1
+          minimum: 1
+          type: integer
+        perPage:
+          description: Number of records per page
+          example: 1
+          minimum: 1
+          type: integer
+        total:
+          description: Total number of records
+          example: 1
+          format: int64
+          minimum: 0
+          type: integer
       required:
-      - data
+      - count
+      - currentPage
+      - hasMorePages
+      - lastPage
+      - perPage
+      - total
       type: object
     uploadFiles_request:
       properties:
@@ -1199,14 +1243,7 @@ components:
       - files
       - folder
       type: object
-    ValidationErrorResponse_errors_inner:
-      properties:
-        field:
-          type: string
-        message:
-          type: string
-      type: object
-    FetchHomestayResponse_homestay_rooms_inner_homestay_images_inner:
+    FetchHomestayResponse_data_inner_homestay_rooms_inner_homestay_images_inner:
       example:
         id: 178
         room_id: 17
@@ -1239,7 +1276,7 @@ components:
       - room_id
       - sort_order
       type: object
-    FetchHomestayResponse_homestay_rooms_inner:
+    FetchHomestayResponse_data_inner_homestay_rooms_inner:
       example:
         id: 17
         homestay_id: 28
@@ -1288,7 +1325,7 @@ components:
           type: string
         homestay_images:
           items:
-            $ref: "#/components/schemas/FetchHomestayResponse_homestay_rooms_inner_homestay_images_inner"
+            $ref: "#/components/schemas/FetchHomestayResponse_data_inner_homestay_rooms_inner_homestay_images_inner"
           type: array
       required:
       - homestay_id
@@ -1296,6 +1333,87 @@ components:
       - id
       - name
       - sort_order
+      type: object
+    FetchHomestayResponse_data_inner:
+      example:
+        id: 28
+        name: Green Pine Homestay
+        address: "12 Tran Phu, Da Lat"
+        description: Cozy homestay with garden view
+        google_maps_url: https://www.google.com/maps
+        homestay_rooms:
+        - id: 17
+          homestay_id: 28
+          name: Room 1
+          description: Deluxe double room with balcony
+          sort_order: 1
+          price_amount: 10000.0
+          price_unit: per_room_per_night
+          homestay_images:
+          - id: 178
+            room_id: 17
+            image_path: homestays/28/1792554894062_zbd0lt_halo.png
+            sort_order: 1
+            is_cover: true
+          - id: 178
+            room_id: 17
+            image_path: homestays/28/1792554894062_zbd0lt_halo.png
+            sort_order: 1
+            is_cover: true
+        - id: 17
+          homestay_id: 28
+          name: Room 1
+          description: Deluxe double room with balcony
+          sort_order: 1
+          price_amount: 10000.0
+          price_unit: per_room_per_night
+          homestay_images:
+          - id: 178
+            room_id: 17
+            image_path: homestays/28/1792554894062_zbd0lt_halo.png
+            sort_order: 1
+            is_cover: true
+          - id: 178
+            room_id: 17
+            image_path: homestays/28/1792554894062_zbd0lt_halo.png
+            sort_order: 1
+            is_cover: true
+      properties:
+        id:
+          example: 28
+          format: int64
+          type: integer
+        name:
+          example: Green Pine Homestay
+          type: string
+        address:
+          example: "12 Tran Phu, Da Lat"
+          type: string
+        description:
+          example: Cozy homestay with garden view
+          nullable: true
+          type: string
+        google_maps_url:
+          example: https://www.google.com/maps
+          format: uri
+          nullable: true
+          type: string
+        homestay_rooms:
+          items:
+            $ref: "#/components/schemas/FetchHomestayResponse_data_inner_homestay_rooms_inner"
+          type: array
+      required:
+      - address
+      - homestay_rooms
+      - id
+      - name
+      type: object
+    ValidationErrorResponse_errors_inner:
+      properties:
+        field:
+          type: string
+        message:
+          type: string
       type: object
   securitySchemes:
     AccessCookie:

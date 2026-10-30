@@ -74,25 +74,9 @@ func main() {
 	}
 
 	// CORS Middleware
-	r.Use(func(c *gin.Context) {
-		origin := os.Getenv("CORS_ALLOW_ORIGIN")
-		if origin == "" {
-			origin = "http://localhost:3000"
-		}
-		c.Writer.Header().Set("Access-Control-Allow-Origin", origin)
-		c.Writer.Header().Set("Vary", "Origin")
-		c.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
-		c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, accept, origin, Cache-Control, X-Requested-With")
-		c.Writer.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, PATCH, DELETE, OPTIONS")
-
-		if c.Request.Method == "OPTIONS" {
-			c.AbortWithStatus(204)
-			return
-		}
-
-		c.Next()
-	})
-	r.Use(middleware.JWTAuth(application.AuthUsecase), middleware.CSRFProtection())
+	r.Use(middleware.CORSMiddleware())
+	r.Use(middleware.JWTAuth(application.AuthUsecase))
+	r.Use(middleware.CSRFProtection())
 
 	r.GET("/health", func(c *gin.Context) { c.Status(http.StatusNoContent) })
 	// Register generated routes to the gin router

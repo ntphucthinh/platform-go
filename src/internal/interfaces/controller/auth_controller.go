@@ -41,7 +41,7 @@ func (ac *AuthController) Login(c *gin.Context) {
 		return
 	}
 	ac.setCookies(c, tokens)
-	ac.writeAuthResponse(c, http.StatusOK, tokens.CSRFToken, "Login successful")
+	ac.writeAuthResponse(c, http.StatusOK, tokens, "Login successful")
 }
 
 func (ac *AuthController) Refresh(c *gin.Context) {
@@ -58,7 +58,7 @@ func (ac *AuthController) Refresh(c *gin.Context) {
 		return
 	}
 	ac.setCookies(c, tokens)
-	ac.writeAuthResponse(c, http.StatusOK, tokens.CSRFToken, "Token refreshed")
+	ac.writeAuthResponse(c, http.StatusOK, tokens, "Token refreshed")
 }
 
 // Logout clears the client-held credentials. Tokens remain stateless and are not server-side revoked.
@@ -92,24 +92,30 @@ func (ac *AuthController) Me(c *gin.Context) {
 }
 
 func (ac *AuthController) setCookies(c *gin.Context, tokens usecases.AuthTokens) {
-	c.SetSameSite(http.SameSiteLaxMode)
-	c.SetCookie("jwt", tokens.AccessToken, 24*60*60, "/", "", ac.secureCookies, true)
-	c.SetCookie("refresh_token", tokens.RefreshToken, 7*24*60*60, "/", "", ac.secureCookies, true)
+	c.SetSameSite(http.SameSiteNoneMode)
+	c.SetCookie("jwt", tokens.AccessToken, 24*60*60, "/", "", true, true)
+	c.SetCookie("refresh_token", tokens.RefreshToken, 7*24*60*60, "/", "", true, true)
 	// Expire the former path-scoped cookie so a legacy /refresh request cannot prefer it.
-	c.SetCookie("refresh_token", "", -1, "/refresh", "", ac.secureCookies, true)
+	c.SetCookie("refresh_token", "", -1, "/refresh", "", true, true)
 	// The client must read this non-HttpOnly value and mirror it in X-CSRF-Token.
-	c.SetCookie("csrf", tokens.CSRFToken, 24*60*60, "/", "", ac.secureCookies, false)
+	c.SetCookie("csrf", tokens.CSRFToken, 24*60*60, "/", "", true, false)
 }
 
 func (ac *AuthController) clearCookies(c *gin.Context) {
-	c.SetCookie("jwt", "", -1, "/", "", ac.secureCookies, true)
-	c.SetCookie("refresh_token", "", -1, "/", "", ac.secureCookies, true)
-	c.SetCookie("refresh_token", "", -1, "/refresh", "", ac.secureCookies, true)
-	c.SetCookie("csrf", "", -1, "/", "", ac.secureCookies, false)
+	c.SetSameSite(http.SameSiteNoneMode)
+	c.SetCookie("jwt", "", -1, "/", "", true, true)
+	c.SetCookie("refresh_token", "", -1, "/", "", true, true)
+	c.SetCookie("refresh_token", "", -1, "/refresh", "", true, true)
+	c.SetCookie("csrf", "", -1, "/", "", true, false)
 }
 
-func (ac *AuthController) writeAuthResponse(c *gin.Context, status int, csrfToken, message string) {
-	c.JSON(status, gin.H{"data": gin.H{"csrfToken": csrfToken}, "message": message})
+func (ac *AuthController) writeAuthResponse(c *gin.Context, status int, tokens usecases.AuthTokens, message string) {
+	c.JSON(status, api.AuthResponse{
+		Data: api.AuthResponseData{
+			CsrfToken: tokens.CSRFToken,
+		},
+		Message: message,
+	})
 }
 
 func (ac *AuthController) writeAuthenticationError(c *gin.Context, err error, message string) {

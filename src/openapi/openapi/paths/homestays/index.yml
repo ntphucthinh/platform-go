@@ -4,22 +4,16 @@ get:
     - Homestays
   summary: Get homestay list
   description: Retrieve a list of homestays with their rooms and images.
+  parameters:
+    - $ref: "../../components/schemas/common/query_pagination.yml#/Page"
+    - $ref: "../../components/schemas/common/query_pagination.yml#/PerPage"
   responses:
     "200":
       description: Homestays retrieved successfully
       content:
         application/json:
           schema:
-            type: object
-            properties:
-              data:
-                type: array
-                items:
-                  $ref: "../../components/schemas/homestays/index.yml#/FetchHomestayResponse"
-            required:
-              - data
-    "500":
-      description: Internal server error
+            $ref: "../../components/schemas/homestays/index.yml#/FetchHomestayResponse"
 post:
   operationId: createHomestay
   tags:
