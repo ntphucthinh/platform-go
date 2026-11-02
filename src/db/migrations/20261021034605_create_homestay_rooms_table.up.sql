@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS homestay_rooms (
     name VARCHAR(255) NOT NULL,
     description TEXT NULL,
     price_amount DECIMAL(15, 2) NULL,
-    price_unit VARCHAR(50) NULL,
+    price_unit VARCHAR(255) NULL,
     sort_order INT NOT NULL DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP

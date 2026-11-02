@@ -6,19 +6,12 @@ import (
 	"os"
 
 	"github.com/joho/godotenv"
-	"golang.org/x/crypto/bcrypt"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
-)
 
-type User struct {
-	ID           uint64 `gorm:"primaryKey"`
-	Name         string
-	Email        string
-	PasswordHash string
-	AccountType  string
-	Active       bool
-}
+	"platform-go/db/seed/seeder"
+	"platform-go/internal/infrastructure/repository"
+)
 
 func main() {
 	// Load env from the corresponding file based on environment
@@ -29,7 +22,6 @@ func main() {
 	} else {
 		_ = godotenv.Load(".env.local")
 	}
-
 
 	dsn := os.Getenv("DB_DSN")
 	if dsn == "" {
@@ -64,20 +56,12 @@ func main() {
 		log.Fatalf("failed to connect database: %v", err)
 	}
 
-	fmt.Println("Seeding users...")
-	adminPassword, err := bcrypt.GenerateFromPassword([]byte("123456"), bcrypt.DefaultCost)
-	if err != nil {
-		log.Fatalf("Could not hash admin password: %v", err)
-	}
-	users := []User{{Name: "Administrator", Email: "admin@gmail.com", PasswordHash: string(adminPassword), AccountType: "admin", Active: true}}
+	schemaDB := repository.NewSchemaDB(db)
 
-	for _, u := range users {
-		if err := db.Where("email = ?", u.Email).FirstOrCreate(&u).Error; err != nil {
-			log.Printf("Could not seed user %s: %v", u.Name, err)
-		} else {
-			fmt.Printf("Seeded user: %s\n", u.Name)
-		}
-	}
+	seeder.CreateUsers(schemaDB)
+	homestays := seeder.CreateHomestays(schemaDB)
+	rooms := seeder.CreateHomestayRooms(schemaDB, homestays)
+	seeder.CreateHomestayImages(schemaDB, rooms)
 
 	fmt.Println("Seeding completed successfully.")
 }
