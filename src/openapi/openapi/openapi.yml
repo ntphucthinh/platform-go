@@ -67,6 +67,8 @@ components:
       $ref: "./components/schemas/homestays/index.yml#/CreateHomestayRequest"
     UpdateHomestayRequest:
       $ref: "./components/schemas/homestays/:homestayID.yml#/UpdateHomestayRequest"
+    PriceUnit:
+      $ref: "./components/schemas/enum/price_unit.yml#/PriceUnit"
     MessageOnlyResponse:
       $ref: "./components/schemas/common/message.yml#/MessageOnlyResponse"
     ValidationErrorResponse:

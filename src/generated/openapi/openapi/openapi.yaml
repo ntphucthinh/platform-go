@@ -463,7 +463,7 @@ components:
             description: Deluxe double room with balcony
             sort_order: 1
             price_amount: 10000.0
-            price_unit: per_room_per_night
+            price_unit: night_per_room
             homestay_images:
             - id: 178
               room_id: 17
@@ -481,7 +481,7 @@ components:
             description: Deluxe double room with balcony
             sort_order: 1
             price_amount: 10000.0
-            price_unit: per_room_per_night
+            price_unit: night_per_room
             homestay_images:
             - id: 178
               room_id: 17
@@ -505,7 +505,7 @@ components:
             description: Deluxe double room with balcony
             sort_order: 1
             price_amount: 10000.0
-            price_unit: per_room_per_night
+            price_unit: night_per_room
             homestay_images:
             - id: 178
               room_id: 17
@@ -523,7 +523,7 @@ components:
             description: Deluxe double room with balcony
             sort_order: 1
             price_amount: 10000.0
-            price_unit: per_room_per_night
+            price_unit: night_per_room
             homestay_images:
             - id: 178
               room_id: 17
@@ -568,7 +568,7 @@ components:
             description: Deluxe double room with balcony
             sort_order: 1
             price_amount: 10000.0
-            price_unit: per_room_per_night
+            price_unit: night_per_room
             homestay_images:
             - id: 178
               room_id: 17
@@ -586,7 +586,7 @@ components:
             description: Deluxe double room with balcony
             sort_order: 1
             price_amount: 10000.0
-            price_unit: per_room_per_night
+            price_unit: night_per_room
             homestay_images:
             - id: 178
               room_id: 17
@@ -614,7 +614,7 @@ components:
         - name: Room 1
           description: Deluxe room with garden view
           priceAmount: 10000.0
-          priceUnit: per_room_per_night
+          priceUnit: night_per_room
           sortOrder: 1
           images:
           - imagePath: homestays/550e8400-e29b-41d4-a716-446655440000.png
@@ -626,7 +626,7 @@ components:
         - name: Room 1
           description: Deluxe room with garden view
           priceAmount: 10000.0
-          priceUnit: per_room_per_night
+          priceUnit: night_per_room
           sortOrder: 1
           images:
           - imagePath: homestays/550e8400-e29b-41d4-a716-446655440000.png
@@ -681,7 +681,7 @@ components:
             $ref: "#/components/schemas/CreateHomestayRoomInput"
           type: array
           x-oapi-codegen-extra-tags:
-            binding: omitempty
+            binding: "omitempty,dive"
       required:
       - address
       - name
@@ -697,7 +697,7 @@ components:
           name: Room 1
           description: Deluxe room with garden view
           priceAmount: 10000.0
-          priceUnit: per_room_per_night
+          priceUnit: night_per_room
           sortOrder: 1
           images:
           - id: 178
@@ -712,7 +712,7 @@ components:
           name: Room 1
           description: Deluxe room with garden view
           priceAmount: 10000.0
-          priceUnit: per_room_per_night
+          priceUnit: night_per_room
           sortOrder: 1
           images:
           - id: 178
@@ -771,11 +771,23 @@ components:
           x-order: 5
           x-go-name: Rooms
           x-oapi-codegen-extra-tags:
-            binding: omitempty
+            binding: "omitempty,dive"
       required:
       - address
       - name
       type: object
+    PriceUnit:
+      description: |-
+        The pricing unit.
+        - "night_per_room": Price per room per night.
+        - "night_per_house": Price per house per night.
+      enum:
+      - night_per_room
+      - night_per_house
+      type: string
+      x-enum-varnames:
+      - PriceUnitNightPerRoom
+      - PriceUnitNightPerHouse
     MessageOnlyResponse:
       example:
         message: Create new successfully
@@ -868,7 +880,7 @@ components:
         name: Room 1
         description: Deluxe room with garden view
         priceAmount: 10000.0
-        priceUnit: per_room_per_night
+        priceUnit: night_per_room
         sortOrder: 1
         images:
         - imagePath: homestays/550e8400-e29b-41d4-a716-446655440000.png
@@ -909,15 +921,15 @@ components:
           x-oapi-codegen-extra-tags:
             binding: omitempty
         priceUnit:
+          allOf:
+          - $ref: "#/components/schemas/PriceUnit"
           description: Price unit
-          example: per_room_per_night
-          maxLength: 50
+          example: night_per_room
           nullable: true
-          type: string
           x-order: 4
           x-go-name: PriceUnit
           x-oapi-codegen-extra-tags:
-            binding: omitempty
+            binding: "omitempty,oneof=night_per_room night_per_house"
         sortOrder:
           description: Display order
           example: 1
@@ -983,7 +995,7 @@ components:
         name: Room 1
         description: Deluxe room with garden view
         priceAmount: 10000.0
-        priceUnit: per_room_per_night
+        priceUnit: night_per_room
         sortOrder: 1
         images:
         - id: 178
@@ -1034,15 +1046,15 @@ components:
           x-oapi-codegen-extra-tags:
             binding: omitempty
         priceUnit:
+          allOf:
+          - $ref: "#/components/schemas/PriceUnit"
           description: Price unit
-          example: per_room_per_night
-          maxLength: 50
+          example: night_per_room
           nullable: true
-          type: string
           x-order: 5
           x-go-name: PriceUnit
           x-oapi-codegen-extra-tags:
-            binding: omitempty
+            binding: "omitempty,oneof=night_per_room night_per_house"
         sortOrder:
           description: Display order
           example: 1
@@ -1284,7 +1296,7 @@ components:
         description: Deluxe double room with balcony
         sort_order: 1
         price_amount: 10000.0
-        price_unit: per_room_per_night
+        price_unit: night_per_room
         homestay_images:
         - id: 178
           room_id: 17
@@ -1321,8 +1333,10 @@ components:
           format: double
           type: number
         price_unit:
-          example: per_room_per_night
-          type: string
+          allOf:
+          - $ref: "#/components/schemas/PriceUnit"
+          example: night_per_room
+          nullable: true
         homestay_images:
           items:
             $ref: "#/components/schemas/FetchHomestayResponse_data_inner_homestay_rooms_inner_homestay_images_inner"
@@ -1348,7 +1362,7 @@ components:
           description: Deluxe double room with balcony
           sort_order: 1
           price_amount: 10000.0
-          price_unit: per_room_per_night
+          price_unit: night_per_room
           homestay_images:
           - id: 178
             room_id: 17
@@ -1366,7 +1380,7 @@ components:
           description: Deluxe double room with balcony
           sort_order: 1
           price_amount: 10000.0
-          price_unit: per_room_per_night
+          price_unit: night_per_room
           homestay_images:
           - id: 178
             room_id: 17

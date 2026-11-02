@@ -49,7 +49,7 @@ var _ homestayqueryservice.HomestayQueryService = homestayQueryService{}
 func TestFetchHomestays(t *testing.T) {
 	description := "Room description"
 	price := 10000.0
-	priceUnit := "per_room_per_night"
+	priceUnit := string(api.PriceUnitNightPerRoom)
 	roomID := int64(11)
 	queryService := homestayQueryService{homestays: []qsdto.HomestayDto{{
 		ID: 1, Name: "Homestay", Address: "Da Nang",

@@ -42,7 +42,7 @@ func TestFetchHomestayByID_Success(t *testing.T) {
 	mapsURL := "https://maps.google.com/?q=danang"
 	roomDesc := "Deluxe Ocean View"
 	price := 1200000.0
-	unit := "per_room_per_night"
+	unit := string(api.PriceUnitNightPerRoom)
 	roomID := int64(10)
 
 	qs := homestayQueryService{

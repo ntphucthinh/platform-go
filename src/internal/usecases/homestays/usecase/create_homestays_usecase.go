@@ -62,7 +62,7 @@ func (uc *CreateHomestayUsecase) Execute(ctx context.Context, request api.Create
 					Name:        strings.TrimSpace(r.Name),
 					Description: r.Description,
 					PriceAmount: r.PriceAmount,
-					PriceUnit:   r.PriceUnit,
+					PriceUnit:   (*string)(r.PriceUnit),
 					SortOrder:   r.SortOrder,
 				}
 				if err := tx.Create(&room).Error; err != nil {

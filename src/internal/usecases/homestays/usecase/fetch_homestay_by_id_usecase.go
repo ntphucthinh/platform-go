@@ -46,7 +46,7 @@ func (uc *FetchHomestayByIDUseCase) Execute(ctx context.Context, id int64) (*api
 			Name:           r.Name,
 			Description:    r.Description,
 			PriceAmount:    r.PriceAmount,
-			PriceUnit:      r.PriceUnit,
+			PriceUnit:      (*api.PriceUnit)(r.PriceUnit),
 			SortOrder:      r.SortOrder,
 			HomestayImages: images,
 		}

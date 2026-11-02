@@ -107,6 +107,44 @@ func TestUpdateHomestay_NotFound(t *testing.T) {
 	}
 }
 
+func TestUpdateHomestay_InvalidPriceUnit(t *testing.T) {
+	router := newUpdateHomestayRouter(t, &fakeDB{})
+
+	invalidPayload := map[string]interface{}{
+		"name":    "Updated Homestay",
+		"address": "456 Tran Phu, Da Lat",
+		"rooms": []map[string]interface{}{
+			{
+				"name":      "Deluxe Room",
+				"sortOrder": 1,
+				"priceUnit": "invalid_unit",
+			},
+		},
+	}
+	bodyBytes, err := json.Marshal(invalidPayload)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	response := performPut(t, router, "/homestays/1", bodyBytes)
+	if response.Code != http.StatusBadRequest {
+		t.Fatalf("expected status 400, got %d, body: %s", response.Code, response.Body.String())
+	}
+
+	var res map[string]interface{}
+	if err := json.Unmarshal(response.Body.Bytes(), &res); err != nil {
+		t.Fatal(err)
+	}
+
+	errorsMap, ok := res["errors"].(map[string]interface{})
+	if !ok {
+		t.Fatalf("expected errors object in response, got: %#v", res)
+	}
+	if _, exists := errorsMap["priceUnit"]; !exists {
+		t.Fatalf("expected priceUnit validation error, got: %#v", errorsMap)
+	}
+}
+
 func TestUpdateHomestay_SuccessWithRealDB(t *testing.T) {
 	db := shared.SetupTestDB(t)
 
@@ -175,12 +213,12 @@ func TestUpdateHomestay_SuccessWithRealDB(t *testing.T) {
 	newDesc := "Updated description"
 	newMapsURL := "https://maps.google.com/?q=updated"
 	price1 := 600000.0
-	unit1 := "per_room_per_night"
+	unit1 := api.PriceUnitNightPerRoom
 	updatedImg1Path := "homestays/img1-updated.jpg"
 	newImg4Path := "homestays/img4-new.jpg"
 
 	price3 := 800000.0
-	unit3 := "per_room_per_night"
+	unit3 := api.PriceUnitNightPerHouse
 	newImg5Path := "homestays/img5-new.jpg"
 
 	updatePayload := api.UpdateHomestayRequest{

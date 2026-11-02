@@ -1,0 +1,15 @@
+PriceUnit:
+  type: string
+  enum:
+    - "night_per_room"
+    - "night_per_house"
+  description: |-
+    The pricing unit.
+    - "night_per_room": Price per room per night.
+    - "night_per_house": Price per house per night.
+  x-enum-varnames:
+    - PriceUnitNightPerRoom
+    - PriceUnitNightPerHouse
+  x-enum-varnames:
+    - PriceUnitNightPerRoom
+    - PriceUnitNightPerHouse

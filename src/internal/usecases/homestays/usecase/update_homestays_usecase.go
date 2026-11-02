@@ -164,7 +164,7 @@ func (uc *UpdateHomestayUsecase) Execute(
 					"name":         strings.TrimSpace(roomRequest.Name),
 					"description":  roomRequest.Description,
 					"price_amount": roomRequest.PriceAmount,
-					"price_unit":   roomRequest.PriceUnit,
+					"price_unit":   (*string)(roomRequest.PriceUnit),
 					"sort_order":   roomRequest.SortOrder,
 				}
 
@@ -184,7 +184,7 @@ func (uc *UpdateHomestayUsecase) Execute(
 					Name:        strings.TrimSpace(roomRequest.Name),
 					Description: roomRequest.Description,
 					PriceAmount: roomRequest.PriceAmount,
-					PriceUnit:   roomRequest.PriceUnit,
+					PriceUnit:   (*string)(roomRequest.PriceUnit),
 					SortOrder:   roomRequest.SortOrder,
 				}
 

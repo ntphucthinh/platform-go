@@ -42,7 +42,7 @@ func (uc *FetchHomestaysUseCase) Execute(ctx context.Context, page, perPage int)
 				Name:           r.Name,
 				Description:    r.Description,
 				PriceAmount:    r.PriceAmount,
-				PriceUnit:      r.PriceUnit,
+				PriceUnit:      (*api.PriceUnit)(r.PriceUnit),
 				SortOrder:      r.SortOrder,
 				HomestayImages: images,
 			}

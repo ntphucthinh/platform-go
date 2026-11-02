@@ -20,6 +20,12 @@ const (
 	Video DeleteUploadItemResourceType = "video"
 )
 
+// Defines values for PriceUnit.
+const (
+	PriceUnitNightPerHouse PriceUnit = "night_per_house"
+	PriceUnitNightPerRoom  PriceUnit = "night_per_room"
+)
+
 // Defines values for UploadFilesRequestFolder.
 const (
 	Homestays UploadFilesRequestFolder = "homestays"
@@ -52,7 +58,7 @@ type CreateHomestayRequest struct {
 	GoogleMapsUrl *string `binding:"omitempty" json:"googleMapsUrl"`
 
 	// Rooms List of rooms
-	Rooms *[]CreateHomestayRoomInput `binding:"omitempty" json:"rooms,omitempty"`
+	Rooms *[]CreateHomestayRoomInput `binding:"omitempty,dive" json:"rooms,omitempty"`
 }
 
 // CreateHomestayRoomInput defines model for CreateHomestayRoomInput.
@@ -67,7 +73,7 @@ type CreateHomestayRoomInput struct {
 	PriceAmount *float64 `binding:"omitempty" json:"priceAmount"`
 
 	// PriceUnit Price unit
-	PriceUnit *string `binding:"omitempty" json:"priceUnit"`
+	PriceUnit *PriceUnit `binding:"omitempty,oneof=night_per_room night_per_house" json:"priceUnit"`
 
 	// SortOrder Display order
 	SortOrder int32 `binding:"required,min=0" json:"sortOrder"`
@@ -136,7 +142,7 @@ type FetchHomestayResponseDataInnerHomestayRoomsInner struct {
 	Id             int64                                                                 `json:"id"`
 	Name           string                                                                `json:"name"`
 	PriceAmount    *float64                                                              `json:"price_amount,omitempty"`
-	PriceUnit      *string                                                               `json:"price_unit,omitempty"`
+	PriceUnit      *PriceUnit                                                            `json:"price_unit"`
 	SortOrder      int32                                                                 `json:"sort_order"`
 }
 
@@ -186,6 +192,11 @@ type MessageOnlyResponse struct {
 	Message string `json:"message"`
 }
 
+// PriceUnit The pricing unit.
+// - "night_per_room": Price per room per night.
+// - "night_per_house": Price per house per night.
+type PriceUnit string
+
 // UpdateHomestayImageInput defines model for UpdateHomestayImageInput.
 type UpdateHomestayImageInput struct {
 	// Id Existing image ID. Omit or set to null to create a new image.
@@ -216,7 +227,7 @@ type UpdateHomestayRequest struct {
 	GoogleMapsUrl *string `binding:"omitempty" json:"googleMapsUrl"`
 
 	// Rooms List of rooms
-	Rooms *[]UpdateHomestayRoomInput `binding:"omitempty" json:"rooms,omitempty"`
+	Rooms *[]UpdateHomestayRoomInput `binding:"omitempty,dive" json:"rooms,omitempty"`
 }
 
 // UpdateHomestayRoomInput defines model for UpdateHomestayRoomInput.
@@ -234,7 +245,7 @@ type UpdateHomestayRoomInput struct {
 	PriceAmount *float64 `binding:"omitempty" json:"priceAmount"`
 
 	// PriceUnit Price unit
-	PriceUnit *string `binding:"omitempty" json:"priceUnit"`
+	PriceUnit *PriceUnit `binding:"omitempty,oneof=night_per_room night_per_house" json:"priceUnit"`
 
 	// SortOrder Display order
 	SortOrder int32 `binding:"required,min=0" json:"sortOrder"`

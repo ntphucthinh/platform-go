@@ -63,7 +63,41 @@ func TestCreateHomestay_InvalidBody(t *testing.T) {
 }
 
 func TestCreateHomestay_ValidationErrors(t *testing.T) {
-	t.Skip("manual validation is currently commented out in usecase")
+	router := newCreateHomestayRouter(t, &fakeDB{})
+
+	invalidPayload := map[string]interface{}{
+		"name":    "Test Homestay",
+		"address": "456 Tran Phu, Da Lat",
+		"rooms": []map[string]interface{}{
+			{
+				"name":      "Deluxe Room",
+				"sortOrder": 1,
+				"priceUnit": "invalid_unit",
+			},
+		},
+	}
+	bodyBytes, err := json.Marshal(invalidPayload)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	response := performPost(t, router, bodyBytes)
+	if response.Code != http.StatusBadRequest {
+		t.Fatalf("expected status 400, got %d, body: %s", response.Code, response.Body.String())
+	}
+
+	var res map[string]interface{}
+	if err := json.Unmarshal(response.Body.Bytes(), &res); err != nil {
+		t.Fatal(err)
+	}
+
+	errorsMap, ok := res["errors"].(map[string]interface{})
+	if !ok {
+		t.Fatalf("expected errors object in response, got: %#v", res)
+	}
+	if _, exists := errorsMap["priceUnit"]; !exists {
+		t.Fatalf("expected priceUnit validation error, got: %#v", errorsMap)
+	}
 }
 
 func TestCreateHomestay_DatabaseError(t *testing.T) {
@@ -99,7 +133,7 @@ func TestCreateHomestay_SuccessWithRealDB(t *testing.T) {
 	desc := "A lovely homestay"
 	mapsURL := "https://maps.google.com/?q=dalat"
 	price := 500000.0
-	unit := "per_room_per_night"
+	unit := api.PriceUnitNightPerRoom
 	imagePath := "homestays/test-image-1.jpg"
 
 	payload := api.CreateHomestayRequest{

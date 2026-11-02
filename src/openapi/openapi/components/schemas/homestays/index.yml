@@ -54,8 +54,10 @@ FetchHomestayResponse:
                   format: double
                   example: 10000.00
                 price_unit:
-                  type: string
-                  example: per_room_per_night
+                  allOf:
+                    - $ref: "../enum/price_unit.yml#/PriceUnit"
+                  nullable: true
+                  example: night_per_room
                 homestay_images:
                   type: array
                   items:
@@ -153,7 +155,7 @@ CreateHomestayRequest:
       items:
         $ref: "#/CreateHomestayRoomInput"
       x-oapi-codegen-extra-tags:
-        binding: "omitempty"
+        binding: "omitempty,dive"
   required:
     - name
     - address
@@ -192,15 +194,15 @@ CreateHomestayRoomInput:
       x-oapi-codegen-extra-tags:
         binding: "omitempty"
     priceUnit:
-      type: string
-      maxLength: 50
+      allOf:
+        - $ref: "../enum/price_unit.yml#/PriceUnit"
       nullable: true
       x-order: 4
       x-go-name: PriceUnit
       description: "Price unit"
-      example: per_room_per_night
+      example: night_per_room
       x-oapi-codegen-extra-tags:
-        binding: "omitempty"
+        binding: "omitempty,oneof=night_per_room night_per_house"
     sortOrder:
       type: integer
       format: int32
