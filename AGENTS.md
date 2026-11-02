@@ -172,3 +172,12 @@ This project follows **Clean Architecture** with **DDD** to keep business rules 
 - ❌ Avoid running `go test` directly inside containers via `make go`; rely on the scripted targets to ensure migrations and seeds run correctly.
 - ✅ Regenerate code (`make codegen`) and re-run targeted tests when OpenAPI contracts change.
 - ✅ Regenerate DI (`make wire`) before testing when constructors change.
+
+### Implementation Rules
+
+- Read the existing source code before making any modifications.
+- Adhere to AGENTS.md and the project's established conventions.
+- Reuse existing packages and helper utilities whenever appropriate.
+- Do not create circular file dependencies or introduce new dependencies unless strictly necessary.
+- Do not modify files outside the scope of the task unless there is a clear technical requirement to do so.
+- Do not provide instructions or code snippets; apply updates directly to the source code.
