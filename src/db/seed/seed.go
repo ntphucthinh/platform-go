@@ -59,9 +59,14 @@ func main() {
 	schemaDB := repository.NewSchemaDB(db)
 
 	seeder.CreateUsers(schemaDB)
+
+	//Homestay
 	homestays := seeder.CreateHomestays(schemaDB)
 	rooms := seeder.CreateHomestayRooms(schemaDB, homestays)
 	seeder.CreateHomestayImages(schemaDB, rooms)
+
+	//Travel map
+	seeder.CreateTravelLocations(schemaDB)
 
 	fmt.Println("Seeding completed successfully.")
 }
