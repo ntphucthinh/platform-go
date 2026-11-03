@@ -21,12 +21,12 @@ FetchHomestayByIDResponse:
           type: string
           nullable: true
           example: Cozy homestay with garden view
-        google_maps_url:
+        googleMapsUrl:
           type: string
           nullable: true
           format: uri
           example: https://www.google.com/maps
-        homestay_rooms:
+        homestayRooms:
           type: array
           items:
             type: object
@@ -35,7 +35,7 @@ FetchHomestayByIDResponse:
                 type: integer
                 format: int64
                 example: 17
-              homestay_id:
+              homestayId:
                 type: integer
                 format: int64
                 example: 28
@@ -46,20 +46,20 @@ FetchHomestayByIDResponse:
                 type: string
                 nullable: true
                 example: Deluxe double room with balcony
-              sort_order:
+              sortOrder:
                 type: integer
                 format: int32
                 example: 1
-              price_amount:
+              priceAmount:
                 type: number
                 format: double
                 example: 10000.00
-              price_unit:
+              priceUnit:
                 allOf:
                   - $ref: "../enum/price_unit.yml#/PriceUnit"
                 nullable: true
                 example: night_per_room
-              homestay_images:
+              homestayImages:
                 type: array
                 items:
                   type: object
@@ -68,37 +68,37 @@ FetchHomestayByIDResponse:
                       type: integer
                       format: int64
                       example: 178
-                    room_id:
+                    roomId:
                       type: integer
                       format: int64
                       example: 17
-                    image_path:
+                    imagePath:
                       type: string
                       example: homestays/28/1792554894062_zbd0lt_halo.png
-                    sort_order:
+                    sortOrder:
                       type: integer
                       format: int32
                       example: 1
-                    is_cover:
+                    isCover:
                       type: boolean
                       example: true
                   required:
                     - id
-                    - room_id
-                    - image_path
-                    - sort_order
-                    - is_cover
+                    - roomId
+                    - imagePath
+                    - sortOrder
+                    - isCover
             required:
               - id
-              - homestay_id
+              - homestayId
               - name
-              - sort_order
-              - homestay_images
+              - sortOrder
+              - homestayImages
       required:
         - id
         - name
         - address
-        - homestay_rooms
+        - homestayRooms
   required:
     - data
 

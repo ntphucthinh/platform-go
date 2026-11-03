@@ -1,0 +1,12 @@
+TravelLocationStatus:
+  type: string
+  enum:
+    - "visited"
+    - "wishlist"
+  x-enum-varnames:
+    - TravelLocationStatusVisited
+    - TravelLocationStatusWishlist
+  description: |-
+    The status of a travel location.
+    - "visited": The user has visited the location.
+    - "wishlist": The user wants to visit the location.

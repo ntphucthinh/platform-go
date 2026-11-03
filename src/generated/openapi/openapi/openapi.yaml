@@ -455,86 +455,86 @@ components:
           name: Green Pine Homestay
           address: "12 Tran Phu, Da Lat"
           description: Cozy homestay with garden view
-          google_maps_url: https://www.google.com/maps
-          homestay_rooms:
+          googleMapsUrl: https://www.google.com/maps
+          homestayRooms:
           - id: 17
-            homestay_id: 28
+            homestayId: 28
             name: Room 1
             description: Deluxe double room with balcony
-            sort_order: 1
-            price_amount: 10000.0
-            price_unit: night_per_room
-            homestay_images:
+            sortOrder: 1
+            priceAmount: 10000.0
+            priceUnit: night_per_room
+            homestayImages:
             - id: 178
-              room_id: 17
-              image_path: homestays/28/1792554894062_zbd0lt_halo.png
-              sort_order: 1
-              is_cover: true
+              roomId: 17
+              imagePath: homestays/28/1792554894062_zbd0lt_halo.png
+              sortOrder: 1
+              isCover: true
             - id: 178
-              room_id: 17
-              image_path: homestays/28/1792554894062_zbd0lt_halo.png
-              sort_order: 1
-              is_cover: true
+              roomId: 17
+              imagePath: homestays/28/1792554894062_zbd0lt_halo.png
+              sortOrder: 1
+              isCover: true
           - id: 17
-            homestay_id: 28
+            homestayId: 28
             name: Room 1
             description: Deluxe double room with balcony
-            sort_order: 1
-            price_amount: 10000.0
-            price_unit: night_per_room
-            homestay_images:
+            sortOrder: 1
+            priceAmount: 10000.0
+            priceUnit: night_per_room
+            homestayImages:
             - id: 178
-              room_id: 17
-              image_path: homestays/28/1792554894062_zbd0lt_halo.png
-              sort_order: 1
-              is_cover: true
+              roomId: 17
+              imagePath: homestays/28/1792554894062_zbd0lt_halo.png
+              sortOrder: 1
+              isCover: true
             - id: 178
-              room_id: 17
-              image_path: homestays/28/1792554894062_zbd0lt_halo.png
-              sort_order: 1
-              is_cover: true
+              roomId: 17
+              imagePath: homestays/28/1792554894062_zbd0lt_halo.png
+              sortOrder: 1
+              isCover: true
         - id: 28
           name: Green Pine Homestay
           address: "12 Tran Phu, Da Lat"
           description: Cozy homestay with garden view
-          google_maps_url: https://www.google.com/maps
-          homestay_rooms:
+          googleMapsUrl: https://www.google.com/maps
+          homestayRooms:
           - id: 17
-            homestay_id: 28
+            homestayId: 28
             name: Room 1
             description: Deluxe double room with balcony
-            sort_order: 1
-            price_amount: 10000.0
-            price_unit: night_per_room
-            homestay_images:
+            sortOrder: 1
+            priceAmount: 10000.0
+            priceUnit: night_per_room
+            homestayImages:
             - id: 178
-              room_id: 17
-              image_path: homestays/28/1792554894062_zbd0lt_halo.png
-              sort_order: 1
-              is_cover: true
+              roomId: 17
+              imagePath: homestays/28/1792554894062_zbd0lt_halo.png
+              sortOrder: 1
+              isCover: true
             - id: 178
-              room_id: 17
-              image_path: homestays/28/1792554894062_zbd0lt_halo.png
-              sort_order: 1
-              is_cover: true
+              roomId: 17
+              imagePath: homestays/28/1792554894062_zbd0lt_halo.png
+              sortOrder: 1
+              isCover: true
           - id: 17
-            homestay_id: 28
+            homestayId: 28
             name: Room 1
             description: Deluxe double room with balcony
-            sort_order: 1
-            price_amount: 10000.0
-            price_unit: night_per_room
-            homestay_images:
+            sortOrder: 1
+            priceAmount: 10000.0
+            priceUnit: night_per_room
+            homestayImages:
             - id: 178
-              room_id: 17
-              image_path: homestays/28/1792554894062_zbd0lt_halo.png
-              sort_order: 1
-              is_cover: true
+              roomId: 17
+              imagePath: homestays/28/1792554894062_zbd0lt_halo.png
+              sortOrder: 1
+              isCover: true
             - id: 178
-              room_id: 17
-              image_path: homestays/28/1792554894062_zbd0lt_halo.png
-              sort_order: 1
-              is_cover: true
+              roomId: 17
+              imagePath: homestays/28/1792554894062_zbd0lt_halo.png
+              sortOrder: 1
+              isCover: true
         paginatorInfo:
           count: 1
           currentPage: 1
@@ -560,44 +560,44 @@ components:
           name: Green Pine Homestay
           address: "12 Tran Phu, Da Lat"
           description: Cozy homestay with garden view
-          google_maps_url: https://www.google.com/maps
-          homestay_rooms:
+          googleMapsUrl: https://www.google.com/maps
+          homestayRooms:
           - id: 17
-            homestay_id: 28
+            homestayId: 28
             name: Room 1
             description: Deluxe double room with balcony
-            sort_order: 1
-            price_amount: 10000.0
-            price_unit: night_per_room
-            homestay_images:
+            sortOrder: 1
+            priceAmount: 10000.0
+            priceUnit: night_per_room
+            homestayImages:
             - id: 178
-              room_id: 17
-              image_path: homestays/28/1792554894062_zbd0lt_halo.png
-              sort_order: 1
-              is_cover: true
+              roomId: 17
+              imagePath: homestays/28/1792554894062_zbd0lt_halo.png
+              sortOrder: 1
+              isCover: true
             - id: 178
-              room_id: 17
-              image_path: homestays/28/1792554894062_zbd0lt_halo.png
-              sort_order: 1
-              is_cover: true
+              roomId: 17
+              imagePath: homestays/28/1792554894062_zbd0lt_halo.png
+              sortOrder: 1
+              isCover: true
           - id: 17
-            homestay_id: 28
+            homestayId: 28
             name: Room 1
             description: Deluxe double room with balcony
-            sort_order: 1
-            price_amount: 10000.0
-            price_unit: night_per_room
-            homestay_images:
+            sortOrder: 1
+            priceAmount: 10000.0
+            priceUnit: night_per_room
+            homestayImages:
             - id: 178
-              room_id: 17
-              image_path: homestays/28/1792554894062_zbd0lt_halo.png
-              sort_order: 1
-              is_cover: true
+              roomId: 17
+              imagePath: homestays/28/1792554894062_zbd0lt_halo.png
+              sortOrder: 1
+              isCover: true
             - id: 178
-              room_id: 17
-              image_path: homestays/28/1792554894062_zbd0lt_halo.png
-              sort_order: 1
-              is_cover: true
+              roomId: 17
+              imagePath: homestays/28/1792554894062_zbd0lt_halo.png
+              sortOrder: 1
+              isCover: true
       properties:
         data:
           $ref: "#/components/schemas/FetchHomestayResponse_data_inner"
@@ -1255,65 +1255,65 @@ components:
       - files
       - folder
       type: object
-    FetchHomestayResponse_data_inner_homestay_rooms_inner_homestay_images_inner:
+    FetchHomestayResponse_data_inner_homestayRooms_inner_homestayImages_inner:
       example:
         id: 178
-        room_id: 17
-        image_path: homestays/28/1792554894062_zbd0lt_halo.png
-        sort_order: 1
-        is_cover: true
+        roomId: 17
+        imagePath: homestays/28/1792554894062_zbd0lt_halo.png
+        sortOrder: 1
+        isCover: true
       properties:
         id:
           example: 178
           format: int64
           type: integer
-        room_id:
+        roomId:
           example: 17
           format: int64
           type: integer
-        image_path:
+        imagePath:
           example: homestays/28/1792554894062_zbd0lt_halo.png
           type: string
-        sort_order:
+        sortOrder:
           example: 1
           format: int32
           type: integer
-        is_cover:
+        isCover:
           example: true
           type: boolean
       required:
       - id
-      - image_path
-      - is_cover
-      - room_id
-      - sort_order
+      - imagePath
+      - isCover
+      - roomId
+      - sortOrder
       type: object
-    FetchHomestayResponse_data_inner_homestay_rooms_inner:
+    FetchHomestayResponse_data_inner_homestayRooms_inner:
       example:
         id: 17
-        homestay_id: 28
+        homestayId: 28
         name: Room 1
         description: Deluxe double room with balcony
-        sort_order: 1
-        price_amount: 10000.0
-        price_unit: night_per_room
-        homestay_images:
+        sortOrder: 1
+        priceAmount: 10000.0
+        priceUnit: night_per_room
+        homestayImages:
         - id: 178
-          room_id: 17
-          image_path: homestays/28/1792554894062_zbd0lt_halo.png
-          sort_order: 1
-          is_cover: true
+          roomId: 17
+          imagePath: homestays/28/1792554894062_zbd0lt_halo.png
+          sortOrder: 1
+          isCover: true
         - id: 178
-          room_id: 17
-          image_path: homestays/28/1792554894062_zbd0lt_halo.png
-          sort_order: 1
-          is_cover: true
+          roomId: 17
+          imagePath: homestays/28/1792554894062_zbd0lt_halo.png
+          sortOrder: 1
+          isCover: true
       properties:
         id:
           example: 17
           format: int64
           type: integer
-        homestay_id:
+        homestayId:
           example: 28
           format: int64
           type: integer
@@ -1324,29 +1324,29 @@ components:
           example: Deluxe double room with balcony
           nullable: true
           type: string
-        sort_order:
+        sortOrder:
           example: 1
           format: int32
           type: integer
-        price_amount:
+        priceAmount:
           example: 10000.0
           format: double
           type: number
-        price_unit:
+        priceUnit:
           allOf:
           - $ref: "#/components/schemas/PriceUnit"
           example: night_per_room
           nullable: true
-        homestay_images:
+        homestayImages:
           items:
-            $ref: "#/components/schemas/FetchHomestayResponse_data_inner_homestay_rooms_inner_homestay_images_inner"
+            $ref: "#/components/schemas/FetchHomestayResponse_data_inner_homestayRooms_inner_homestayImages_inner"
           type: array
       required:
-      - homestay_id
-      - homestay_images
+      - homestayId
+      - homestayImages
       - id
       - name
-      - sort_order
+      - sortOrder
       type: object
     FetchHomestayResponse_data_inner:
       example:
@@ -1354,44 +1354,44 @@ components:
         name: Green Pine Homestay
         address: "12 Tran Phu, Da Lat"
         description: Cozy homestay with garden view
-        google_maps_url: https://www.google.com/maps
-        homestay_rooms:
+        googleMapsUrl: https://www.google.com/maps
+        homestayRooms:
         - id: 17
-          homestay_id: 28
+          homestayId: 28
           name: Room 1
           description: Deluxe double room with balcony
-          sort_order: 1
-          price_amount: 10000.0
-          price_unit: night_per_room
-          homestay_images:
+          sortOrder: 1
+          priceAmount: 10000.0
+          priceUnit: night_per_room
+          homestayImages:
           - id: 178
-            room_id: 17
-            image_path: homestays/28/1792554894062_zbd0lt_halo.png
-            sort_order: 1
-            is_cover: true
+            roomId: 17
+            imagePath: homestays/28/1792554894062_zbd0lt_halo.png
+            sortOrder: 1
+            isCover: true
           - id: 178
-            room_id: 17
-            image_path: homestays/28/1792554894062_zbd0lt_halo.png
-            sort_order: 1
-            is_cover: true
+            roomId: 17
+            imagePath: homestays/28/1792554894062_zbd0lt_halo.png
+            sortOrder: 1
+            isCover: true
         - id: 17
-          homestay_id: 28
+          homestayId: 28
           name: Room 1
           description: Deluxe double room with balcony
-          sort_order: 1
-          price_amount: 10000.0
-          price_unit: night_per_room
-          homestay_images:
+          sortOrder: 1
+          priceAmount: 10000.0
+          priceUnit: night_per_room
+          homestayImages:
           - id: 178
-            room_id: 17
-            image_path: homestays/28/1792554894062_zbd0lt_halo.png
-            sort_order: 1
-            is_cover: true
+            roomId: 17
+            imagePath: homestays/28/1792554894062_zbd0lt_halo.png
+            sortOrder: 1
+            isCover: true
           - id: 178
-            room_id: 17
-            image_path: homestays/28/1792554894062_zbd0lt_halo.png
-            sort_order: 1
-            is_cover: true
+            roomId: 17
+            imagePath: homestays/28/1792554894062_zbd0lt_halo.png
+            sortOrder: 1
+            isCover: true
       properties:
         id:
           example: 28
@@ -1407,18 +1407,18 @@ components:
           example: Cozy homestay with garden view
           nullable: true
           type: string
-        google_maps_url:
+        googleMapsUrl:
           example: https://www.google.com/maps
           format: uri
           nullable: true
           type: string
-        homestay_rooms:
+        homestayRooms:
           items:
-            $ref: "#/components/schemas/FetchHomestayResponse_data_inner_homestay_rooms_inner"
+            $ref: "#/components/schemas/FetchHomestayResponse_data_inner_homestayRooms_inner"
           type: array
       required:
       - address
-      - homestay_rooms
+      - homestayRooms
       - id
       - name
       type: object

@@ -6,6 +6,7 @@ import (
 	"errors"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 
 	api "platform-go/generated/api"
@@ -79,6 +80,25 @@ func TestFetchHomestays(t *testing.T) {
 	}
 	if body.PaginatorInfo.CurrentPage != 1 || body.PaginatorInfo.Count != 1 || body.PaginatorInfo.Total != 1 {
 		t.Fatalf("paginatorInfo = %#v", body.PaginatorInfo)
+	}
+
+	rawJSON := response.Body.String()
+	for _, camelField := range []string{
+		`"googleMapsUrl"`,
+		`"homestayRooms"`,
+		`"homestayId"`,
+		`"priceAmount"`,
+		`"priceUnit"`,
+		`"sortOrder"`,
+		`"homestayImages"`,
+		`"roomId"`,
+		`"imagePath"`,
+		`"isCover"`,
+		`"paginatorInfo"`,
+	} {
+		if !strings.Contains(rawJSON, camelField) {
+			t.Fatalf("expected JSON response to contain camelCase field %s, got: %s", camelField, rawJSON)
+		}
 	}
 }
 

@@ -5,6 +5,7 @@ import (
 	"errors"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 
 	api "platform-go/generated/api"
@@ -95,6 +96,24 @@ func TestFetchHomestayByID_Success(t *testing.T) {
 	}
 	if res.Data.HomestayRooms[0].HomestayImages[0].ImagePath != "homestays/ocean.jpg" {
 		t.Fatalf("unexpected image path: %s", res.Data.HomestayRooms[0].HomestayImages[0].ImagePath)
+	}
+
+	rawJSON := response.Body.String()
+	for _, camelField := range []string{
+		`"googleMapsUrl"`,
+		`"homestayRooms"`,
+		`"homestayId"`,
+		`"priceAmount"`,
+		`"priceUnit"`,
+		`"sortOrder"`,
+		`"homestayImages"`,
+		`"roomId"`,
+		`"imagePath"`,
+		`"isCover"`,
+	} {
+		if !strings.Contains(rawJSON, camelField) {
+			t.Fatalf("expected JSON response to contain camelCase field %s, got: %s", camelField, rawJSON)
+		}
 	}
 }
 
