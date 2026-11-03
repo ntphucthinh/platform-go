@@ -10,6 +10,3 @@ PriceUnit:
   x-enum-varnames:
     - PriceUnitNightPerRoom
     - PriceUnitNightPerHouse
-  x-enum-varnames:
-    - PriceUnitNightPerRoom
-    - PriceUnitNightPerHouse
