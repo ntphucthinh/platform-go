@@ -99,6 +99,25 @@ This project follows **Clean Architecture** with **DDD** to keep business rules 
 - Delegate business rules to domain/services; keep use cases focused on orchestration and transaction boundaries.
 - Apply repository/query-service patterns consistently for data access and reporting use cases.
 
+#### Write Operations (Create, Update, Delete) & Repository Rule
+
+All database write/mutation operations (`Create`, `Update`, `Delete`) **must** be separated into the Domain and Repository layers rather than executing database queries directly inside UseCases:
+
+1. **Domain Entities & Constructors (`src/internal/domain/<module>/<module>_entity.go`)**:
+   - Define pure domain structs with no GORM tags, database dependencies, or OpenAPI/transport types.
+   - Provide domain constructor/factory functions (`New<Entity>(...)`) and domain methods to handle field normalization (such as `strings.TrimSpace` and pointer unwrapping), state transitions, and domain invariants.
+2. **Domain Repository Interface (`src/internal/domain/<module>/<module>_repository.go`)**:
+   - Declare repository methods for mutations (e.g., `Create<Entity>`, `Update<Entity>`, `Delete<Entity>`) and domain lookups that accept `context.Context` and domain entities or primitive identifiers.
+   - Never pass OpenAPI request DTOs (`api.*`) or GORM models (`dbmodel.*`) into repository interfaces.
+3. **Infrastructure Repository Implementation (`src/internal/infrastructure/repository/<module>_repository.go`)**:
+   - Inject `DBInterface` via `New<Module>Repository(db DBInterface)` and always obtain the `*gorm.DB` session via `r.db.GetDBByCtx(ctx)` so every query automatically participates in active transactions.
+   - Perform all GORM operations (`Create`, `Save`, `Updates`, `Delete`) inside the repository, mapping between domain entities and `dbmodel` structs, and syncing generated fields (`ID`, `CreatedAt`, `UpdatedAt`) back to the domain entity when applicable.
+4. **UseCase Orchestration & Transactions (`src/internal/usecases/<module>/usecase/`)**:
+   - **Never** import `dbmodel` or execute GORM mutation methods (`tx.Create`, `tx.Save`, `tx.Updates`, `tx.Delete`) directly inside a UseCase.
+   - Inject both `repository.DBInterface` (when transaction management is needed) and `<module>.<Module>Repository` into the UseCase.
+   - For multi-step writes (`Create`, `Update`, `Delete`), wrap the workflow in `uc.db.Transaction(ctx, func(tx *gorm.DB) error { ... })`, bind the transaction to the context using `txCtx := repository.WithTx(ctx, tx)`, construct or update domain entities via `New<Entity>(...)`, and delegate every database operation to the repository using `txCtx`.
+   - Register new repository constructors in `src/internal/di/wire.go` and `src/internal/di/wire-test.go`, then run `make wire`.
+
 ### Performance & Optimisation
 
 - Vet database queries for N+1 patterns; batch or eager-load where feasible.
