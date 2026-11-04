@@ -30,6 +30,7 @@ func TestInitializeControllers(t *testing.T, db *gorm.DB) (*TestHandlerSet, erro
 	wire.Build(
 		repository.NewSchemaDB,
 		repository.NewMySQLUserRepository,
+		repository.NewHomestayRepository,
 		queryservice.NewUserQueryService,
 		queryservice.NewHomestayQueryService,
 		queryservice.NewTravelLocationQueryService,

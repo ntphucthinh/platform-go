@@ -4,12 +4,11 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"strings"
 
 	"gorm.io/gorm"
 
 	api "platform-go/generated/api"
-	"platform-go/internal/infrastructure/dbmodel"
+	"platform-go/internal/domain/homestay"
 	"platform-go/internal/infrastructure/repository"
 )
 
@@ -34,13 +33,18 @@ var (
 )
 
 type UpdateHomestayUsecase struct {
-	db repository.DBInterface
+	db           repository.DBInterface
+	homestayRepo homestay.HomestayRepository
 }
 
 func NewUpdateHomestayUsecase(
 	db repository.DBInterface,
+	homestayRepo homestay.HomestayRepository,
 ) *UpdateHomestayUsecase {
-	return &UpdateHomestayUsecase{db: db}
+	return &UpdateHomestayUsecase{
+		db:           db,
+		homestayRepo: homestayRepo,
+	}
 }
 
 func (uc *UpdateHomestayUsecase) Execute(
@@ -53,24 +57,25 @@ func (uc *UpdateHomestayUsecase) Execute(
 	}
 
 	err := uc.db.Transaction(ctx, func(tx *gorm.DB) error {
+		txCtx := repository.WithTx(ctx, tx)
+
 		// Find the homestay to update.
-		var homestay dbmodel.Homestay
-		if err := tx.
-			Where("id = ?", homestayID).
-			First(&homestay).Error; err != nil {
-			if errors.Is(err, gorm.ErrRecordNotFound) {
-				return ErrHomestayNotFound
-			}
+		existingHomestay, err := uc.homestayRepo.FindHomestayByID(txCtx, homestayID)
+		if err != nil {
 			return err
+		}
+		if existingHomestay == nil {
+			return ErrHomestayNotFound
 		}
 
 		// Update homestay information.
-		homestay.Name = strings.TrimSpace(request.Name)
-		homestay.Address = strings.TrimSpace(request.Address)
-		homestay.Description = request.Description
-		homestay.GoogleMapsURL = request.GoogleMapsUrl
-
-		if err := tx.Save(&homestay).Error; err != nil {
+		existingHomestay.Update(
+			request.Name,
+			request.Address,
+			request.Description,
+			request.GoogleMapsUrl,
+		)
+		if err := uc.homestayRepo.UpdateHomestay(txCtx, existingHomestay); err != nil {
 			return err
 		}
 
@@ -81,14 +86,12 @@ func (uc *UpdateHomestayUsecase) Execute(
 		}
 
 		// Load existing rooms belonging to this homestay.
-		var existingRooms []dbmodel.HomestayRoom
-		if err := tx.
-			Where("homestay_id = ?", homestayID).
-			Find(&existingRooms).Error; err != nil {
+		existingRooms, err := uc.homestayRepo.FindRoomsByHomestayID(txCtx, homestayID)
+		if err != nil {
 			return err
 		}
 
-		existingRoomMap := make(map[int64]dbmodel.HomestayRoom, len(existingRooms))
+		existingRoomMap := make(map[int64]homestay.HomestayRoom, len(existingRooms))
 		for _, room := range existingRooms {
 			existingRoomMap[room.ID] = room
 		}
@@ -140,60 +143,38 @@ func (uc *UpdateHomestayUsecase) Execute(
 		}
 
 		if len(roomIDsToDelete) > 0 {
-			if err := tx.
-				Where("room_id IN ?", roomIDsToDelete).
-				Delete(&dbmodel.HomestayImage{}).Error; err != nil {
+			if err := uc.homestayRepo.DeleteImagesByRoomIDs(txCtx, roomIDsToDelete); err != nil {
 				return err
 			}
 
-			if err := tx.
-				Where("id IN ?", roomIDsToDelete).
-				Delete(&dbmodel.HomestayRoom{}).Error; err != nil {
+			if err := uc.homestayRepo.DeleteRoomsByIDs(txCtx, roomIDsToDelete); err != nil {
 				return err
 			}
 		}
 
 		// Create or update rooms.
 		for _, roomRequest := range *request.Rooms {
-			var roomID int64
+			room := homestay.NewHomestayRoom(
+				homestayID,
+				roomRequest.Name,
+				roomRequest.Description,
+				roomRequest.PriceAmount,
+				(*string)(roomRequest.PriceUnit),
+				roomRequest.SortOrder,
+			)
 
 			if roomRequest.Id != nil && *roomRequest.Id > 0 {
-				roomID = *roomRequest.Id
-
-				roomUpdates := map[string]interface{}{
-					"name":         strings.TrimSpace(roomRequest.Name),
-					"description":  roomRequest.Description,
-					"price_amount": roomRequest.PriceAmount,
-					"price_unit":   (*string)(roomRequest.PriceUnit),
-					"sort_order":   roomRequest.SortOrder,
-				}
-
-				if err := tx.
-					Model(&dbmodel.HomestayRoom{}).
-					Where(
-						"id = ? AND homestay_id = ?",
-						roomID,
-						homestayID,
-					).
-					Updates(roomUpdates).Error; err != nil {
+				room.ID = *roomRequest.Id
+				if err := uc.homestayRepo.UpdateHomestayRoom(txCtx, &room); err != nil {
 					return err
 				}
 			} else {
-				newRoom := dbmodel.HomestayRoom{
-					HomestayID:  homestayID,
-					Name:        strings.TrimSpace(roomRequest.Name),
-					Description: roomRequest.Description,
-					PriceAmount: roomRequest.PriceAmount,
-					PriceUnit:   (*string)(roomRequest.PriceUnit),
-					SortOrder:   roomRequest.SortOrder,
-				}
-
-				if err := tx.Create(&newRoom).Error; err != nil {
+				if err := uc.homestayRepo.CreateHomestayRoom(txCtx, &room); err != nil {
 					return err
 				}
-
-				roomID = newRoom.ID
 			}
+
+			roomID := room.ID
 
 			// A nil Images field means that the room's images remain unchanged.
 			// An empty Images list means that all images of this room are removed.
@@ -202,15 +183,13 @@ func (uc *UpdateHomestayUsecase) Execute(
 			}
 
 			// Load images belonging to the current room only.
-			var existingImages []dbmodel.HomestayImage
-			if err := tx.
-				Where("room_id = ?", roomID).
-				Find(&existingImages).Error; err != nil {
+			existingImages, err := uc.homestayRepo.FindImagesByRoomID(txCtx, roomID)
+			if err != nil {
 				return err
 			}
 
 			existingImageMap := make(
-				map[int64]dbmodel.HomestayImage,
+				map[int64]homestay.HomestayImage,
 				len(existingImages),
 			)
 
@@ -265,48 +244,27 @@ func (uc *UpdateHomestayUsecase) Execute(
 			}
 
 			if len(imageIDsToDelete) > 0 {
-				if err := tx.
-					Where("id IN ?", imageIDsToDelete).
-					Delete(&dbmodel.HomestayImage{}).Error; err != nil {
+				if err := uc.homestayRepo.DeleteImagesByIDs(txCtx, imageIDsToDelete); err != nil {
 					return err
 				}
 			}
 
 			// Create or update images.
 			for _, imageRequest := range *roomRequest.Images {
-				imagePath := ""
-				if imageRequest.ImagePath != nil {
-					imagePath = strings.TrimSpace(*imageRequest.ImagePath)
-				}
+				img := homestay.NewHomestayImage(
+					roomID,
+					imageRequest.ImagePath,
+					imageRequest.SortOrder,
+					imageRequest.IsCover,
+				)
 
 				if imageRequest.Id != nil && *imageRequest.Id > 0 {
-					imageID := *imageRequest.Id
-
-					imageUpdates := map[string]interface{}{
-						"image_path": imagePath,
-						"sort_order": imageRequest.SortOrder,
-						"is_cover":   imageRequest.IsCover,
-					}
-
-					if err := tx.
-						Model(&dbmodel.HomestayImage{}).
-						Where(
-							"id = ? AND room_id = ?",
-							imageID,
-							roomID,
-						).
-						Updates(imageUpdates).Error; err != nil {
+					img.ID = *imageRequest.Id
+					if err := uc.homestayRepo.UpdateHomestayImage(txCtx, &img); err != nil {
 						return err
 					}
 				} else {
-					newImage := dbmodel.HomestayImage{
-						RoomID:    roomID,
-						ImagePath: imagePath,
-						SortOrder: imageRequest.SortOrder,
-						IsCover:   imageRequest.IsCover,
-					}
-
-					if err := tx.Create(&newImage).Error; err != nil {
+					if err := uc.homestayRepo.CreateHomestayImage(txCtx, []homestay.HomestayImage{img}); err != nil {
 						return err
 					}
 				}

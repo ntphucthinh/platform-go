@@ -19,10 +19,10 @@ import (
 func newFetchHomestayByIDRouter(t *testing.T, queryService homestayqueryservice.HomestayQueryService) http.Handler {
 	t.Helper()
 	fetchUsecase := homestayusecase.NewFetchHomestaysUseCase(queryService)
-	createUsecase := homestayusecase.NewCreateHomestayUsecase(nil)
+	createUsecase := homestayusecase.NewCreateHomestayUsecase(nil, nil)
 	fetchByIDUsecase := homestayusecase.NewFetchHomestayByIDUseCase(queryService)
-	updateUsecase := homestayusecase.NewUpdateHomestayUsecase(nil)
-	deleteUsecase := homestayusecase.NewDeleteHomestayUsecase(nil)
+	updateUsecase := homestayusecase.NewUpdateHomestayUsecase(nil, nil)
+	deleteUsecase := homestayusecase.NewDeleteHomestayUsecase(nil, nil)
 	handler := controller.NewHomestayController(fetchUsecase, createUsecase, fetchByIDUsecase, updateUsecase, deleteUsecase)
 	serverController := controller.NewServerController(nil, nil, handler, nil, nil)
 	router := shared.NewSetupRouter(t)

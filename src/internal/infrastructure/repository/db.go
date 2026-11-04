@@ -6,6 +6,16 @@ import (
 	"gorm.io/gorm"
 )
 
+type txCtxKey struct{}
+
+// WithTx attaches a GORM transaction to the context so GetDBByCtx can retrieve it.
+func WithTx(ctx context.Context, tx *gorm.DB) context.Context {
+	if tx == nil {
+		return ctx
+	}
+	return context.WithValue(ctx, txCtxKey{}, tx)
+}
+
 type DBInterface interface {
 	GetDB() *gorm.DB
 	GetDBByCtx(ctx context.Context) *gorm.DB
@@ -26,6 +36,9 @@ func (d *SchemaDB) GetDB() *gorm.DB {
 }
 
 func (d *SchemaDB) GetDBByCtx(ctx context.Context) *gorm.DB {
+	if tx, ok := ctx.Value(txCtxKey{}).(*gorm.DB); ok && tx != nil {
+		return tx.WithContext(ctx)
+	}
 	return d.db.WithContext(ctx)
 }
 
@@ -34,7 +47,6 @@ func (d *SchemaDB) Transaction(ctx context.Context, fn func(tx *gorm.DB) error) 
 }
 
 func (d *SchemaDB) Close() error {
-
 	return closeGormDB(d.db)
 }
 

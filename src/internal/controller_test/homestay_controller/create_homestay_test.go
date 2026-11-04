@@ -34,11 +34,12 @@ func (f *fakeDB) Close() error { return nil }
 
 func newCreateHomestayRouter(t *testing.T, db repository.DBInterface) http.Handler {
 	t.Helper()
+	homestayRepo := repository.NewHomestayRepository(db)
 	fetchUsecase := homestayusecase.NewFetchHomestaysUseCase(nil)
-	createUsecase := homestayusecase.NewCreateHomestayUsecase(db)
+	createUsecase := homestayusecase.NewCreateHomestayUsecase(db, homestayRepo)
 	fetchByIDUsecase := homestayusecase.NewFetchHomestayByIDUseCase(nil)
-	updateUsecase := homestayusecase.NewUpdateHomestayUsecase(db)
-	deleteUsecase := homestayusecase.NewDeleteHomestayUsecase(db)
+	updateUsecase := homestayusecase.NewUpdateHomestayUsecase(db, homestayRepo)
+	deleteUsecase := homestayusecase.NewDeleteHomestayUsecase(db, homestayRepo)
 	handler := controller.NewHomestayController(fetchUsecase, createUsecase, fetchByIDUsecase, updateUsecase, deleteUsecase)
 	router := shared.NewSetupRouter(t)
 	router.POST("/homestays", handler.CreateHomestay)
