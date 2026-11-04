@@ -879,7 +879,6 @@ components:
           countryName: Vietnam
           stateCode: SG
           name: TP. Hồ Chí Minh
-          address: "Thành phố Hồ Chí Minh, Vietnam"
           latitude: 10.8230989
           longitude: 106.6296638
           imagePath: https://example.com/image.jpg
@@ -894,7 +893,6 @@ components:
           countryName: Vietnam
           stateCode: SG
           name: TP. Hồ Chí Minh
-          address: "Thành phố Hồ Chí Minh, Vietnam"
           latitude: 10.8230989
           longitude: 106.6296638
           imagePath: https://example.com/image.jpg
@@ -926,7 +924,6 @@ components:
           countryName: Vietnam
           stateCode: SG
           name: TP. Hồ Chí Minh
-          address: "Thành phố Hồ Chí Minh, Vietnam"
           latitude: 10.8230989
           longitude: 106.6296638
           imagePath: https://example.com/image.jpg
@@ -1583,7 +1580,6 @@ components:
         countryName: Vietnam
         stateCode: SG
         name: TP. Hồ Chí Minh
-        address: "Thành phố Hồ Chí Minh, Vietnam"
         latitude: 10.8230989
         longitude: 106.6296638
         imagePath: https://example.com/image.jpg
@@ -1609,9 +1605,6 @@ components:
           type: string
         name:
           example: TP. Hồ Chí Minh
-          type: string
-        address:
-          example: "Thành phố Hồ Chí Minh, Vietnam"
           type: string
         latitude:
           example: 10.8230989
@@ -1652,7 +1645,6 @@ components:
           format: int64
           type: integer
       required:
-      - address
       - countryCode
       - countryName
       - description

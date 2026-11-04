@@ -34,7 +34,6 @@ func (uc *FetchTravelLocationByIDUseCase) Execute(ctx context.Context, id int64)
 			CountryName:    loc.CountryName,
 			StateCode:      loc.StateCode,
 			Name:           loc.Name,
-			Address:        loc.Address,
 			Latitude:       loc.Latitude,
 			Longitude:      loc.Longitude,
 			ImagePath:      loc.ImagePath,

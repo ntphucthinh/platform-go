@@ -27,7 +27,6 @@ func TestFetchTravelLocationByID_Success(t *testing.T) {
 			CountryName:   "Vietnam",
 			StateCode:     "SG",
 			Name:          "TP. Hồ Chí Minh",
-			Address:       "Thành phố Hồ Chí Minh, Vietnam",
 			Latitude:      &lat,
 			Longitude:     &lng,
 			ImagePath:     &img,

@@ -174,7 +174,6 @@ type FetchTravelLocationsResponse struct {
 
 // FetchTravelLocationsResponseDataInner defines model for FetchTravelLocationsResponse_data_inner.
 type FetchTravelLocationsResponseDataInner struct {
-	Address        string               `json:"address"`
 	CountryCode    string               `json:"countryCode"`
 	CountryName    string               `json:"countryName"`
 	Description    *string              `json:"description"`

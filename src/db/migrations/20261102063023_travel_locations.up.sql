@@ -4,7 +4,6 @@ CREATE TABLE IF NOT EXISTS travel_locations (
     country_name VARCHAR(255) NOT NULL,
     state_code VARCHAR(20) NOT NULL,
     name VARCHAR(255) NOT NULL,
-    address VARCHAR(255) NOT NULL,
     latitude DECIMAL(10, 7) NULL,
     longitude DECIMAL(10, 7) NULL,
     image_path VARCHAR(255) NULL,

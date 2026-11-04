@@ -23,9 +23,6 @@ FetchTravelLocationByIDResponse:
         name:
           type: string
           example: "TP. Hồ Chí Minh"
-        address:
-          type: string
-          example: "Thành phố Hồ Chí Minh, Vietnam"
         latitude:
           type: number
           format: double
@@ -70,7 +67,6 @@ FetchTravelLocationByIDResponse:
         - countryName
         - stateCode
         - name
-        - address
         - latitude
         - longitude
         - imagePath

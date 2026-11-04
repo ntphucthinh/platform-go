@@ -22,7 +22,6 @@ import (
 //	    WithCountryName("Vietnam").
 //	    WithGeonames("VN", "Da Lat").
 //	    WithName("Đà Lạt").
-//	    WithAddress("Đà Lạt, Lâm Đồng, Vietnam").
 //	    WithCoordinates(11.9404192, 108.4583132).
 //	    WithVisited().
 //	    Build()
@@ -36,7 +35,6 @@ type TravelLocationFactory struct {
 	countryName   string
 	stateCode     string
 	name          string
-	address       string
 	latitude      *float64
 	longitude     *float64
 	imagePath     *string
@@ -60,7 +58,6 @@ func NewTravelLocationFactory() *TravelLocationFactory {
 		countryName:   "Vietnam",
 		stateCode:     "35",
 		name:          "Đà Lạt",
-		address:       "Đà Lạt, Lâm Đồng, Vietnam",
 		latitude:      &lat,
 		longitude:     &lng,
 		imagePath:     &img,
@@ -77,7 +74,6 @@ func (f *TravelLocationFactory) WithLocation(loc dbmodel.TravelLocation) *Travel
 	f.countryName = loc.CountryName
 	f.stateCode = loc.StateCode
 	f.name = loc.Name
-	f.address = loc.Address
 	f.latitude = loc.Latitude
 	f.longitude = loc.Longitude
 	f.imagePath = loc.ImagePath
@@ -118,12 +114,6 @@ func (f *TravelLocationFactory) WithGeonames(countryCode, cityName string) *Trav
 // WithName sets the location name
 func (f *TravelLocationFactory) WithName(name string) *TravelLocationFactory {
 	f.name = name
-	return f
-}
-
-// WithAddress sets the address
-func (f *TravelLocationFactory) WithAddress(address string) *TravelLocationFactory {
-	f.address = address
 	return f
 }
 
@@ -184,7 +174,6 @@ func (f *TravelLocationFactory) Build() *dbmodel.TravelLocation {
 		CountryName:   f.countryName,
 		StateCode:     f.stateCode,
 		Name:          f.name,
-		Address:       f.address,
 		Latitude:      f.latitude,
 		Longitude:     f.longitude,
 		ImagePath:     f.imagePath,

@@ -16,7 +16,6 @@ type locationSeedItem struct {
 	countryName   string
 	lookupCity    string
 	name          string
-	address       string
 	latitude      float64
 	longitude     float64
 	imagePath     string
@@ -45,7 +44,6 @@ func CreateTravelLocations(db repository.DBInterface) []dbmodel.TravelLocation {
 			countryName:   "Vietnam",
 			lookupCity:    "Da Lat",
 			name:          "Đà Lạt",
-			address:       "Đà Lạt, Lâm Đồng, Vietnam",
 			latitude:      11.9404192,
 			longitude:     108.4583132,
 			imagePath:     "/images/locations/da_lat.jpg",
@@ -59,7 +57,6 @@ func CreateTravelLocations(db repository.DBInterface) []dbmodel.TravelLocation {
 			countryName:   "Vietnam",
 			lookupCity:    "Ho Chi Minh City",
 			name:          "TP. Hồ Chí Minh",
-			address:       "Thành phố Hồ Chí Minh, Vietnam",
 			latitude:      10.776889,
 			longitude:     106.700806,
 			imagePath:     "/images/locations/hcmc.jpg",
@@ -73,7 +70,6 @@ func CreateTravelLocations(db repository.DBInterface) []dbmodel.TravelLocation {
 			countryName:   "Vietnam",
 			lookupCity:    "Hanoi",
 			name:          "Hà Nội",
-			address:       "Hoàn Kiếm, Hà Nội, Vietnam",
 			latitude:      21.028511,
 			longitude:     105.854444,
 			imagePath:     "/images/locations/hanoi.jpg",
@@ -87,7 +83,6 @@ func CreateTravelLocations(db repository.DBInterface) []dbmodel.TravelLocation {
 			countryName:   "Vietnam",
 			lookupCity:    "Da Nang",
 			name:          "Đà Nẵng",
-			address:       "Đà Nẵng, Vietnam",
 			latitude:      16.054407,
 			longitude:     108.202167,
 			imagePath:     "/images/locations/da_nang.jpg",
@@ -101,7 +96,6 @@ func CreateTravelLocations(db repository.DBInterface) []dbmodel.TravelLocation {
 			countryName:   "Vietnam",
 			lookupCity:    "Hue",
 			name:          "Huế",
-			address:       "Huế, Thừa Thiên Huế, Vietnam",
 			latitude:      16.463713,
 			longitude:     107.590866,
 			imagePath:     "/images/locations/hue.jpg",
@@ -115,7 +109,6 @@ func CreateTravelLocations(db repository.DBInterface) []dbmodel.TravelLocation {
 			countryName:   "Vietnam",
 			lookupCity:    "Nha Trang",
 			name:          "Nha Trang",
-			address:       "Nha Trang, Khánh Hòa, Vietnam",
 			latitude:      12.238791,
 			longitude:     109.196749,
 			imagePath:     "/images/locations/nha_trang.jpg",
@@ -129,7 +122,6 @@ func CreateTravelLocations(db repository.DBInterface) []dbmodel.TravelLocation {
 			countryName:   "Vietnam",
 			lookupCity:    "Can Tho",
 			name:          "Cần Thơ",
-			address:       "Ninh Kiều, Cần Thơ, Vietnam",
 			latitude:      10.045162,
 			longitude:     105.746857,
 			imagePath:     "/images/locations/can_tho.jpg",
@@ -143,7 +135,6 @@ func CreateTravelLocations(db repository.DBInterface) []dbmodel.TravelLocation {
 			countryName:   "Vietnam",
 			lookupCity:    "Ha Long",
 			name:          "Hạ Long",
-			address:       "Hạ Long, Quảng Ninh, Vietnam",
 			latitude:      20.950454,
 			longitude:     107.073364,
 			imagePath:     "/images/locations/ha_long.jpg",
@@ -157,7 +148,6 @@ func CreateTravelLocations(db repository.DBInterface) []dbmodel.TravelLocation {
 			countryName:   "Vietnam",
 			lookupCity:    "Phu Quoc",
 			name:          "Phú Quốc",
-			address:       "Phú Quốc, Kiên Giang, Vietnam",
 			latitude:      10.289879,
 			longitude:     103.98402,
 			imagePath:     "/images/locations/phu_quoc.jpg",
@@ -171,7 +161,6 @@ func CreateTravelLocations(db repository.DBInterface) []dbmodel.TravelLocation {
 			countryName:   "Vietnam",
 			lookupCity:    "Sa Pa",
 			name:          "Sa Pa",
-			address:       "Sa Pa, Lào Cai, Vietnam",
 			latitude:      22.33636,
 			longitude:     103.84378,
 			imagePath:     "/images/locations/sa_pa.jpg",
@@ -186,7 +175,6 @@ func CreateTravelLocations(db repository.DBInterface) []dbmodel.TravelLocation {
 			countryName:   "Japan",
 			lookupCity:    "Tokyo",
 			name:          "Tokyo",
-			address:       "Shibuya, Tokyo, Japan",
 			latitude:      35.6762,
 			longitude:     139.6503,
 			imagePath:     "/images/locations/tokyo.jpg",
@@ -200,7 +188,6 @@ func CreateTravelLocations(db repository.DBInterface) []dbmodel.TravelLocation {
 			countryName:   "France",
 			lookupCity:    "Paris",
 			name:          "Paris",
-			address:       "Paris, France",
 			latitude:      48.8566,
 			longitude:     2.3522,
 			imagePath:     "/images/locations/paris.jpg",
@@ -214,7 +201,6 @@ func CreateTravelLocations(db repository.DBInterface) []dbmodel.TravelLocation {
 			countryName:   "United States",
 			lookupCity:    "New York",
 			name:          "New York",
-			address:       "Manhattan, New York, NY, USA",
 			latitude:      40.7128,
 			longitude:     -74.0060,
 			imagePath:     "/images/locations/new_york.jpg",
@@ -228,7 +214,6 @@ func CreateTravelLocations(db repository.DBInterface) []dbmodel.TravelLocation {
 			countryName:   "United Kingdom",
 			lookupCity:    "London",
 			name:          "London",
-			address:       "Westminster, London, UK",
 			latitude:      51.5074,
 			longitude:     -0.1278,
 			imagePath:     "/images/locations/london.jpg",
@@ -242,7 +227,6 @@ func CreateTravelLocations(db repository.DBInterface) []dbmodel.TravelLocation {
 			countryName:   "South Korea",
 			lookupCity:    "Seoul",
 			name:          "Seoul",
-			address:       "Jongno-gu, Seoul, South Korea",
 			latitude:      37.5665,
 			longitude:     126.9780,
 			imagePath:     "/images/locations/seoul.jpg",
@@ -267,7 +251,6 @@ func CreateTravelLocations(db repository.DBInterface) []dbmodel.TravelLocation {
 			WithCountryName(item.countryName).
 			WithStateCode(stateCode).
 			WithName(item.name).
-			WithAddress(item.address).
 			WithCoordinates(item.latitude, item.longitude).
 			WithImagePath(item.imagePath).
 			WithStatus(item.status).
@@ -288,4 +271,3 @@ func CreateTravelLocations(db repository.DBInterface) []dbmodel.TravelLocation {
 
 	return models
 }
-

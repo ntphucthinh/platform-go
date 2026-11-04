@@ -65,7 +65,6 @@ func TestFetchTravelLocations(t *testing.T) {
 				CountryName:   "Vietnam",
 				StateCode:     "35",
 				Name:          "Đà Lạt",
-				Address:       "Đà Lạt, Lâm Đồng, Vietnam",
 				Latitude:      &lat,
 				Longitude:     &lng,
 				ImagePath:     &img,

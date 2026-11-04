@@ -13,7 +13,6 @@ type TravelLocation struct {
 	CountryName   string         `gorm:"column:country_name;size:255;not null"`
 	StateCode     string         `gorm:"column:state_code;size:20;not null"`
 	Name          string         `gorm:"size:255;not null"`
-	Address       string         `gorm:"size:255;not null"`
 	Latitude      *float64       `gorm:"column:latitude;type:decimal(10,7)"`
 	Longitude     *float64       `gorm:"column:longitude;type:decimal(10,7)"`
 	ImagePath     *string        `gorm:"column:image_path;size:255"`
