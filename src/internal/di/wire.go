@@ -15,6 +15,8 @@ import (
 	"platform-go/internal/usecases"
 	homestayqueryservice "platform-go/internal/usecases/homestays/queryservice"
 	homestayusecase "platform-go/internal/usecases/homestays/usecase"
+	travellocationqueryservice "platform-go/internal/usecases/travel_locations/queryservice"
+	travellocationusecase "platform-go/internal/usecases/travel_locations/usecase"
 	"platform-go/internal/usecases/uploads"
 )
 
@@ -31,9 +33,11 @@ func InitializeApplication(db *gorm.DB, jwtService *security.JWTService, secureC
 		repository.NewMySQLUserRepository,
 		queryservice.NewUserQueryService,
 		queryservice.NewHomestayQueryService,
+		queryservice.NewTravelLocationQueryService,
 		cloudinary.NewClient,
 		wire.Bind(new(uploads.AssetClient), new(*cloudinary.Client)),
 		wire.Bind(new(homestayqueryservice.HomestayQueryService), new(*queryservice.HomestayQueryService)),
+		wire.Bind(new(travellocationqueryservice.TravelLocationQueryService), new(*queryservice.TravelLocationQueryService)),
 		usecases.NewUserUsecase,
 		usecases.NewAuthUsecase,
 		uploads.NewUseCase,
@@ -42,9 +46,12 @@ func InitializeApplication(db *gorm.DB, jwtService *security.JWTService, secureC
 		homestayusecase.NewFetchHomestayByIDUseCase,
 		homestayusecase.NewUpdateHomestayUsecase,
 		homestayusecase.NewDeleteHomestayUsecase,
+		travellocationusecase.NewFetchTravelLocationsUseCase,
+		travellocationusecase.NewFetchTravelLocationByIDUseCase,
 		controller.NewUserController,
 		controller.NewAuthController,
 		controller.NewHomestayController,
+		controller.NewTravelLocationController,
 		controller.NewUploadController,
 		controller.NewServerController,
 		wire.Struct(new(Application), "*"),

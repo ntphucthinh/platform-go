@@ -1,0 +1,24 @@
+get:
+  operationId: fetchTravelLocationByID
+  parameters:
+    - name: travelLocationID
+      in: path
+      required: true
+      schema:
+        type: integer
+        format: int64
+        minimum: 1
+      example: 1
+  tags:
+    - travelLocations
+  summary: Get travel location detail
+  description: Retrieve details of a single travel location by ID.
+  security:
+    - AccessCookie: []
+  responses:
+    "200":
+      description: Travel location retrieved successfully
+      content:
+        application/json:
+          schema:
+            $ref: "../../components/schemas/travel_locations/:travelLocationID.yml#/FetchTravelLocationByIDResponse"

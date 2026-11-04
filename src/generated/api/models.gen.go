@@ -26,6 +26,12 @@ const (
 	PriceUnitNightPerRoom  PriceUnit = "night_per_room"
 )
 
+// Defines values for TravelLocationStatus.
+const (
+	TravelLocationStatusVisited  TravelLocationStatus = "visited"
+	TravelLocationStatusWishlist TravelLocationStatus = "wishlist"
+)
+
 // Defines values for UploadFilesRequestFolder.
 const (
 	Homestays UploadFilesRequestFolder = "homestays"
@@ -155,6 +161,36 @@ type FetchHomestayResponseDataInnerHomestayRoomsInnerHomestayImagesInner struct 
 	SortOrder int32  `json:"sortOrder"`
 }
 
+// FetchTravelLocationByIDResponse defines model for FetchTravelLocationByIDResponse.
+type FetchTravelLocationByIDResponse struct {
+	Data FetchTravelLocationsResponseDataInner `json:"data"`
+}
+
+// FetchTravelLocationsResponse defines model for FetchTravelLocationsResponse.
+type FetchTravelLocationsResponse struct {
+	Data  []FetchTravelLocationsResponseDataInner `json:"data"`
+	Total int64                                   `json:"total"`
+}
+
+// FetchTravelLocationsResponseDataInner defines model for FetchTravelLocationsResponse_data_inner.
+type FetchTravelLocationsResponseDataInner struct {
+	Address        string               `json:"address"`
+	CountryCode    string               `json:"countryCode"`
+	CountryName    string               `json:"countryName"`
+	Description    *string              `json:"description"`
+	GoogleMapsUrl  *string              `json:"googleMapsUrl"`
+	Id             int64                `json:"id"`
+	ImagePath      *string              `json:"imagePath"`
+	ItineraryCount int64                `json:"itineraryCount"`
+	Latitude       *float64             `json:"latitude"`
+	Longitude      *float64             `json:"longitude"`
+	Name           string               `json:"name"`
+	Notes          *string              `json:"notes"`
+	StateCode      string               `json:"stateCode"`
+	Status         TravelLocationStatus `json:"status"`
+	VisitCount     int64                `json:"visitCount"`
+}
+
 // HomestayImageInput defines model for HomestayImageInput.
 type HomestayImageInput struct {
 	// ImagePath Path returned by `POST /uploads`.
@@ -196,6 +232,11 @@ type MessageOnlyResponse struct {
 // - "night_per_room": Price per room per night.
 // - "night_per_house": Price per house per night.
 type PriceUnit string
+
+// TravelLocationStatus The status of a travel location.
+// - "visited": The user has visited the location.
+// - "wishlist": The user wants to visit the location.
+type TravelLocationStatus string
 
 // UpdateHomestayImageInput defines model for UpdateHomestayImageInput.
 type UpdateHomestayImageInput struct {
@@ -346,6 +387,21 @@ type FetchHomestaysParams struct {
 
 	// PerPage Number of records per page
 	PerPage int `binding:"required,number,min=2,max=20" form:"perPage" json:"perPage" label:"Number of records per page"`
+}
+
+// FetchTravelLocationsParams defines parameters for FetchTravelLocations.
+type FetchTravelLocationsParams struct {
+	// Status Filter by travel location status (visited or wishlist)
+	Status *TravelLocationStatus `binding:"omitempty,oneof=visited wishlist" form:"status,omitempty" json:"status,omitempty"`
+
+	// Name Filter by location name
+	Name *string `form:"name,omitempty" json:"name,omitempty"`
+
+	// StateCode Filter by province or state code
+	StateCode *string `form:"stateCode,omitempty" json:"stateCode,omitempty"`
+
+	// CountryCode Filter by ISO 3166-1 alpha-2 country code
+	CountryCode *string `form:"countryCode,omitempty" json:"countryCode,omitempty"`
 }
 
 // LoginJSONRequestBody defines body for Login for application/json ContentType.

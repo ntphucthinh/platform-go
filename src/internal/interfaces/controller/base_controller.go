@@ -11,18 +11,20 @@ var _ api.ServerInterface = (*ServerController)(nil)
 // ServerController is the HTTP composition root for generated API endpoints.
 // It delegates each endpoint to the controller that owns its business workflow.
 type ServerController struct {
-	userController     *UserController
-	authController     *AuthController
-	homestayController HomestayController
-	uploadController   *UploadController
+	userController           *UserController
+	authController           *AuthController
+	homestayController       HomestayController
+	travelLocationController TravelLocationController
+	uploadController         *UploadController
 }
 
-func NewServerController(userController *UserController, authController *AuthController, homestayController HomestayController, uploadController *UploadController) *ServerController {
+func NewServerController(userController *UserController, authController *AuthController, homestayController HomestayController, travelLocationController TravelLocationController, uploadController *UploadController) *ServerController {
 	return &ServerController{
-		userController:     userController,
-		authController:     authController,
-		homestayController: homestayController,
-		uploadController:   uploadController,
+		userController:           userController,
+		authController:           authController,
+		homestayController:       homestayController,
+		travelLocationController: travelLocationController,
+		uploadController:         uploadController,
 	}
 }
 
@@ -102,6 +104,22 @@ func (con *ServerController) UpdateHomestay(c *gin.Context, homestayID int64) {
 // (DELETE /homestays/{homestayID})
 func (con *ServerController) DeleteHomestay(c *gin.Context, homestayID int64) {
 	con.homestayController.DeleteHomestay(c, homestayID)
+}
+
+// -----------------------------------------------------------------------------
+// Travel Locations APIs (TravelLocationController)
+// -----------------------------------------------------------------------------
+
+// FetchTravelLocations retrieves a list of travel locations.
+// (GET /travel-locations)
+func (con *ServerController) FetchTravelLocations(c *gin.Context, params api.FetchTravelLocationsParams) {
+	con.travelLocationController.FetchTravelLocations(c, params)
+}
+
+// FetchTravelLocationByID retrieves details of a single travel location by ID.
+// (GET /travel-locations/{travelLocationID})
+func (con *ServerController) FetchTravelLocationByID(c *gin.Context, travelLocationID int64) {
+	con.travelLocationController.FetchTravelLocationByID(c, travelLocationID)
 }
 
 // -----------------------------------------------------------------------------

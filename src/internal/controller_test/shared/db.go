@@ -76,16 +76,16 @@ func SetupTestDB(t *testing.T) *gorm.DB {
 
 	// Ensure base tables exist if migrations were not executed beforehand
 	migrator := db.Migrator()
-	if !migrator.HasTable(&dbmodel.User{}) ||
-		!migrator.HasTable(&dbmodel.Homestay{}) ||
-		!migrator.HasTable(&dbmodel.HomestayRoom{}) ||
-		!migrator.HasTable(&dbmodel.HomestayImage{}) {
-		_ = db.AutoMigrate(
-			&dbmodel.User{},
-			&dbmodel.Homestay{},
-			&dbmodel.HomestayRoom{},
-			&dbmodel.HomestayImage{},
-		)
+	for _, model := range []any{
+		&dbmodel.User{},
+		&dbmodel.Homestay{},
+		&dbmodel.HomestayRoom{},
+		&dbmodel.HomestayImage{},
+		&dbmodel.TravelLocation{},
+	} {
+		if !migrator.HasTable(model) {
+			_ = db.AutoMigrate(model)
+		}
 	}
 
 	// Clean up data on successful test run

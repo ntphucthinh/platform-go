@@ -1,0 +1,42 @@
+get:
+  operationId: fetchTravelLocations
+  tags:
+    - travelLocations
+  summary: Get travel location list
+  description: Retrieve all travel locations with optional filtering and total count.
+  security:
+    - AccessCookie: []
+  parameters:
+    - name: status
+      in: query
+      required: false
+      description: Filter by travel location status (visited or wishlist)
+      x-oapi-codegen-extra-tags:
+        binding: "omitempty,oneof=visited wishlist"
+      schema:
+        $ref: "../../components/schemas/enum/travel_location_status.yml#/TravelLocationStatus"
+    - name: name
+      in: query
+      required: false
+      description: Filter by location name
+      schema:
+        type: string
+    - name: stateCode
+      in: query
+      required: false
+      description: Filter by province or state code
+      schema:
+        type: string
+    - name: countryCode
+      in: query
+      required: false
+      description: Filter by ISO 3166-1 alpha-2 country code
+      schema:
+        type: string
+  responses:
+    "200":
+      description: Travel locations retrieved successfully
+      content:
+        application/json:
+          schema:
+            $ref: "../../components/schemas/travel_locations/index.yml#/FetchTravelLocationsResponse"

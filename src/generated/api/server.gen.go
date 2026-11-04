@@ -40,6 +40,12 @@ type ServerInterface interface {
 	// Update a homestay
 	// (PUT /homestays/{homestayID})
 	UpdateHomestay(c *gin.Context, homestayID int64)
+	// Get travel location list
+	// (GET /travel-locations)
+	FetchTravelLocations(c *gin.Context, params FetchTravelLocationsParams)
+	// Get travel location detail
+	// (GET /travel-locations/{travelLocationID})
+	FetchTravelLocationByID(c *gin.Context, travelLocationID int64)
 	// Delete unused uploaded files
 	// (DELETE /uploads)
 	DeleteUploads(c *gin.Context)
@@ -260,6 +266,84 @@ func (siw *ServerInterfaceWrapper) UpdateHomestay(c *gin.Context) {
 	siw.Handler.UpdateHomestay(c, homestayID)
 }
 
+// FetchTravelLocations operation middleware
+func (siw *ServerInterfaceWrapper) FetchTravelLocations(c *gin.Context) {
+
+	var err error
+
+	c.Set(AccessCookieScopes, []string{})
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params FetchTravelLocationsParams
+
+	// ------------- Optional query parameter "status" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "status", c.Request.URL.Query(), &params.Status)
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter status: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	// ------------- Optional query parameter "name" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "name", c.Request.URL.Query(), &params.Name)
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter name: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	// ------------- Optional query parameter "stateCode" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "stateCode", c.Request.URL.Query(), &params.StateCode)
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter stateCode: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	// ------------- Optional query parameter "countryCode" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "countryCode", c.Request.URL.Query(), &params.CountryCode)
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter countryCode: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.FetchTravelLocations(c, params)
+}
+
+// FetchTravelLocationByID operation middleware
+func (siw *ServerInterfaceWrapper) FetchTravelLocationByID(c *gin.Context) {
+
+	var err error
+
+	// ------------- Path parameter "travelLocationID" -------------
+	var travelLocationID int64
+
+	err = runtime.BindStyledParameterWithOptions("simple", "travelLocationID", c.Param("travelLocationID"), &travelLocationID, runtime.BindStyledParameterOptions{Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter travelLocationID: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	c.Set(AccessCookieScopes, []string{})
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.FetchTravelLocationByID(c, travelLocationID)
+}
+
 // DeleteUploads operation middleware
 func (siw *ServerInterfaceWrapper) DeleteUploads(c *gin.Context) {
 
@@ -352,6 +436,8 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.DELETE(options.BaseURL+"/homestays/:homestayID", wrapper.DeleteHomestay)
 	router.GET(options.BaseURL+"/homestays/:homestayID", wrapper.FetchHomestayByID)
 	router.PUT(options.BaseURL+"/homestays/:homestayID", wrapper.UpdateHomestay)
+	router.GET(options.BaseURL+"/travel-locations", wrapper.FetchTravelLocations)
+	router.GET(options.BaseURL+"/travel-locations/:travelLocationID", wrapper.FetchTravelLocationByID)
 	router.DELETE(options.BaseURL+"/uploads", wrapper.DeleteUploads)
 	router.POST(options.BaseURL+"/uploads", wrapper.UploadFiles)
 	router.GET(options.BaseURL+"/users", wrapper.GetUsers)

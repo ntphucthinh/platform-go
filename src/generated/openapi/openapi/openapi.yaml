@@ -15,6 +15,8 @@ tags:
   name: users
 - description: Homestay management
   name: homestays
+- description: Travel location management
+  name: travelLocations
 - description: Generic media upload management
   name: uploads
 paths:
@@ -265,6 +267,75 @@ paths:
       summary: Update a homestay
       tags:
       - Homestays
+  /travel-locations:
+    get:
+      description: Retrieve all travel locations with optional filtering and total
+        count.
+      operationId: fetchTravelLocations
+      parameters:
+      - description: Filter by travel location status (visited or wishlist)
+        in: query
+        name: status
+        required: false
+        schema:
+          $ref: "#/components/schemas/TravelLocationStatus"
+        x-oapi-codegen-extra-tags:
+          binding: "omitempty,oneof=visited wishlist"
+      - description: Filter by location name
+        in: query
+        name: name
+        required: false
+        schema:
+          type: string
+      - description: Filter by province or state code
+        in: query
+        name: stateCode
+        required: false
+        schema:
+          type: string
+      - description: Filter by ISO 3166-1 alpha-2 country code
+        in: query
+        name: countryCode
+        required: false
+        schema:
+          type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FetchTravelLocationsResponse"
+          description: Travel locations retrieved successfully
+      security:
+      - AccessCookie: []
+      summary: Get travel location list
+      tags:
+      - travelLocations
+  /travel-locations/{travelLocationID}:
+    get:
+      description: Retrieve details of a single travel location by ID.
+      operationId: fetchTravelLocationByID
+      parameters:
+      - example: 1
+        in: path
+        name: travelLocationID
+        required: true
+        schema:
+          format: int64
+          minimum: 1
+          type: integer
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FetchTravelLocationByIDResponse"
+          description: Travel location retrieved successfully
+      security:
+      - AccessCookie: []
+      summary: Get travel location detail
+      tags:
+      - travelLocations
   /uploads:
     delete:
       operationId: deleteUploads
@@ -788,6 +859,89 @@ components:
       x-enum-varnames:
       - PriceUnitNightPerRoom
       - PriceUnitNightPerHouse
+    TravelLocationStatus:
+      description: |-
+        The status of a travel location.
+        - "visited": The user has visited the location.
+        - "wishlist": The user wants to visit the location.
+      enum:
+      - visited
+      - wishlist
+      type: string
+      x-enum-varnames:
+      - TravelLocationStatusVisited
+      - TravelLocationStatusWishlist
+    FetchTravelLocationsResponse:
+      example:
+        data:
+        - id: 1
+          countryCode: VN
+          countryName: Vietnam
+          stateCode: SG
+          name: TP. Hồ Chí Minh
+          address: "Thành phố Hồ Chí Minh, Vietnam"
+          latitude: 10.8230989
+          longitude: 106.6296638
+          imagePath: https://example.com/image.jpg
+          status: visited
+          description: TP. Hồ Chí Minh is the largest city in Vietnam by population.
+          notes: I visited TP. Hồ Chí Minh in 2022 and it was a great experience.
+          googleMapsUrl: https://maps.app.goo.gl/example
+          visitCount: 3
+          itineraryCount: 2
+        - id: 1
+          countryCode: VN
+          countryName: Vietnam
+          stateCode: SG
+          name: TP. Hồ Chí Minh
+          address: "Thành phố Hồ Chí Minh, Vietnam"
+          latitude: 10.8230989
+          longitude: 106.6296638
+          imagePath: https://example.com/image.jpg
+          status: visited
+          description: TP. Hồ Chí Minh is the largest city in Vietnam by population.
+          notes: I visited TP. Hồ Chí Minh in 2022 and it was a great experience.
+          googleMapsUrl: https://maps.app.goo.gl/example
+          visitCount: 3
+          itineraryCount: 2
+        total: 100
+      properties:
+        data:
+          items:
+            $ref: "#/components/schemas/FetchTravelLocationsResponse_data_inner"
+          type: array
+        total:
+          example: 100
+          format: int64
+          type: integer
+      required:
+      - data
+      - total
+      type: object
+    FetchTravelLocationByIDResponse:
+      example:
+        data:
+          id: 1
+          countryCode: VN
+          countryName: Vietnam
+          stateCode: SG
+          name: TP. Hồ Chí Minh
+          address: "Thành phố Hồ Chí Minh, Vietnam"
+          latitude: 10.8230989
+          longitude: 106.6296638
+          imagePath: https://example.com/image.jpg
+          status: visited
+          description: TP. Hồ Chí Minh is the largest city in Vietnam by population.
+          notes: I visited TP. Hồ Chí Minh in 2022 and it was a great experience.
+          googleMapsUrl: https://maps.app.goo.gl/example
+          visitCount: 3
+          itineraryCount: 2
+      properties:
+        data:
+          $ref: "#/components/schemas/FetchTravelLocationsResponse_data_inner"
+      required:
+      - data
+      type: object
     MessageOnlyResponse:
       example:
         message: Create new successfully
@@ -1421,6 +1575,98 @@ components:
       - homestayRooms
       - id
       - name
+      type: object
+    FetchTravelLocationsResponse_data_inner:
+      example:
+        id: 1
+        countryCode: VN
+        countryName: Vietnam
+        stateCode: SG
+        name: TP. Hồ Chí Minh
+        address: "Thành phố Hồ Chí Minh, Vietnam"
+        latitude: 10.8230989
+        longitude: 106.6296638
+        imagePath: https://example.com/image.jpg
+        status: visited
+        description: TP. Hồ Chí Minh is the largest city in Vietnam by population.
+        notes: I visited TP. Hồ Chí Minh in 2022 and it was a great experience.
+        googleMapsUrl: https://maps.app.goo.gl/example
+        visitCount: 3
+        itineraryCount: 2
+      properties:
+        id:
+          example: 1
+          format: int64
+          type: integer
+        countryCode:
+          example: VN
+          type: string
+        countryName:
+          example: Vietnam
+          type: string
+        stateCode:
+          example: SG
+          type: string
+        name:
+          example: TP. Hồ Chí Minh
+          type: string
+        address:
+          example: "Thành phố Hồ Chí Minh, Vietnam"
+          type: string
+        latitude:
+          example: 10.8230989
+          format: double
+          nullable: true
+          type: number
+        longitude:
+          example: 106.6296638
+          format: double
+          nullable: true
+          type: number
+        imagePath:
+          example: https://example.com/image.jpg
+          nullable: true
+          type: string
+        status:
+          allOf:
+          - $ref: "#/components/schemas/TravelLocationStatus"
+          example: visited
+        description:
+          example: TP. Hồ Chí Minh is the largest city in Vietnam by population.
+          nullable: true
+          type: string
+        notes:
+          example: I visited TP. Hồ Chí Minh in 2022 and it was a great experience.
+          nullable: true
+          type: string
+        googleMapsUrl:
+          example: https://maps.app.goo.gl/example
+          nullable: true
+          type: string
+        visitCount:
+          example: 3
+          format: int64
+          type: integer
+        itineraryCount:
+          example: 2
+          format: int64
+          type: integer
+      required:
+      - address
+      - countryCode
+      - countryName
+      - description
+      - googleMapsUrl
+      - id
+      - imagePath
+      - itineraryCount
+      - latitude
+      - longitude
+      - name
+      - notes
+      - stateCode
+      - status
+      - visitCount
       type: object
     ValidationErrorResponse_errors_inner:
       properties:

@@ -13,6 +13,7 @@ import (
 	"platform-go/internal/interfaces/controller"
 	"platform-go/internal/usecases"
 	"platform-go/internal/usecases/homestays/usecase"
+	usecase2 "platform-go/internal/usecases/travel_locations/usecase"
 	"testing"
 )
 
@@ -31,10 +32,15 @@ func TestInitializeControllers(t *testing.T, db *gorm.DB) (*TestHandlerSet, erro
 	updateHomestayUsecase := usecase.NewUpdateHomestayUsecase(dbInterface)
 	deleteHomestayUsecase := usecase.NewDeleteHomestayUsecase(dbInterface)
 	homestayController := controller.NewHomestayController(fetchHomestaysUseCase, createHomestayUsecase, fetchHomestayByIDUseCase, updateHomestayUsecase, deleteHomestayUsecase)
+	travelLocationQueryService := queryservice.NewTravelLocationQueryService(db)
+	fetchTravelLocationsUseCase := usecase2.NewFetchTravelLocationsUseCase(travelLocationQueryService)
+	fetchTravelLocationByIDUseCase := usecase2.NewFetchTravelLocationByIDUseCase(travelLocationQueryService)
+	travelLocationController := controller.NewTravelLocationController(fetchTravelLocationsUseCase, fetchTravelLocationByIDUseCase)
 	testHandlerSet := &TestHandlerSet{
-		Handler:         userController,
-		HomestayHandler: homestayController,
-		DB:              db,
+		Handler:               userController,
+		HomestayHandler:       homestayController,
+		TravelLocationHandler: travelLocationController,
+		DB:                    db,
 	}
 	return testHandlerSet, nil
 }
@@ -42,7 +48,8 @@ func TestInitializeControllers(t *testing.T, db *gorm.DB) (*TestHandlerSet, erro
 // wire-test.go:
 
 type TestHandlerSet struct {
-	Handler         *controller.UserController
-	HomestayHandler controller.HomestayController
-	DB              *gorm.DB
+	Handler               *controller.UserController
+	HomestayHandler       controller.HomestayController
+	TravelLocationHandler controller.TravelLocationController
+	DB                    *gorm.DB
 }

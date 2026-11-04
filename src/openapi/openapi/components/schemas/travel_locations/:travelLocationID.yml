@@ -1,0 +1,85 @@
+# ---------------------------------------------------------------------------
+# Fetch travel location detail (GET /travel-locations/{travelLocationID})
+# ---------------------------------------------------------------------------
+FetchTravelLocationByIDResponse:
+  type: object
+  properties:
+    data:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1
+        countryCode:
+          type: string
+          example: "VN"
+        countryName:
+          type: string
+          example: "Vietnam"
+        stateCode:
+          type: string
+          example: "SG"
+        name:
+          type: string
+          example: "TP. Hồ Chí Minh"
+        address:
+          type: string
+          example: "Thành phố Hồ Chí Minh, Vietnam"
+        latitude:
+          type: number
+          format: double
+          nullable: true
+          example: 10.8230989
+        longitude:
+          type: number
+          format: double
+          nullable: true
+          example: 106.6296638
+        imagePath:
+          type: string
+          nullable: true
+          example: "https://example.com/image.jpg"
+        status:
+          allOf:
+            - $ref: "../enum/travel_location_status.yml#/TravelLocationStatus"
+          example: "visited"
+        description:
+          type: string
+          nullable: true
+          example: "TP. Hồ Chí Minh is the largest city in Vietnam by population."
+        notes:
+          type: string
+          nullable: true
+          example: "I visited TP. Hồ Chí Minh in 2022 and it was a great experience."
+        googleMapsUrl:
+          type: string
+          nullable: true
+          example: "https://maps.app.goo.gl/example"
+        visitCount:
+          type: integer
+          format: int64
+          example: 3
+        itineraryCount:
+          type: integer
+          format: int64
+          example: 2
+      required:
+        - id
+        - countryCode
+        - countryName
+        - stateCode
+        - name
+        - address
+        - latitude
+        - longitude
+        - imagePath
+        - status
+        - description
+        - notes
+        - googleMapsUrl
+        - visitCount
+        - itineraryCount
+  required:
+    - data
+

@@ -15,6 +15,8 @@ tags:
     description: User management
   - name: homestays
     description: Homestay management
+  - name: travelLocations
+    description: Travel location management
   - name: uploads
     description: Generic media upload management
 
@@ -33,6 +35,10 @@ paths:
     $ref: "./paths/homestays/index.yml"
   /homestays/{homestayID}:
     $ref: "./paths/homestays/:homestayID.yml"
+  /travel-locations:
+    $ref: "./paths/travel_locations/index.yml"
+  /travel-locations/{travelLocationID}:
+    $ref: "./paths/travel_locations/:travelLocationID.yml"
   /uploads:
     $ref: "./paths/uploads.yml"
 
@@ -69,6 +75,12 @@ components:
       $ref: "./components/schemas/homestays/:homestayID.yml#/UpdateHomestayRequest"
     PriceUnit:
       $ref: "./components/schemas/enum/price_unit.yml#/PriceUnit"
+    TravelLocationStatus:
+      $ref: "./components/schemas/enum/travel_location_status.yml#/TravelLocationStatus"
+    FetchTravelLocationsResponse:
+      $ref: "./components/schemas/travel_locations/index.yml#/FetchTravelLocationsResponse"
+    FetchTravelLocationByIDResponse:
+      $ref: "./components/schemas/travel_locations/:travelLocationID.yml#/FetchTravelLocationByIDResponse"
     MessageOnlyResponse:
       $ref: "./components/schemas/common/message.yml#/MessageOnlyResponse"
     ValidationErrorResponse:

@@ -21,8 +21,8 @@ type TravelLocation struct {
 	Description   *string        `gorm:"type:text"`
 	Notes         *string        `gorm:"type:text"`
 	GoogleMapsURL *string        `gorm:"column:google_maps_url;size:255"`
-	CreatedAt     time.Time      `gorm:"default:CURRENT_TIMESTAMP"`
-	UpdatedAt     time.Time      `gorm:"default:CURRENT_TIMESTAMP;autoUpdateLine"`
+	CreatedAt     time.Time      `gorm:"type:timestamp;default:CURRENT_TIMESTAMP"`
+	UpdatedAt     time.Time      `gorm:"type:timestamp;default:CURRENT_TIMESTAMP;autoUpdateTime"`
 	DeletedAt     gorm.DeletedAt `gorm:"index"`
 }
 
