@@ -68,7 +68,7 @@ services:
     networks:
       platform-network:
         aliases:
-          - backend.platform.internal
+          - api.platform.internal
 
   # Swagger UI Document
   platform-swagger-ui:
@@ -80,17 +80,23 @@ services:
     volumes:
       - ./src/generated/openapi/openapi/openapi.yaml:/usr/share/nginx/html/openapi.yaml
     networks:
-      - platform-network
+      platform-network:
+        aliases:
+          - swagger.platform.internal
 
   # HTTPS Proxy for API and Swagger UI
   platform-https-proxy:
     image: steveltn/https-portal:1
+    restart: unless-stopped
     ports:
       - "8085:80"
       - "8445:443"
     environment:
       STAGE: local
       DOMAINS: "api.platform.internal -> http://platform-api:8080, swagger.platform.internal -> http://platform-swagger-ui:8080"
+    depends_on:
+      - platform-api
+      - platform-swagger-ui
     networks:
       - platform-network
 
