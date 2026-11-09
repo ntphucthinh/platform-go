@@ -10,6 +10,8 @@ import (
 	"gorm.io/gorm"
 
 	"platform-go/internal/infrastructure/dbmodel"
+	"platform-go/internal/infrastructure/repository"
+	"platform-go/internal/pkg/cvalidator"
 )
 
 // LoadTestEnv loads .env.test.local from common project directories.
@@ -87,6 +89,9 @@ func SetupTestDB(t *testing.T) *gorm.DB {
 			_ = db.AutoMigrate(model)
 		}
 	}
+
+	cvalidator.AddCustomValidation(cvalidator.Validator(), repository.NewSchemaDB(db))
+	cvalidator.ValidatorTranslate(cvalidator.Validator())
 
 	// Clean up data on successful test run
 	t.Cleanup(func() {

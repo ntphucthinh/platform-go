@@ -23,10 +23,6 @@ import (
 func main() {
 	loadEnv()
 
-	cvalidator.NewValidate()
-	v := cvalidator.Validator()
-	cvalidator.CustomTagName(v)
-
 	// Prefer DB_DSN if set; otherwise build from individual environment variables
 	dsn := os.Getenv("DB_DSN")
 	if dsn == "" {
@@ -67,6 +63,12 @@ func main() {
 		log.Fatalf("invalid JWT configuration: %v", err)
 	}
 	application := di.InitializeApplication(db, jwtService, !app.IsLocal())
+
+	cvalidator.NewValidate()
+	v := cvalidator.Validator()
+	cvalidator.CustomTagName(v)
+	cvalidator.ValidatorTranslate(v)
+	cvalidator.AddCustomValidation(v, application.DB)
 
 	r := gin.Default()
 	if err := r.SetTrustedProxies(trustedProxies()); err != nil {

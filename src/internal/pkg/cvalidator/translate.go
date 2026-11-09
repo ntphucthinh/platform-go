@@ -16,6 +16,10 @@ var (
 	trans ut.Translator
 )
 
+func ValidatorTranslate(v *validator.Validate) {
+	registerCustomTranslation(v, "validateTravelLocationID", validateTravelLocationIDTranslation)
+}
+
 func TranslateError(err error) map[string]string {
 	if err == nil {
 		return map[string]string{}
@@ -63,6 +67,15 @@ func TranslateError(err error) map[string]string {
 	return map[string]string{
 		field: msg,
 	}
+}
+
+func registerCustomTranslation(v *validator.Validate, tag string, message string) {
+	_ = v.RegisterTranslation(tag, trans, func(ut ut.Translator) error {
+		return ut.Add(tag, message, true)
+	}, func(ut ut.Translator, fe validator.FieldError) string {
+		t, _ := ut.T(fe.Tag(), fe.Field())
+		return t
+	})
 }
 
 func toLowerFirst(s string) string {

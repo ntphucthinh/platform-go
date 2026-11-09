@@ -52,6 +52,7 @@ func InitializeApplication(db *gorm.DB, jwtService *security.JWTService, secureC
 	application := &Application{
 		Controller:  serverController,
 		AuthUsecase: authUsecase,
+		DB:          dbInterface,
 	}
 	return application
 }
@@ -63,4 +64,5 @@ func InitializeApplication(db *gorm.DB, jwtService *security.JWTService, secureC
 type Application struct {
 	Controller  *controller.ServerController
 	AuthUsecase *usecases.AuthUsecase
+	DB          repository.DBInterface
 }

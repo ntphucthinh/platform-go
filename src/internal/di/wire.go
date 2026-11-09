@@ -25,6 +25,7 @@ import (
 type Application struct {
 	Controller  *controller.ServerController
 	AuthUsecase *usecases.AuthUsecase
+	DB          repository.DBInterface
 }
 
 func InitializeApplication(db *gorm.DB, jwtService *security.JWTService, secureCookies bool) *Application {
