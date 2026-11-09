@@ -27,7 +27,7 @@ func NewTravelMemoryFactory() *TravelMemoryFactory {
 		startDate:      start,
 		endDate:        end,
 		description:    &desc,
-		coverImagePath: "/images/memories/default_cover.jpg",
+		coverImagePath: "travel_memories/550e8400-e29b-41d4-a716-446655440000.jpg",
 	}
 }
 

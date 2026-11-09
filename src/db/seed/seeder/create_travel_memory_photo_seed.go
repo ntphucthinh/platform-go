@@ -23,14 +23,14 @@ func CreateTravelMemoryPhotos(db repository.DBInterface, days []dbmodel.TravelMe
 	}
 
 	photoPool := []string{
-		"https://images.unsplash.com/photo-1507525428034-b723cf961d3e",
-		"https://images.unsplash.com/photo-1544644181-1484b3fdfc62",
-		"https://images.unsplash.com/photo-1528127269322-539801943592",
-		"https://images.unsplash.com/photo-1503899036084-c55cdd92da26",
-		"https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e",
-		"https://images.unsplash.com/photo-1534447677768-be436bb09401",
-		"https://images.unsplash.com/photo-1506744038136-46273834b3fb",
-		"https://images.unsplash.com/photo-1512453979798-5ea266f8880c",
+		"travel_memories/b1b2c3d4-e5f6-4a5b-8c9d-0e1f2a3b4c01.jpg",
+		"travel_memories/b1b2c3d4-e5f6-4a5b-8c9d-0e1f2a3b4c02.jpg",
+		"travel_memories/b1b2c3d4-e5f6-4a5b-8c9d-0e1f2a3b4c03.jpg",
+		"travel_memories/b1b2c3d4-e5f6-4a5b-8c9d-0e1f2a3b4c04.jpg",
+		"travel_memories/b1b2c3d4-e5f6-4a5b-8c9d-0e1f2a3b4c05.jpg",
+		"travel_memories/b1b2c3d4-e5f6-4a5b-8c9d-0e1f2a3b4c06.jpg",
+		"travel_memories/b1b2c3d4-e5f6-4a5b-8c9d-0e1f2a3b4c07.jpg",
+		"travel_memories/b1b2c3d4-e5f6-4a5b-8c9d-0e1f2a3b4c08.jpg",
 	}
 
 	var models []dbmodel.TravelMemoryPhoto

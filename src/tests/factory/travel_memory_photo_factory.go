@@ -14,7 +14,7 @@ type TravelMemoryPhotoFactory struct {
 func NewTravelMemoryPhotoFactory() *TravelMemoryPhotoFactory {
 	return &TravelMemoryPhotoFactory{
 		memoryDayID: 1,
-		imagePath:   "/images/memories/photo_default.jpg",
+		imagePath:   "travel_memories/6ba7b810-9dad-11d1-80b4-00c04fd43000.jpg",
 		sortOrder:   0,
 	}
 }

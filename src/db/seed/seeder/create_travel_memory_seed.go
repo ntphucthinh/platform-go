@@ -62,7 +62,7 @@ func CreateTravelMemories(db repository.DBInterface, locations []dbmodel.TravelL
 			startDate:      time.Date(2024, 11, 10, 0, 0, 0, 0, time.UTC),
 			endDate:        time.Date(2024, 11, 12, 0, 0, 0, 0, time.UTC),
 			description:    "Hành trình săn hoa dã quỳ, ngắm bình minh trên đồi thông và thưởng thức cà phê se lạnh Đà Lạt.",
-			coverImagePath: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e",
+			coverImagePath: "travel_memories/a1b2c3d4-e5f6-4a5b-8c9d-0e1f2a3b4c50.jpg",
 		},
 		{
 			locationName:   "Đà Nẵng",
@@ -70,7 +70,7 @@ func CreateTravelMemories(db repository.DBInterface, locations []dbmodel.TravelL
 			startDate:      time.Date(2024, 7, 20, 0, 0, 0, 0, time.UTC),
 			endDate:        time.Date(2024, 7, 22, 0, 0, 0, 0, time.UTC),
 			description:    "Thư giãn tại bãi biển Mỹ Khê, check-in Cầu Vàng Bà Nà Hills và xem Cầu Rồng phun lửa.",
-			coverImagePath: "https://images.unsplash.com/photo-1544644181-1484b3fdfc62",
+			coverImagePath: "travel_memories/a1b2c3d4-e5f6-4a5b-8c9d-0e1f2a3b4c51.jpg",
 		},
 		{
 			locationName:   "Huế",
@@ -78,7 +78,7 @@ func CreateTravelMemories(db repository.DBInterface, locations []dbmodel.TravelL
 			startDate:      time.Date(2024, 6, 15, 0, 0, 0, 0, time.UTC),
 			endDate:        time.Date(2024, 6, 17, 0, 0, 0, 0, time.UTC),
 			description:    "Trải nghiệm không gian hoài niệm tại Đại Nội, các lăng tẩm triều Nguyễn và ẩm thực cung đình Huế.",
-			coverImagePath: "https://images.unsplash.com/photo-1528127269322-539801943592",
+			coverImagePath: "travel_memories/a1b2c3d4-e5f6-4a5b-8c9d-0e1f2a3b4c52.jpg",
 		},
 		{
 			locationName:   "Tokyo",
@@ -86,7 +86,7 @@ func CreateTravelMemories(db repository.DBInterface, locations []dbmodel.TravelL
 			startDate:      time.Date(2024, 11, 20, 0, 0, 0, 0, time.UTC),
 			endDate:        time.Date(2024, 11, 23, 0, 0, 0, 0, time.UTC),
 			description:    "Dạo bước dưới những tán lá vàng lá đỏ tại vườn Shinjuku Gyoen và đền Asakusa cổ kính.",
-			coverImagePath: "https://images.unsplash.com/photo-1503899036084-c55cdd92da26",
+			coverImagePath: "travel_memories/a1b2c3d4-e5f6-4a5b-8c9d-0e1f2a3b4c53.jpg",
 		},
 	}
 
