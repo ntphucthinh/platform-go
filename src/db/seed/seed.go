@@ -66,7 +66,12 @@ func main() {
 	seeder.CreateHomestayImages(schemaDB, rooms)
 
 	//Travel map
-	seeder.CreateTravelLocations(schemaDB)
+	locations := seeder.CreateTravelLocations(schemaDB)
+
+	//Travel memories
+	memories := seeder.CreateTravelMemories(schemaDB, locations)
+	days := seeder.CreateTravelMemoryDays(schemaDB, memories)
+	seeder.CreateTravelMemoryPhotos(schemaDB, days)
 
 	fmt.Println("Seeding completed successfully.")
 }
