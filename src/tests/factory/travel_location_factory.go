@@ -3,7 +3,6 @@ package factory
 import (
 	"time"
 
-	"github.com/hunter-io/geonames"
 	"gorm.io/gorm"
 
 	"platform-go/internal/infrastructure/dbmodel"
@@ -16,12 +15,11 @@ import (
 //	// Create a TravelLocation with default values
 //	location := factory.NewTravelLocationFactory().Build()
 //
-//	// Create a TravelLocation with custom values and automatic geonames resolution
+//	// Create a TravelLocation with custom values
 //	location := factory.NewTravelLocationFactory().
 //	    WithCountryCode("VN").
 //	    WithCountryName("Vietnam").
-//	    WithGeonames("VN", "Da Lat").
-//	    WithName("Đà Lạt").
+//	    WithLocationName("Đà Lạt").
 //	    WithCoordinates(11.9404192, 108.4583132).
 //	    WithVisited().
 //	    Build()
@@ -33,8 +31,7 @@ import (
 type TravelLocationFactory struct {
 	countryCode   string
 	countryName   string
-	stateCode     string
-	name          string
+	locationName  string
 	latitude      *float64
 	longitude     *float64
 	imagePath     *string
@@ -56,8 +53,7 @@ func NewTravelLocationFactory() *TravelLocationFactory {
 	return &TravelLocationFactory{
 		countryCode:   "VN",
 		countryName:   "Vietnam",
-		stateCode:     "35",
-		name:          "Đà Lạt",
+		locationName:  "Đà Lạt",
 		latitude:      &lat,
 		longitude:     &lng,
 		imagePath:     &img,
@@ -72,8 +68,7 @@ func NewTravelLocationFactory() *TravelLocationFactory {
 func (f *TravelLocationFactory) WithLocation(loc dbmodel.TravelLocation) *TravelLocationFactory {
 	f.countryCode = loc.CountryCode
 	f.countryName = loc.CountryName
-	f.stateCode = loc.StateCode
-	f.name = loc.Name
+	f.locationName = loc.LocationName
 	f.latitude = loc.Latitude
 	f.longitude = loc.Longitude
 	f.imagePath = loc.ImagePath
@@ -96,24 +91,9 @@ func (f *TravelLocationFactory) WithCountryName(name string) *TravelLocationFact
 	return f
 }
 
-// WithStateCode sets the subdivision / state code directly
-func (f *TravelLocationFactory) WithStateCode(state string) *TravelLocationFactory {
-	f.stateCode = state
-	return f
-}
-
-// WithGeonames resolves and sets state code using the geonames package
-func (f *TravelLocationFactory) WithGeonames(countryCode, cityName string) *TravelLocationFactory {
-	f.countryCode = countryCode
-	if res, err := geonames.ResolveState(countryCode, cityName); err == nil && res.State != "" {
-		f.stateCode = res.State
-	}
-	return f
-}
-
-// WithName sets the location name
-func (f *TravelLocationFactory) WithName(name string) *TravelLocationFactory {
-	f.name = name
+// WithLocationName sets the location name
+func (f *TravelLocationFactory) WithLocationName(name string) *TravelLocationFactory {
+	f.locationName = name
 	return f
 }
 
@@ -172,8 +152,7 @@ func (f *TravelLocationFactory) Build() *dbmodel.TravelLocation {
 	return &dbmodel.TravelLocation{
 		CountryCode:   f.countryCode,
 		CountryName:   f.countryName,
-		StateCode:     f.stateCode,
-		Name:          f.name,
+		LocationName:  f.locationName,
 		Latitude:      f.latitude,
 		Longitude:     f.longitude,
 		ImagePath:     f.imagePath,

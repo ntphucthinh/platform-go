@@ -34,9 +34,13 @@ func TestInitializeControllers(t *testing.T, db *gorm.DB) (*TestHandlerSet, erro
 	deleteHomestayUsecase := usecase.NewDeleteHomestayUsecase(dbInterface, homestayRepository)
 	homestayController := controller.NewHomestayController(fetchHomestaysUseCase, createHomestayUsecase, fetchHomestayByIDUseCase, updateHomestayUsecase, deleteHomestayUsecase)
 	travelLocationQueryService := queryservice.NewTravelLocationQueryService(db)
-	fetchTravelLocationsUseCase := usecase2.NewFetchTravelLocationsUseCase(travelLocationQueryService)
-	fetchTravelLocationByIDUseCase := usecase2.NewFetchTravelLocationByIDUseCase(travelLocationQueryService)
-	travelLocationController := controller.NewTravelLocationController(fetchTravelLocationsUseCase, fetchTravelLocationByIDUseCase)
+	fetchTravelLocationsUsecase := usecase2.NewFetchTravelLocationsUsecase(travelLocationQueryService)
+	travelLocationRepository := repository.NewTravelLocationRepository(dbInterface)
+	createTravelLocationUsecase := usecase2.NewCreateTravelLocationUsecase(dbInterface, travelLocationRepository)
+	fetchTravelLocationByIDUsecase := usecase2.NewFetchTravelLocationByIDUsecase(travelLocationQueryService)
+	updateTravelLocationUsecase := usecase2.NewUpdateTravelLocationUsecase(dbInterface, travelLocationRepository)
+	deleteTravelLocationUsecase := usecase2.NewDeleteTravelLocationUsecase(dbInterface, travelLocationRepository)
+	travelLocationController := controller.NewTravelLocationController(fetchTravelLocationsUsecase, createTravelLocationUsecase, fetchTravelLocationByIDUsecase, updateTravelLocationUsecase, deleteTravelLocationUsecase)
 	testHandlerSet := &TestHandlerSet{
 		Handler:               userController,
 		HomestayHandler:       homestayController,

@@ -8,15 +8,15 @@ import (
 	travellocationqueryservice "platform-go/internal/usecases/travel_locations/queryservice"
 )
 
-type FetchTravelLocationsUseCase struct {
+type FetchTravelLocationsUsecase struct {
 	queryService travellocationqueryservice.TravelLocationQueryService
 }
 
-func NewFetchTravelLocationsUseCase(queryService travellocationqueryservice.TravelLocationQueryService) *FetchTravelLocationsUseCase {
-	return &FetchTravelLocationsUseCase{queryService: queryService}
+func NewFetchTravelLocationsUsecase(queryService travellocationqueryservice.TravelLocationQueryService) *FetchTravelLocationsUsecase {
+	return &FetchTravelLocationsUsecase{queryService: queryService}
 }
 
-func (uc *FetchTravelLocationsUseCase) Execute(ctx context.Context, params api.FetchTravelLocationsParams) (*api.FetchTravelLocationsResponse, error) {
+func (uc *FetchTravelLocationsUsecase) Execute(ctx context.Context, params api.FetchTravelLocationsParams) (*api.FetchTravelLocationsResponse, error) {
 	var status *string
 	if params.Status != nil {
 		s := string(*params.Status)
@@ -24,10 +24,9 @@ func (uc *FetchTravelLocationsUseCase) Execute(ctx context.Context, params api.F
 	}
 
 	filter := qsdto.TravelLocationFilter{
-		Status:      status,
-		Name:        params.Name,
-		StateCode:   params.StateCode,
-		CountryCode: params.CountryCode,
+		Status:       status,
+		LocationName: params.LocationName,
+		CountryCode:  params.CountryCode,
 	}
 
 	locations, total, err := uc.queryService.FetchTravelLocations(ctx, filter)
@@ -41,8 +40,7 @@ func (uc *FetchTravelLocationsUseCase) Execute(ctx context.Context, params api.F
 			Id:             loc.ID,
 			CountryCode:    loc.CountryCode,
 			CountryName:    loc.CountryName,
-			StateCode:      loc.StateCode,
-			Name:           loc.Name,
+			LocationName:   loc.LocationName,
 			Latitude:       loc.Latitude,
 			Longitude:      loc.Longitude,
 			ImagePath:      loc.ImagePath,
@@ -60,4 +58,3 @@ func (uc *FetchTravelLocationsUseCase) Execute(ctx context.Context, params api.F
 		Total: total,
 	}, nil
 }
-

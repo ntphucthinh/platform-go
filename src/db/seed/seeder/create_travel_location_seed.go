@@ -3,7 +3,6 @@ package seeder
 import (
 	"fmt"
 
-	"github.com/hunter-io/geonames"
 	"gorm.io/gorm"
 
 	"platform-go/internal/infrastructure/dbmodel"
@@ -14,8 +13,7 @@ import (
 type locationSeedItem struct {
 	countryCode   string
 	countryName   string
-	lookupCity    string
-	name          string
+	locationName  string
 	latitude      float64
 	longitude     float64
 	imagePath     string
@@ -42,8 +40,7 @@ func CreateTravelLocations(db repository.DBInterface) []dbmodel.TravelLocation {
 		{
 			countryCode:   "VN",
 			countryName:   "Vietnam",
-			lookupCity:    "Da Lat",
-			name:          "Đà Lạt",
+			locationName:  "Đà Lạt",
 			latitude:      11.9404192,
 			longitude:     108.4583132,
 			imagePath:     "/images/locations/da_lat.jpg",
@@ -55,8 +52,7 @@ func CreateTravelLocations(db repository.DBInterface) []dbmodel.TravelLocation {
 		{
 			countryCode:   "VN",
 			countryName:   "Vietnam",
-			lookupCity:    "Ho Chi Minh City",
-			name:          "TP. Hồ Chí Minh",
+			locationName:  "TP. Hồ Chí Minh",
 			latitude:      10.776889,
 			longitude:     106.700806,
 			imagePath:     "/images/locations/hcmc.jpg",
@@ -68,8 +64,7 @@ func CreateTravelLocations(db repository.DBInterface) []dbmodel.TravelLocation {
 		{
 			countryCode:   "VN",
 			countryName:   "Vietnam",
-			lookupCity:    "Hanoi",
-			name:          "Hà Nội",
+			locationName:  "Hà Nội",
 			latitude:      21.028511,
 			longitude:     105.854444,
 			imagePath:     "/images/locations/hanoi.jpg",
@@ -81,8 +76,7 @@ func CreateTravelLocations(db repository.DBInterface) []dbmodel.TravelLocation {
 		{
 			countryCode:   "VN",
 			countryName:   "Vietnam",
-			lookupCity:    "Da Nang",
-			name:          "Đà Nẵng",
+			locationName:  "Đà Nẵng",
 			latitude:      16.054407,
 			longitude:     108.202167,
 			imagePath:     "/images/locations/da_nang.jpg",
@@ -94,8 +88,7 @@ func CreateTravelLocations(db repository.DBInterface) []dbmodel.TravelLocation {
 		{
 			countryCode:   "VN",
 			countryName:   "Vietnam",
-			lookupCity:    "Hue",
-			name:          "Huế",
+			locationName:  "Huế",
 			latitude:      16.463713,
 			longitude:     107.590866,
 			imagePath:     "/images/locations/hue.jpg",
@@ -107,8 +100,7 @@ func CreateTravelLocations(db repository.DBInterface) []dbmodel.TravelLocation {
 		{
 			countryCode:   "VN",
 			countryName:   "Vietnam",
-			lookupCity:    "Nha Trang",
-			name:          "Nha Trang",
+			locationName:  "Nha Trang",
 			latitude:      12.238791,
 			longitude:     109.196749,
 			imagePath:     "/images/locations/nha_trang.jpg",
@@ -120,8 +112,7 @@ func CreateTravelLocations(db repository.DBInterface) []dbmodel.TravelLocation {
 		{
 			countryCode:   "VN",
 			countryName:   "Vietnam",
-			lookupCity:    "Can Tho",
-			name:          "Cần Thơ",
+			locationName:  "Cần Thơ",
 			latitude:      10.045162,
 			longitude:     105.746857,
 			imagePath:     "/images/locations/can_tho.jpg",
@@ -133,8 +124,7 @@ func CreateTravelLocations(db repository.DBInterface) []dbmodel.TravelLocation {
 		{
 			countryCode:   "VN",
 			countryName:   "Vietnam",
-			lookupCity:    "Ha Long",
-			name:          "Hạ Long",
+			locationName:  "Hạ Long",
 			latitude:      20.950454,
 			longitude:     107.073364,
 			imagePath:     "/images/locations/ha_long.jpg",
@@ -146,8 +136,7 @@ func CreateTravelLocations(db repository.DBInterface) []dbmodel.TravelLocation {
 		{
 			countryCode:   "VN",
 			countryName:   "Vietnam",
-			lookupCity:    "Phu Quoc",
-			name:          "Phú Quốc",
+			locationName:  "Phú Quốc",
 			latitude:      10.289879,
 			longitude:     103.98402,
 			imagePath:     "/images/locations/phu_quoc.jpg",
@@ -159,8 +148,7 @@ func CreateTravelLocations(db repository.DBInterface) []dbmodel.TravelLocation {
 		{
 			countryCode:   "VN",
 			countryName:   "Vietnam",
-			lookupCity:    "Sa Pa",
-			name:          "Sa Pa",
+			locationName:  "Sa Pa",
 			latitude:      22.33636,
 			longitude:     103.84378,
 			imagePath:     "/images/locations/sa_pa.jpg",
@@ -173,8 +161,7 @@ func CreateTravelLocations(db repository.DBInterface) []dbmodel.TravelLocation {
 		{
 			countryCode:   "JP",
 			countryName:   "Japan",
-			lookupCity:    "Tokyo",
-			name:          "Tokyo",
+			locationName:  "Tokyo",
 			latitude:      35.6762,
 			longitude:     139.6503,
 			imagePath:     "/images/locations/tokyo.jpg",
@@ -186,8 +173,7 @@ func CreateTravelLocations(db repository.DBInterface) []dbmodel.TravelLocation {
 		{
 			countryCode:   "FR",
 			countryName:   "France",
-			lookupCity:    "Paris",
-			name:          "Paris",
+			locationName:  "Paris",
 			latitude:      48.8566,
 			longitude:     2.3522,
 			imagePath:     "/images/locations/paris.jpg",
@@ -199,8 +185,7 @@ func CreateTravelLocations(db repository.DBInterface) []dbmodel.TravelLocation {
 		{
 			countryCode:   "US",
 			countryName:   "United States",
-			lookupCity:    "New York",
-			name:          "New York",
+			locationName:  "New York",
 			latitude:      40.7128,
 			longitude:     -74.0060,
 			imagePath:     "/images/locations/new_york.jpg",
@@ -212,8 +197,7 @@ func CreateTravelLocations(db repository.DBInterface) []dbmodel.TravelLocation {
 		{
 			countryCode:   "GB",
 			countryName:   "United Kingdom",
-			lookupCity:    "London",
-			name:          "London",
+			locationName:  "London",
 			latitude:      51.5074,
 			longitude:     -0.1278,
 			imagePath:     "/images/locations/london.jpg",
@@ -225,8 +209,7 @@ func CreateTravelLocations(db repository.DBInterface) []dbmodel.TravelLocation {
 		{
 			countryCode:   "KR",
 			countryName:   "South Korea",
-			lookupCity:    "Seoul",
-			name:          "Seoul",
+			locationName:  "Seoul",
 			latitude:      37.5665,
 			longitude:     126.9780,
 			imagePath:     "/images/locations/seoul.jpg",
@@ -239,18 +222,10 @@ func CreateTravelLocations(db repository.DBInterface) []dbmodel.TravelLocation {
 
 	var models []dbmodel.TravelLocation
 	for _, item := range items {
-		// Resolve state code using geonames package
-		stateResult, err := geonames.ResolveState(item.countryCode, item.lookupCity)
-		stateCode := ""
-		if err == nil && stateResult.State != "" {
-			stateCode = stateResult.State
-		}
-
 		builder := factory.NewTravelLocationFactory().
 			WithCountryCode(item.countryCode).
 			WithCountryName(item.countryName).
-			WithStateCode(stateCode).
-			WithName(item.name).
+			WithLocationName(item.locationName).
 			WithCoordinates(item.latitude, item.longitude).
 			WithImagePath(item.imagePath).
 			WithStatus(item.status).

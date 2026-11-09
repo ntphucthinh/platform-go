@@ -10,15 +10,15 @@ import (
 
 var ErrTravelLocationNotFound = errors.New("travel location not found")
 
-type FetchTravelLocationByIDUseCase struct {
+type FetchTravelLocationByIDUsecase struct {
 	queryService travellocationqueryservice.TravelLocationQueryService
 }
 
-func NewFetchTravelLocationByIDUseCase(queryService travellocationqueryservice.TravelLocationQueryService) *FetchTravelLocationByIDUseCase {
-	return &FetchTravelLocationByIDUseCase{queryService: queryService}
+func NewFetchTravelLocationByIDUsecase(queryService travellocationqueryservice.TravelLocationQueryService) *FetchTravelLocationByIDUsecase {
+	return &FetchTravelLocationByIDUsecase{queryService: queryService}
 }
 
-func (uc *FetchTravelLocationByIDUseCase) Execute(ctx context.Context, id int64) (*api.FetchTravelLocationByIDResponse, error) {
+func (uc *FetchTravelLocationByIDUsecase) Execute(ctx context.Context, id int64) (*api.FetchTravelLocationByIDResponse, error) {
 	loc, err := uc.queryService.FetchTravelLocationByID(ctx, id)
 	if err != nil {
 		return nil, err
@@ -32,8 +32,7 @@ func (uc *FetchTravelLocationByIDUseCase) Execute(ctx context.Context, id int64)
 			Id:             loc.ID,
 			CountryCode:    loc.CountryCode,
 			CountryName:    loc.CountryName,
-			StateCode:      loc.StateCode,
-			Name:           loc.Name,
+			LocationName:   loc.LocationName,
 			Latitude:       loc.Latitude,
 			Longitude:      loc.Longitude,
 			ImagePath:      loc.ImagePath,
@@ -46,4 +45,3 @@ func (uc *FetchTravelLocationByIDUseCase) Execute(ctx context.Context, id int64)
 		},
 	}, nil
 }
-

@@ -81,6 +81,10 @@ components:
       $ref: "./components/schemas/travel_locations/index.yml#/FetchTravelLocationsResponse"
     FetchTravelLocationByIDResponse:
       $ref: "./components/schemas/travel_locations/:travelLocationID.yml#/FetchTravelLocationByIDResponse"
+    CreateTravelLocationRequest:
+      $ref: "./components/schemas/travel_locations/index.yml#/CreateTravelLocationRequest"
+    UpdateTravelLocationRequest:
+      $ref: "./components/schemas/travel_locations/:travelLocationID.yml#/UpdateTravelLocationRequest"
     MessageOnlyResponse:
       $ref: "./components/schemas/common/message.yml#/MessageOnlyResponse"
     ValidationErrorResponse:

@@ -43,9 +43,18 @@ type ServerInterface interface {
 	// Get travel location list
 	// (GET /travel-locations)
 	FetchTravelLocations(c *gin.Context, params FetchTravelLocationsParams)
+	// Create a new travel location
+	// (POST /travel-locations)
+	CreateTravelLocation(c *gin.Context)
+	// Delete a travel location
+	// (DELETE /travel-locations/{travelLocationID})
+	DeleteTravelLocation(c *gin.Context, travelLocationID int64)
 	// Get travel location detail
 	// (GET /travel-locations/{travelLocationID})
 	FetchTravelLocationByID(c *gin.Context, travelLocationID int64)
+	// Update a travel location
+	// (PUT /travel-locations/{travelLocationID})
+	UpdateTravelLocation(c *gin.Context, travelLocationID int64)
 	// Delete unused uploaded files
 	// (DELETE /uploads)
 	DeleteUploads(c *gin.Context)
@@ -284,19 +293,11 @@ func (siw *ServerInterfaceWrapper) FetchTravelLocations(c *gin.Context) {
 		return
 	}
 
-	// ------------- Optional query parameter "name" -------------
+	// ------------- Optional query parameter "locationName" -------------
 
-	err = runtime.BindQueryParameter("form", true, false, "name", c.Request.URL.Query(), &params.Name)
+	err = runtime.BindQueryParameter("form", true, false, "locationName", c.Request.URL.Query(), &params.LocationName)
 	if err != nil {
-		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter name: %w", err), http.StatusBadRequest)
-		return
-	}
-
-	// ------------- Optional query parameter "stateCode" -------------
-
-	err = runtime.BindQueryParameter("form", true, false, "stateCode", c.Request.URL.Query(), &params.StateCode)
-	if err != nil {
-		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter stateCode: %w", err), http.StatusBadRequest)
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter locationName: %w", err), http.StatusBadRequest)
 		return
 	}
 
@@ -316,6 +317,47 @@ func (siw *ServerInterfaceWrapper) FetchTravelLocations(c *gin.Context) {
 	}
 
 	siw.Handler.FetchTravelLocations(c, params)
+}
+
+// CreateTravelLocation operation middleware
+func (siw *ServerInterfaceWrapper) CreateTravelLocation(c *gin.Context) {
+
+	c.Set(AccessCookieScopes, []string{})
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.CreateTravelLocation(c)
+}
+
+// DeleteTravelLocation operation middleware
+func (siw *ServerInterfaceWrapper) DeleteTravelLocation(c *gin.Context) {
+
+	var err error
+
+	// ------------- Path parameter "travelLocationID" -------------
+	var travelLocationID int64
+
+	err = runtime.BindStyledParameterWithOptions("simple", "travelLocationID", c.Param("travelLocationID"), &travelLocationID, runtime.BindStyledParameterOptions{Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter travelLocationID: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	c.Set(AccessCookieScopes, []string{})
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.DeleteTravelLocation(c, travelLocationID)
 }
 
 // FetchTravelLocationByID operation middleware
@@ -342,6 +384,32 @@ func (siw *ServerInterfaceWrapper) FetchTravelLocationByID(c *gin.Context) {
 	}
 
 	siw.Handler.FetchTravelLocationByID(c, travelLocationID)
+}
+
+// UpdateTravelLocation operation middleware
+func (siw *ServerInterfaceWrapper) UpdateTravelLocation(c *gin.Context) {
+
+	var err error
+
+	// ------------- Path parameter "travelLocationID" -------------
+	var travelLocationID int64
+
+	err = runtime.BindStyledParameterWithOptions("simple", "travelLocationID", c.Param("travelLocationID"), &travelLocationID, runtime.BindStyledParameterOptions{Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter travelLocationID: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	c.Set(AccessCookieScopes, []string{})
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.UpdateTravelLocation(c, travelLocationID)
 }
 
 // DeleteUploads operation middleware
@@ -437,7 +505,10 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.GET(options.BaseURL+"/homestays/:homestayID", wrapper.FetchHomestayByID)
 	router.PUT(options.BaseURL+"/homestays/:homestayID", wrapper.UpdateHomestay)
 	router.GET(options.BaseURL+"/travel-locations", wrapper.FetchTravelLocations)
+	router.POST(options.BaseURL+"/travel-locations", wrapper.CreateTravelLocation)
+	router.DELETE(options.BaseURL+"/travel-locations/:travelLocationID", wrapper.DeleteTravelLocation)
 	router.GET(options.BaseURL+"/travel-locations/:travelLocationID", wrapper.FetchTravelLocationByID)
+	router.PUT(options.BaseURL+"/travel-locations/:travelLocationID", wrapper.UpdateTravelLocation)
 	router.DELETE(options.BaseURL+"/uploads", wrapper.DeleteUploads)
 	router.POST(options.BaseURL+"/uploads", wrapper.UploadFiles)
 	router.GET(options.BaseURL+"/users", wrapper.GetUsers)

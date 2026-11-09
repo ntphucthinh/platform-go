@@ -34,8 +34,8 @@ const (
 
 // Defines values for UploadFilesRequestFolder.
 const (
-	Homestays UploadFilesRequestFolder = "homestays"
-	Travel    UploadFilesRequestFolder = "travel"
+	Homestays      UploadFilesRequestFolder = "homestays"
+	TravelLocation UploadFilesRequestFolder = "travel_location"
 )
 
 // AuthResponse defines model for AuthResponse.
@@ -86,6 +86,39 @@ type CreateHomestayRoomInput struct {
 
 	// Images List of images
 	Images *[]HomestayImageInput `binding:"omitempty" json:"images,omitempty"`
+}
+
+// CreateTravelLocationRequest defines model for CreateTravelLocationRequest.
+type CreateTravelLocationRequest struct {
+	// CountryCode ISO 3166-1 alpha-2 country code
+	CountryCode string `binding:"required,len=2" json:"countryCode"`
+
+	// CountryName Country name
+	CountryName string `binding:"required,min=1,max=255" json:"countryName"`
+
+	// LocationName Location display name
+	LocationName string `binding:"required,min=1,max=255" json:"locationName"`
+
+	// Latitude Latitude coordinate
+	Latitude *float64 `binding:"omitempty" json:"latitude"`
+
+	// Longitude Longitude coordinate
+	Longitude *float64 `binding:"omitempty" json:"longitude"`
+
+	// ImagePath Path returned by POST /uploads
+	ImagePath *string `binding:"omitempty,max=255" json:"imagePath"`
+
+	// Status Travel status (visited or wishlist)
+	Status TravelLocationStatus `binding:"required,oneof=visited wishlist" json:"status"`
+
+	// Description General description of the location
+	Description *string `binding:"omitempty" json:"description"`
+
+	// Notes Personal travel notes
+	Notes *string `binding:"omitempty" json:"notes"`
+
+	// GoogleMapsUrl Google Maps URL
+	GoogleMapsUrl *string `binding:"omitempty,max=255" json:"googleMapsUrl"`
 }
 
 // CreateUser defines model for CreateUser.
@@ -182,10 +215,9 @@ type FetchTravelLocationsResponseDataInner struct {
 	ImagePath      *string              `json:"imagePath"`
 	ItineraryCount int64                `json:"itineraryCount"`
 	Latitude       *float64             `json:"latitude"`
+	LocationName   string               `json:"locationName"`
 	Longitude      *float64             `json:"longitude"`
-	Name           string               `json:"name"`
 	Notes          *string              `json:"notes"`
-	StateCode      string               `json:"stateCode"`
 	Status         TravelLocationStatus `json:"status"`
 	VisitCount     int64                `json:"visitCount"`
 }
@@ -294,6 +326,39 @@ type UpdateHomestayRoomInput struct {
 	Images *[]UpdateHomestayImageInput `binding:"omitempty" json:"images,omitempty"`
 }
 
+// UpdateTravelLocationRequest defines model for UpdateTravelLocationRequest.
+type UpdateTravelLocationRequest struct {
+	// CountryCode ISO 3166-1 alpha-2 country code
+	CountryCode string `binding:"required,len=2" json:"countryCode"`
+
+	// CountryName Country name
+	CountryName string `binding:"required,min=1,max=255" json:"countryName"`
+
+	// LocationName Location display name
+	LocationName string `binding:"required,min=1,max=255" json:"locationName"`
+
+	// Latitude Latitude coordinate
+	Latitude *float64 `binding:"omitempty" json:"latitude"`
+
+	// Longitude Longitude coordinate
+	Longitude *float64 `binding:"omitempty" json:"longitude"`
+
+	// ImagePath Path returned by POST /uploads
+	ImagePath *string `binding:"omitempty,max=255" json:"imagePath"`
+
+	// Status Travel status (visited or wishlist)
+	Status TravelLocationStatus `binding:"required,oneof=visited wishlist" json:"status"`
+
+	// Description General description of the location
+	Description *string `binding:"omitempty" json:"description"`
+
+	// Notes Personal travel notes
+	Notes *string `binding:"omitempty" json:"notes"`
+
+	// GoogleMapsUrl Google Maps URL
+	GoogleMapsUrl *string `binding:"omitempty,max=255" json:"googleMapsUrl"`
+}
+
 // UploadItem defines model for UploadItem.
 type UploadItem struct {
 	FileName        string            `json:"fileName"`
@@ -393,11 +458,8 @@ type FetchTravelLocationsParams struct {
 	// Status Filter by travel location status (visited or wishlist)
 	Status *TravelLocationStatus `binding:"omitempty,oneof=visited wishlist" form:"status,omitempty" json:"status,omitempty"`
 
-	// Name Filter by location name
-	Name *string `form:"name,omitempty" json:"name,omitempty"`
-
-	// StateCode Filter by province or state code
-	StateCode *string `form:"stateCode,omitempty" json:"stateCode,omitempty"`
+	// LocationName Filter by location name
+	LocationName *string `form:"locationName,omitempty" json:"locationName,omitempty"`
 
 	// CountryCode Filter by ISO 3166-1 alpha-2 country code
 	CountryCode *string `form:"countryCode,omitempty" json:"countryCode,omitempty"`
@@ -411,6 +473,12 @@ type CreateHomestayJSONRequestBody = CreateHomestayRequest
 
 // UpdateHomestayJSONRequestBody defines body for UpdateHomestay for application/json ContentType.
 type UpdateHomestayJSONRequestBody = UpdateHomestayRequest
+
+// CreateTravelLocationJSONRequestBody defines body for CreateTravelLocation for application/json ContentType.
+type CreateTravelLocationJSONRequestBody = CreateTravelLocationRequest
+
+// UpdateTravelLocationJSONRequestBody defines body for UpdateTravelLocation for application/json ContentType.
+type UpdateTravelLocationJSONRequestBody = UpdateTravelLocationRequest
 
 // DeleteUploadsJSONRequestBody defines body for DeleteUploads for application/json ContentType.
 type DeleteUploadsJSONRequestBody = DeleteUploadsRequest

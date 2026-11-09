@@ -16,10 +16,7 @@ FetchTravelLocationsResponse:
           countryName:
             type: string
             example: "Vietnam"
-          stateCode:
-            type: string
-            example: "SG"
-          name:
+          locationName:
             type: string
             example: "TP. Hồ Chí Minh"
           latitude:
@@ -35,7 +32,7 @@ FetchTravelLocationsResponse:
           imagePath:
             type: string
             nullable: true
-            example: "https://example.com/image.jpg"
+            example: "travel_location/550e8400-e29b-41d4-a716-446655440000.png"
           status:
             allOf:
               - $ref: "../enum/travel_location_status.yml#/TravelLocationStatus"
@@ -64,8 +61,7 @@ FetchTravelLocationsResponse:
           - id
           - countryCode
           - countryName
-          - stateCode
-          - name
+          - locationName
           - latitude
           - longitude
           - imagePath
@@ -82,3 +78,123 @@ FetchTravelLocationsResponse:
   required:
     - data
     - total
+
+# ---------------------------------------------------------------------------
+# Create travel location (POST /travel-locations)
+# ---------------------------------------------------------------------------
+CreateTravelLocationRequest:
+  type: object
+  properties:
+    countryCode:
+      type: string
+      minLength: 2
+      maxLength: 2
+      x-order: 1
+      x-go-name: CountryCode
+      description: "ISO 3166-1 alpha-2 country code"
+      example: "VN"
+      x-oapi-codegen-extra-tags:
+        binding: "required,len=2"
+
+    countryName:
+      type: string
+      minLength: 1
+      maxLength: 255
+      x-order: 2
+      x-go-name: CountryName
+      description: "Country name"
+      example: "Vietnam"
+      x-oapi-codegen-extra-tags:
+        binding: "required,min=1,max=255"
+
+    locationName:
+      type: string
+      minLength: 1
+      maxLength: 255
+      x-order: 3
+      x-go-name: LocationName
+      description: "Location display name"
+      example: "TP. Hồ Chí Minh"
+      x-oapi-codegen-extra-tags:
+        binding: "required,min=1,max=255"
+
+    latitude:
+      type: number
+      format: double
+      nullable: true
+      x-order: 5
+      x-go-name: Latitude
+      description: "Latitude coordinate"
+      example: 10.8230989
+      x-oapi-codegen-extra-tags:
+        binding: "omitempty"
+
+    longitude:
+      type: number
+      format: double
+      nullable: true
+      x-order: 6
+      x-go-name: Longitude
+      description: "Longitude coordinate"
+      example: 106.6296638
+      x-oapi-codegen-extra-tags:
+        binding: "omitempty"
+
+    imagePath:
+      type: string
+      maxLength: 255
+      nullable: true
+      x-order: 7
+      x-go-name: ImagePath
+      description: "Path returned by POST /uploads"
+      example: "travel_location/550e8400-e29b-41d4-a716-446655440000.png"
+      x-oapi-codegen-extra-tags:
+        binding: "omitempty,max=255"
+
+    status:
+      allOf:
+        - $ref: "../enum/travel_location_status.yml#/TravelLocationStatus"
+      x-order: 8
+      x-go-name: Status
+      description: "Travel status (visited or wishlist)"
+      example: "visited"
+      x-oapi-codegen-extra-tags:
+        binding: "required,oneof=visited wishlist"
+
+    description:
+      type: string
+      nullable: true
+      x-order: 9
+      x-go-name: Description
+      description: "General description of the location"
+      example: "TP. Hồ Chí Minh is the largest city in Vietnam by population."
+      x-oapi-codegen-extra-tags:
+        binding: "omitempty"
+
+    notes:
+      type: string
+      nullable: true
+      x-order: 10
+      x-go-name: Notes
+      description: "Personal travel notes"
+      example: "I visited TP. Hồ Chí Minh in 2022 and it was a great experience."
+      x-oapi-codegen-extra-tags:
+        binding: "omitempty"
+
+    googleMapsUrl:
+      type: string
+      maxLength: 255
+      nullable: true
+      x-order: 11
+      x-go-name: GoogleMapsUrl
+      description: "Google Maps URL"
+      example: "https://maps.app.goo.gl/example"
+      x-oapi-codegen-extra-tags:
+        binding: "omitempty,max=255"
+
+  required:
+    - countryCode
+    - countryName
+    - locationName
+    - status
+

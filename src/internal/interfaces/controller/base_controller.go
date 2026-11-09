@@ -116,10 +116,28 @@ func (con *ServerController) FetchTravelLocations(c *gin.Context, params api.Fet
 	con.travelLocationController.FetchTravelLocations(c, params)
 }
 
+// CreateTravelLocation creates a new travel location.
+// (POST /travel-locations)
+func (con *ServerController) CreateTravelLocation(c *gin.Context) {
+	con.travelLocationController.CreateTravelLocation(c)
+}
+
 // FetchTravelLocationByID retrieves details of a single travel location by ID.
 // (GET /travel-locations/{travelLocationID})
 func (con *ServerController) FetchTravelLocationByID(c *gin.Context, travelLocationID int64) {
 	con.travelLocationController.FetchTravelLocationByID(c, travelLocationID)
+}
+
+// UpdateTravelLocation updates an existing travel location by ID.
+// (PUT /travel-locations/{travelLocationID})
+func (con *ServerController) UpdateTravelLocation(c *gin.Context, travelLocationID int64) {
+	con.travelLocationController.UpdateTravelLocation(c, travelLocationID)
+}
+
+// DeleteTravelLocation soft-deletes a travel location by ID.
+// (DELETE /travel-locations/{travelLocationID})
+func (con *ServerController) DeleteTravelLocation(c *gin.Context, travelLocationID int64) {
+	con.travelLocationController.DeleteTravelLocation(c, travelLocationID)
 }
 
 // -----------------------------------------------------------------------------

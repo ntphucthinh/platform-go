@@ -25,14 +25,11 @@ func (qs *TravelLocationQueryService) FetchTravelLocations(ctx context.Context, 
 	if filter.Status != nil && strings.TrimSpace(*filter.Status) != "" {
 		query = query.Where("status = ?", strings.TrimSpace(*filter.Status))
 	}
-	if filter.Name != nil && strings.TrimSpace(*filter.Name) != "" {
-		query = query.Where("name LIKE ?", "%"+strings.TrimSpace(*filter.Name)+"%")
-	}
-	if filter.StateCode != nil && strings.TrimSpace(*filter.StateCode) != "" {
-		query = query.Where("state_code = ?", strings.TrimSpace(*filter.StateCode))
+	if filter.LocationName != nil && strings.TrimSpace(*filter.LocationName) != "" {
+		query = query.Where("location_name LIKE ?", "%"+strings.TrimSpace(*filter.LocationName)+"%")
 	}
 	if filter.CountryCode != nil && strings.TrimSpace(*filter.CountryCode) != "" {
-		query = query.Where("country_code = ?", strings.TrimSpace(*filter.CountryCode))
+		query = query.Where("country_code = ?", strings.ToUpper(strings.TrimSpace(*filter.CountryCode)))
 	}
 
 	var total int64

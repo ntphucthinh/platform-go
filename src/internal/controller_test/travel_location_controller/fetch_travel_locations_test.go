@@ -40,9 +40,12 @@ var _ travellocationqueryservice.TravelLocationQueryService = (*travelLocationQu
 
 func newTravelLocationRouter(t *testing.T, queryService travellocationqueryservice.TravelLocationQueryService) http.Handler {
 	t.Helper()
-	fetchUsecase := travellocationusecase.NewFetchTravelLocationsUseCase(queryService)
-	fetchByIDUsecase := travellocationusecase.NewFetchTravelLocationByIDUseCase(queryService)
-	handler := controller.NewTravelLocationController(fetchUsecase, fetchByIDUsecase)
+	fetchUsecase := travellocationusecase.NewFetchTravelLocationsUsecase(queryService)
+	createUsecase := travellocationusecase.NewCreateTravelLocationUsecase(nil, nil)
+	fetchByIDUsecase := travellocationusecase.NewFetchTravelLocationByIDUsecase(queryService)
+	updateUsecase := travellocationusecase.NewUpdateTravelLocationUsecase(nil, nil)
+	deleteUsecase := travellocationusecase.NewDeleteTravelLocationUsecase(nil, nil)
+	handler := controller.NewTravelLocationController(fetchUsecase, createUsecase, fetchByIDUsecase, updateUsecase, deleteUsecase)
 	serverController := controller.NewServerController(nil, nil, nil, handler, nil)
 	router := shared.NewSetupRouter(t)
 	api.RegisterHandlers(router, serverController)
@@ -63,8 +66,7 @@ func TestFetchTravelLocations(t *testing.T) {
 				ID:            1,
 				CountryCode:   "VN",
 				CountryName:   "Vietnam",
-				StateCode:     "35",
-				Name:          "Đà Lạt",
+				LocationName:  "Đà Lạt",
 				Latitude:      &lat,
 				Longitude:     &lng,
 				ImagePath:     &img,
@@ -77,7 +79,7 @@ func TestFetchTravelLocations(t *testing.T) {
 	}
 
 	router := newTravelLocationRouter(t, qs)
-	request := httptest.NewRequest(http.MethodGet, "/travel-locations?status=visited&name=Đà+Lạt&stateCode=35&countryCode=VN", nil)
+	request := httptest.NewRequest(http.MethodGet, "/travel-locations?status=visited&locationName=Đà+Lạt&countryCode=VN", nil)
 	response := httptest.NewRecorder()
 	router.ServeHTTP(response, request)
 
@@ -92,7 +94,7 @@ func TestFetchTravelLocations(t *testing.T) {
 	if len(body.Data) != 1 || body.Total != 1 {
 		t.Fatalf("response = %#v", body)
 	}
-	if body.Data[0].Name != "Đà Lạt" || body.Data[0].CountryCode != "VN" || body.Data[0].StateCode != "35" {
+	if body.Data[0].LocationName != "Đà Lạt" || body.Data[0].CountryCode != "VN" {
 		t.Fatalf("unexpected location: %#v", body.Data[0])
 	}
 	if body.Data[0].VisitCount != 0 || body.Data[0].ItineraryCount != 0 {
@@ -103,7 +105,7 @@ func TestFetchTravelLocations(t *testing.T) {
 	for _, camelField := range []string{
 		`"countryCode"`,
 		`"countryName"`,
-		`"stateCode"`,
+		`"locationName"`,
 		`"imagePath"`,
 		`"googleMapsUrl"`,
 		`"visitCount"`,
@@ -113,6 +115,28 @@ func TestFetchTravelLocations(t *testing.T) {
 		if !strings.Contains(rawJSON, camelField) {
 			t.Fatalf("expected JSON response to contain camelCase field %s, got: %s", camelField, rawJSON)
 		}
+	}
+
+	if qs.lastFilter.CountryCode == nil || *qs.lastFilter.CountryCode != "VN" {
+		t.Fatalf("expected lastFilter.CountryCode = VN, got: %v", qs.lastFilter.CountryCode)
+	}
+	if qs.lastFilter.LocationName == nil || *qs.lastFilter.LocationName != "Đà Lạt" {
+		t.Fatalf("expected lastFilter.LocationName = Đà Lạt, got: %v", qs.lastFilter.LocationName)
+	}
+}
+
+func TestFetchTravelLocations_CountryCodeQuery(t *testing.T) {
+	qs := &travelLocationQueryService{}
+	router := newTravelLocationRouter(t, qs)
+	request := httptest.NewRequest(http.MethodGet, "/travel-locations?country_code=vn", nil)
+	response := httptest.NewRecorder()
+	router.ServeHTTP(response, request)
+
+	if response.Code != http.StatusOK {
+		t.Fatalf("status = %d, body = %s", response.Code, response.Body.String())
+	}
+	if qs.lastFilter.CountryCode == nil || *qs.lastFilter.CountryCode != "vn" {
+		t.Fatalf("expected lastFilter.CountryCode = vn, got: %v", qs.lastFilter.CountryCode)
 	}
 }
 

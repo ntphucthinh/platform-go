@@ -283,13 +283,7 @@ paths:
           binding: "omitempty,oneof=visited wishlist"
       - description: Filter by location name
         in: query
-        name: name
-        required: false
-        schema:
-          type: string
-      - description: Filter by province or state code
-        in: query
-        name: stateCode
+        name: locationName
         required: false
         schema:
           type: string
@@ -311,7 +305,52 @@ paths:
       summary: Get travel location list
       tags:
       - travelLocations
+    post:
+      description: Create a new travel location. Validates countryCode.
+      operationId: createTravelLocation
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateTravelLocationRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageOnlyResponse"
+          description: Travel location created successfully
+      security:
+      - AccessCookie: []
+      summary: Create a new travel location
+      tags:
+      - travelLocations
   /travel-locations/{travelLocationID}:
+    delete:
+      description: Soft-delete a travel location by ID.
+      operationId: deleteTravelLocation
+      parameters:
+      - example: 1
+        in: path
+        name: travelLocationID
+        required: true
+        schema:
+          format: int64
+          minimum: 1
+          type: integer
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageOnlyResponse"
+          description: Travel location deleted successfully
+      security:
+      - AccessCookie: []
+      summary: Delete a travel location
+      tags:
+      - travelLocations
     get:
       description: Retrieve details of a single travel location by ID.
       operationId: fetchTravelLocationByID
@@ -334,6 +373,36 @@ paths:
       security:
       - AccessCookie: []
       summary: Get travel location detail
+      tags:
+      - travelLocations
+    put:
+      description: Update an existing travel location by ID. Validates countryCode.
+      operationId: updateTravelLocation
+      parameters:
+      - example: 1
+        in: path
+        name: travelLocationID
+        required: true
+        schema:
+          format: int64
+          minimum: 1
+          type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateTravelLocationRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageOnlyResponse"
+          description: Travel location updated successfully
+      security:
+      - AccessCookie: []
+      summary: Update a travel location
       tags:
       - travelLocations
   /uploads:
@@ -877,11 +946,10 @@ components:
         - id: 1
           countryCode: VN
           countryName: Vietnam
-          stateCode: SG
-          name: TP. Hồ Chí Minh
+          locationName: TP. Hồ Chí Minh
           latitude: 10.8230989
           longitude: 106.6296638
-          imagePath: https://example.com/image.jpg
+          imagePath: travel_location/550e8400-e29b-41d4-a716-446655440000.png
           status: visited
           description: TP. Hồ Chí Minh is the largest city in Vietnam by population.
           notes: I visited TP. Hồ Chí Minh in 2022 and it was a great experience.
@@ -891,11 +959,10 @@ components:
         - id: 1
           countryCode: VN
           countryName: Vietnam
-          stateCode: SG
-          name: TP. Hồ Chí Minh
+          locationName: TP. Hồ Chí Minh
           latitude: 10.8230989
           longitude: 106.6296638
-          imagePath: https://example.com/image.jpg
+          imagePath: travel_location/550e8400-e29b-41d4-a716-446655440000.png
           status: visited
           description: TP. Hồ Chí Minh is the largest city in Vietnam by population.
           notes: I visited TP. Hồ Chí Minh in 2022 and it was a great experience.
@@ -922,11 +989,10 @@ components:
           id: 1
           countryCode: VN
           countryName: Vietnam
-          stateCode: SG
-          name: TP. Hồ Chí Minh
+          locationName: TP. Hồ Chí Minh
           latitude: 10.8230989
           longitude: 106.6296638
-          imagePath: https://example.com/image.jpg
+          imagePath: travel_location/550e8400-e29b-41d4-a716-446655440000.png
           status: visited
           description: TP. Hồ Chí Minh is the largest city in Vietnam by population.
           notes: I visited TP. Hồ Chí Minh in 2022 and it was a great experience.
@@ -938,6 +1004,238 @@ components:
           $ref: "#/components/schemas/FetchTravelLocationsResponse_data_inner"
       required:
       - data
+      type: object
+    CreateTravelLocationRequest:
+      example:
+        countryCode: VN
+        countryName: Vietnam
+        locationName: TP. Hồ Chí Minh
+        latitude: 10.8230989
+        longitude: 106.6296638
+        imagePath: travel_location/550e8400-e29b-41d4-a716-446655440000.png
+        status: visited
+        description: TP. Hồ Chí Minh is the largest city in Vietnam by population.
+        notes: I visited TP. Hồ Chí Minh in 2022 and it was a great experience.
+        googleMapsUrl: https://maps.app.goo.gl/example
+      properties:
+        countryCode:
+          description: ISO 3166-1 alpha-2 country code
+          example: VN
+          maxLength: 2
+          minLength: 2
+          type: string
+          x-order: 1
+          x-go-name: CountryCode
+          x-oapi-codegen-extra-tags:
+            binding: "required,len=2"
+        countryName:
+          description: Country name
+          example: Vietnam
+          maxLength: 255
+          minLength: 1
+          type: string
+          x-order: 2
+          x-go-name: CountryName
+          x-oapi-codegen-extra-tags:
+            binding: "required,min=1,max=255"
+        locationName:
+          description: Location display name
+          example: TP. Hồ Chí Minh
+          maxLength: 255
+          minLength: 1
+          type: string
+          x-order: 3
+          x-go-name: LocationName
+          x-oapi-codegen-extra-tags:
+            binding: "required,min=1,max=255"
+        latitude:
+          description: Latitude coordinate
+          example: 10.8230989
+          format: double
+          nullable: true
+          type: number
+          x-order: 5
+          x-go-name: Latitude
+          x-oapi-codegen-extra-tags:
+            binding: omitempty
+        longitude:
+          description: Longitude coordinate
+          example: 106.6296638
+          format: double
+          nullable: true
+          type: number
+          x-order: 6
+          x-go-name: Longitude
+          x-oapi-codegen-extra-tags:
+            binding: omitempty
+        imagePath:
+          description: Path returned by POST /uploads
+          example: travel_location/550e8400-e29b-41d4-a716-446655440000.png
+          maxLength: 255
+          nullable: true
+          type: string
+          x-order: 7
+          x-go-name: ImagePath
+          x-oapi-codegen-extra-tags:
+            binding: "omitempty,max=255"
+        status:
+          allOf:
+          - $ref: "#/components/schemas/TravelLocationStatus"
+          description: Travel status (visited or wishlist)
+          example: visited
+          x-order: 8
+          x-go-name: Status
+          x-oapi-codegen-extra-tags:
+            binding: "required,oneof=visited wishlist"
+        description:
+          description: General description of the location
+          example: TP. Hồ Chí Minh is the largest city in Vietnam by population.
+          nullable: true
+          type: string
+          x-order: 9
+          x-go-name: Description
+          x-oapi-codegen-extra-tags:
+            binding: omitempty
+        notes:
+          description: Personal travel notes
+          example: I visited TP. Hồ Chí Minh in 2022 and it was a great experience.
+          nullable: true
+          type: string
+          x-order: 10
+          x-go-name: Notes
+          x-oapi-codegen-extra-tags:
+            binding: omitempty
+        googleMapsUrl:
+          description: Google Maps URL
+          example: https://maps.app.goo.gl/example
+          maxLength: 255
+          nullable: true
+          type: string
+          x-order: 11
+          x-go-name: GoogleMapsUrl
+          x-oapi-codegen-extra-tags:
+            binding: "omitempty,max=255"
+      required:
+      - countryCode
+      - countryName
+      - locationName
+      - status
+      type: object
+    UpdateTravelLocationRequest:
+      example:
+        countryCode: VN
+        countryName: Vietnam
+        locationName: TP. Hồ Chí Minh
+        latitude: 10.8230989
+        longitude: 106.6296638
+        imagePath: travel_location/550e8400-e29b-41d4-a716-446655440000.png
+        status: visited
+        description: TP. Hồ Chí Minh is the largest city in Vietnam by population.
+        notes: I visited TP. Hồ Chí Minh in 2022 and it was a great experience.
+        googleMapsUrl: https://maps.app.goo.gl/example
+      properties:
+        countryCode:
+          description: ISO 3166-1 alpha-2 country code
+          example: VN
+          maxLength: 2
+          minLength: 2
+          type: string
+          x-order: 1
+          x-go-name: CountryCode
+          x-oapi-codegen-extra-tags:
+            binding: "required,len=2"
+        countryName:
+          description: Country name
+          example: Vietnam
+          maxLength: 255
+          minLength: 1
+          type: string
+          x-order: 2
+          x-go-name: CountryName
+          x-oapi-codegen-extra-tags:
+            binding: "required,min=1,max=255"
+        locationName:
+          description: Location display name
+          example: TP. Hồ Chí Minh
+          maxLength: 255
+          minLength: 1
+          type: string
+          x-order: 3
+          x-go-name: LocationName
+          x-oapi-codegen-extra-tags:
+            binding: "required,min=1,max=255"
+        latitude:
+          description: Latitude coordinate
+          example: 10.8230989
+          format: double
+          nullable: true
+          type: number
+          x-order: 5
+          x-go-name: Latitude
+          x-oapi-codegen-extra-tags:
+            binding: omitempty
+        longitude:
+          description: Longitude coordinate
+          example: 106.6296638
+          format: double
+          nullable: true
+          type: number
+          x-order: 6
+          x-go-name: Longitude
+          x-oapi-codegen-extra-tags:
+            binding: omitempty
+        imagePath:
+          description: Path returned by POST /uploads
+          example: travel_location/550e8400-e29b-41d4-a716-446655440000.png
+          maxLength: 255
+          nullable: true
+          type: string
+          x-order: 7
+          x-go-name: ImagePath
+          x-oapi-codegen-extra-tags:
+            binding: "omitempty,max=255"
+        status:
+          allOf:
+          - $ref: "#/components/schemas/TravelLocationStatus"
+          description: Travel status (visited or wishlist)
+          example: visited
+          x-order: 8
+          x-go-name: Status
+          x-oapi-codegen-extra-tags:
+            binding: "required,oneof=visited wishlist"
+        description:
+          description: General description of the location
+          example: TP. Hồ Chí Minh is the largest city in Vietnam by population.
+          nullable: true
+          type: string
+          x-order: 9
+          x-go-name: Description
+          x-oapi-codegen-extra-tags:
+            binding: omitempty
+        notes:
+          description: Personal travel notes
+          example: I visited TP. Hồ Chí Minh in 2022 and it was a great experience.
+          nullable: true
+          type: string
+          x-order: 10
+          x-go-name: Notes
+          x-oapi-codegen-extra-tags:
+            binding: omitempty
+        googleMapsUrl:
+          description: Google Maps URL
+          example: https://maps.app.goo.gl/example
+          maxLength: 255
+          nullable: true
+          type: string
+          x-order: 11
+          x-go-name: GoogleMapsUrl
+          x-oapi-codegen-extra-tags:
+            binding: "omitempty,max=255"
+      required:
+      - countryCode
+      - countryName
+      - locationName
+      - status
       type: object
     MessageOnlyResponse:
       example:
@@ -1400,7 +1698,7 @@ components:
         folder:
           enum:
           - homestays
-          - travel
+          - travel_location
           type: string
       required:
       - files
@@ -1578,11 +1876,10 @@ components:
         id: 1
         countryCode: VN
         countryName: Vietnam
-        stateCode: SG
-        name: TP. Hồ Chí Minh
+        locationName: TP. Hồ Chí Minh
         latitude: 10.8230989
         longitude: 106.6296638
-        imagePath: https://example.com/image.jpg
+        imagePath: travel_location/550e8400-e29b-41d4-a716-446655440000.png
         status: visited
         description: TP. Hồ Chí Minh is the largest city in Vietnam by population.
         notes: I visited TP. Hồ Chí Minh in 2022 and it was a great experience.
@@ -1600,10 +1897,7 @@ components:
         countryName:
           example: Vietnam
           type: string
-        stateCode:
-          example: SG
-          type: string
-        name:
+        locationName:
           example: TP. Hồ Chí Minh
           type: string
         latitude:
@@ -1617,7 +1911,7 @@ components:
           nullable: true
           type: number
         imagePath:
-          example: https://example.com/image.jpg
+          example: travel_location/550e8400-e29b-41d4-a716-446655440000.png
           nullable: true
           type: string
         status:
@@ -1653,10 +1947,9 @@ components:
       - imagePath
       - itineraryCount
       - latitude
+      - locationName
       - longitude
-      - name
       - notes
-      - stateCode
       - status
       - visitCount
       type: object

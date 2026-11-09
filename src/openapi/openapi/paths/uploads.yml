@@ -19,7 +19,7 @@ post:
                 format: binary
             folder:
               type: string
-              enum: [homestays, travel]
+              enum: [homestays, travel_location]
   responses:
     "200":
       description: Files uploaded successfully

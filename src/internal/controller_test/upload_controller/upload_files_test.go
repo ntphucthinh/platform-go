@@ -88,7 +88,7 @@ func TestUploadFilesValidation(t *testing.T) {
 	t.Run("accepts a 10 MiB video", func(t *testing.T) {
 		content := make([]byte, 10*1024*1024)
 		copy(content, mp4Content())
-		response := performUpload(t, newUploadRouter(t, &fakeAssetClient{}), "travel", "video.mp4", content)
+		response := performUpload(t, newUploadRouter(t, &fakeAssetClient{}), "travel_location", "video.mp4", content)
 		if response.Code != http.StatusOK {
 			t.Fatalf("status = %d, body = %s", response.Code, response.Body.String())
 		}
@@ -98,7 +98,7 @@ func TestUploadFilesValidation(t *testing.T) {
 		name, folder, fileName string
 		content                []byte
 	}{
-		{"rejects video over 10 MiB", "travel", "video.mp4", oversizedMP4Content()},
+		{"rejects video over 10 MiB", "travel_location", "video.mp4", oversizedMP4Content()},
 		{"rejects untrusted folder", "../outside", "image.png", pngContent()},
 		{"rejects spoofed MIME", "homestays", "image.png", []byte("not an image")},
 	}

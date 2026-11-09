@@ -22,3 +22,57 @@ get:
         application/json:
           schema:
             $ref: "../../components/schemas/travel_locations/:travelLocationID.yml#/FetchTravelLocationByIDResponse"
+put:
+  operationId: updateTravelLocation
+  parameters:
+    - name: travelLocationID
+      in: path
+      required: true
+      schema:
+        type: integer
+        format: int64
+        minimum: 1
+      example: 1
+  tags:
+    - travelLocations
+  summary: Update a travel location
+  description: Update an existing travel location by ID. Validates countryCode.
+  security:
+    - AccessCookie: []
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: "../../components/schemas/travel_locations/:travelLocationID.yml#/UpdateTravelLocationRequest"
+  responses:
+    "200":
+      description: Travel location updated successfully
+      content:
+        application/json:
+          schema:
+            $ref: "../../components/schemas/common/message.yml#/MessageOnlyResponse"
+delete:
+  operationId: deleteTravelLocation
+  parameters:
+    - name: travelLocationID
+      in: path
+      required: true
+      schema:
+        type: integer
+        format: int64
+        minimum: 1
+      example: 1
+  tags:
+    - travelLocations
+  summary: Delete a travel location
+  description: Soft-delete a travel location by ID.
+  security:
+    - AccessCookie: []
+  responses:
+    "200":
+      description: Travel location deleted successfully
+      content:
+        application/json:
+          schema:
+            $ref: "../../components/schemas/common/message.yml#/MessageOnlyResponse"

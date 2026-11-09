@@ -11,8 +11,7 @@ type TravelLocation struct {
 	ID            int64          `gorm:"primaryKey;autoIncrement"`
 	CountryCode   string         `gorm:"column:country_code;size:2;not null"`
 	CountryName   string         `gorm:"column:country_name;size:255;not null"`
-	StateCode     string         `gorm:"column:state_code;size:20;not null"`
-	Name          string         `gorm:"size:255;not null"`
+	LocationName  string         `gorm:"column:location_name;size:255;not null"`
 	Latitude      *float64       `gorm:"column:latitude;type:decimal(10,7)"`
 	Longitude     *float64       `gorm:"column:longitude;type:decimal(10,7)"`
 	ImagePath     *string        `gorm:"column:image_path;size:255"`
@@ -29,4 +28,3 @@ type TravelLocation struct {
 func (TravelLocation) TableName() string {
 	return "travel_locations"
 }
-

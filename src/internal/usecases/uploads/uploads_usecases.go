@@ -25,12 +25,12 @@ var (
 	ErrInvalidClient = errors.New("upload asset client is not configured")
 
 	allowedFolders = map[string]struct{}{
-		"homestays": {},
-		"travel":    {},
+		"homestays":       {},
+		"travel_location": {},
 	}
 
 	pathPattern = regexp.MustCompile(
-		`^(homestays|travel)/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})\.(jpg|png|webp|gif|mp4|webm|mov)$`,
+		`^(homestays|travel_location)/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})\.(jpg|png|webp|gif|mp4|webm|mov)$`,
 	)
 )
 

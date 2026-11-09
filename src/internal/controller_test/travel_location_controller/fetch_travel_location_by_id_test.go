@@ -25,8 +25,7 @@ func TestFetchTravelLocationByID_Success(t *testing.T) {
 			ID:            2,
 			CountryCode:   "VN",
 			CountryName:   "Vietnam",
-			StateCode:     "SG",
-			Name:          "TP. Hồ Chí Minh",
+			LocationName:  "TP. Hồ Chí Minh",
 			Latitude:      &lat,
 			Longitude:     &lng,
 			ImagePath:     &img,
@@ -50,7 +49,7 @@ func TestFetchTravelLocationByID_Success(t *testing.T) {
 	if err := json.Unmarshal(response.Body.Bytes(), &res); err != nil {
 		t.Fatal(err)
 	}
-	if res.Data.Id != 2 || res.Data.Name != "TP. Hồ Chí Minh" || res.Data.StateCode != "SG" {
+	if res.Data.Id != 2 || res.Data.LocationName != "TP. Hồ Chí Minh" {
 		t.Fatalf("unexpected travel location data: %#v", res.Data)
 	}
 	if res.Data.VisitCount != 0 || res.Data.ItineraryCount != 0 {
@@ -61,7 +60,7 @@ func TestFetchTravelLocationByID_Success(t *testing.T) {
 	for _, camelField := range []string{
 		`"countryCode"`,
 		`"countryName"`,
-		`"stateCode"`,
+		`"locationName"`,
 		`"imagePath"`,
 		`"googleMapsUrl"`,
 		`"visitCount"`,
