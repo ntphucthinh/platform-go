@@ -104,6 +104,18 @@ func (f *TravelLocationFactory) WithCoordinates(lat, lng float64) *TravelLocatio
 	return f
 }
 
+// WithLatitude sets latitude
+func (f *TravelLocationFactory) WithLatitude(lat float64) *TravelLocationFactory {
+	f.latitude = &lat
+	return f
+}
+
+// WithLongitude sets longitude
+func (f *TravelLocationFactory) WithLongitude(lng float64) *TravelLocationFactory {
+	f.longitude = &lng
+	return f
+}
+
 // WithImagePath sets the image path
 func (f *TravelLocationFactory) WithImagePath(path string) *TravelLocationFactory {
 	f.imagePath = &path

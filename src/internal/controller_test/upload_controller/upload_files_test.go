@@ -11,6 +11,8 @@ import (
 	"testing"
 
 	"github.com/gin-gonic/gin"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	api "platform-go/generated/api"
 	"platform-go/internal/controller_test/shared"
@@ -66,20 +68,16 @@ func TestUploadFiles(t *testing.T) {
 		t.Run(test.name, func(t *testing.T) {
 			client := &fakeAssetClient{}
 			response := performUpload(t, newUploadRouter(t, client), "homestays", test.fileName, test.content)
-			if response.Code != http.StatusOK {
-				t.Fatalf("status = %d, body = %s", response.Code, response.Body.String())
-			}
+			require.Equal(t, http.StatusOK, response.Code, response.Body.String())
 
 			var body api.UploadResponse
-			if err := json.Unmarshal(response.Body.Bytes(), &body); err != nil {
-				t.Fatal(err)
-			}
-			if len(body.Data) != 1 || body.Data[0].MimeType != test.wantMIME || !strings.HasSuffix(body.Data[0].Path, test.wantExtension) {
-				t.Fatalf("response = %#v", body)
-			}
-			if body.Data[0].RequiredHeaders["Content-Type"] != test.wantMIME || len(client.uploads) != 1 || client.uploads[0].ResourceType != test.wantType {
-				t.Fatalf("upload request = %#v, response = %#v", client.uploads, body.Data[0])
-			}
+			require.NoError(t, json.Unmarshal(response.Body.Bytes(), &body))
+			require.Len(t, body.Data, 1)
+			assert.Equal(t, test.wantMIME, body.Data[0].MimeType)
+			assert.True(t, strings.HasSuffix(body.Data[0].Path, test.wantExtension))
+			assert.Equal(t, test.wantMIME, body.Data[0].RequiredHeaders["Content-Type"])
+			require.Len(t, client.uploads, 1)
+			assert.Equal(t, test.wantType, client.uploads[0].ResourceType)
 		})
 	}
 }
@@ -89,9 +87,7 @@ func TestUploadFilesValidation(t *testing.T) {
 		content := make([]byte, 10*1024*1024)
 		copy(content, mp4Content())
 		response := performUpload(t, newUploadRouter(t, &fakeAssetClient{}), "travel_location", "video.mp4", content)
-		if response.Code != http.StatusOK {
-			t.Fatalf("status = %d, body = %s", response.Code, response.Body.String())
-		}
+		require.Equal(t, http.StatusOK, response.Code, response.Body.String())
 	})
 
 	cases := []struct {
@@ -106,18 +102,15 @@ func TestUploadFilesValidation(t *testing.T) {
 		t.Run(test.name, func(t *testing.T) {
 			client := &fakeAssetClient{}
 			response := performUpload(t, newUploadRouter(t, client), test.folder, test.fileName, test.content)
-			if response.Code != http.StatusBadRequest || len(client.uploads) != 0 {
-				t.Fatalf("status = %d, uploads = %d, body = %s", response.Code, len(client.uploads), response.Body.String())
-			}
+			assert.Equal(t, http.StatusBadRequest, response.Code, response.Body.String())
+			assert.Empty(t, client.uploads)
 		})
 	}
 }
 
 func TestUploadFilesReturnsProviderTimeout(t *testing.T) {
 	response := performUpload(t, newUploadRouter(t, &fakeAssetClient{err: context.DeadlineExceeded}), "homestays", "image.png", pngContent())
-	if response.Code != http.StatusBadGateway {
-		t.Fatalf("status = %d, body = %s", response.Code, response.Body.String())
-	}
+	assert.Equal(t, http.StatusBadGateway, response.Code, response.Body.String())
 }
 
 func performUpload(t *testing.T, router *gin.Engine, folder, fileName string, content []byte) *httptest.ResponseRecorder {

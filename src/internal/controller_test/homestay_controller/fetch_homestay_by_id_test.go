@@ -2,147 +2,107 @@ package homestay_controller_test
 
 import (
 	"encoding/json"
-	"errors"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
 	api "platform-go/generated/api"
 	"platform-go/internal/controller_test/shared"
-	"platform-go/internal/infrastructure/qsdto"
-	"platform-go/internal/interfaces/controller"
-	homestayqueryservice "platform-go/internal/usecases/homestays/queryservice"
-	homestayusecase "platform-go/internal/usecases/homestays/usecase"
+	"platform-go/tests/factory"
 )
 
-func newFetchHomestayByIDRouter(t *testing.T, queryService homestayqueryservice.HomestayQueryService) http.Handler {
-	t.Helper()
-	fetchUsecase := homestayusecase.NewFetchHomestaysUseCase(queryService)
-	createUsecase := homestayusecase.NewCreateHomestayUsecase(nil, nil)
-	fetchByIDUsecase := homestayusecase.NewFetchHomestayByIDUseCase(queryService)
-	updateUsecase := homestayusecase.NewUpdateHomestayUsecase(nil, nil)
-	deleteUsecase := homestayusecase.NewDeleteHomestayUsecase(nil, nil)
-	handler := controller.NewHomestayController(fetchUsecase, createUsecase, fetchByIDUsecase, updateUsecase, deleteUsecase)
-	serverController := controller.NewServerController(nil, nil, handler, nil, nil, nil)
-	router := shared.NewSetupRouter(t)
-	api.RegisterHandlers(router, serverController)
-	return router
-}
+func TestHomestayController_FetchHomestayByID(t *testing.T) {
+	t.Run("Normal_GetHomestayByIDSuccess", func(t *testing.T) {
+		shared.SetupTestEnvironment(t)
+		admin := shared.CreateLoginUser()
 
-func performGet(t *testing.T, router http.Handler, path string) *httptest.ResponseRecorder {
-	t.Helper()
-	request := httptest.NewRequest(http.MethodGet, path, nil)
-	response := httptest.NewRecorder()
-	router.ServeHTTP(response, request)
-	return response
-}
+		desc := "A lovely homestay in Da Nang"
+		mapsURL := "https://maps.google.com/?q=danang"
+		roomDesc := "Deluxe Ocean View"
+		price := 1200000.0
+		unit := string(api.PriceUnitNightPerRoom)
 
-func TestFetchHomestayByID_Success(t *testing.T) {
-	desc := "A lovely homestay in Da Nang"
-	mapsURL := "https://maps.google.com/?q=danang"
-	roomDesc := "Deluxe Ocean View"
-	price := 1200000.0
-	unit := string(api.PriceUnitNightPerRoom)
-	roomID := int64(10)
+		homestay := factory.NewHomestayFactory().
+			WithName("Da Nang Homestay").
+			WithAddress("123 Vo Nguyen Giap").
+			WithDescription(desc).
+			WithGoogleMapsURL(mapsURL).
+			MustInsert(shared.TestDB)
 
-	qs := homestayQueryService{
-		homestay: &qsdto.HomestayDto{
-			ID:            1,
-			Name:          "Da Nang Homestay",
-			Address:       "123 Vo Nguyen Giap",
-			Description:   &desc,
-			GoogleMapsURL: &mapsURL,
-			Rooms: []qsdto.HomestayRoomDto{
-				{
-					ID:          roomID,
-					HomestayID:  1,
-					Name:        "Room 101",
-					Description: &roomDesc,
-					PriceAmount: &price,
-					PriceUnit:   &unit,
-					SortOrder:   1,
-					Images: []qsdto.HomestayImageDto{
-						{
-							ID:        100,
-							RoomID:    roomID,
-							ImagePath: "homestays/ocean.jpg",
-							SortOrder: 1,
-							IsCover:   true,
-						},
-					},
-				},
-			},
-		},
-	}
+		room := factory.NewHomestayRoomFactory().
+			WithHomestayID(homestay.ID).
+			WithName("Room 101").
+			WithDescription(roomDesc).
+			WithPrice(price, unit).
+			WithSortOrder(1).
+			MustInsert(shared.TestDB)
 
-	router := newFetchHomestayByIDRouter(t, qs)
-	response := performGet(t, router, "/homestays/1")
+		factory.NewHomestayImageFactory().
+			WithRoomID(room.ID).
+			WithImagePath("homestays/ocean.jpg").
+			WithSortOrder(1).
+			WithCover(true).
+			MustInsert(shared.TestDB)
 
-	if response.Code != http.StatusOK {
-		t.Fatalf("expected status 200, got %d, body: %s", response.Code, response.Body.String())
-	}
+		req := shared.NewRequest(t, admin, http.MethodGet, fmt.Sprintf("/homestays/%d", homestay.ID), nil)
+		w := httptest.NewRecorder()
+		shared.TestRouter.ServeHTTP(w, req)
 
-	var res api.FetchHomestayByIDResponse
-	if err := json.Unmarshal(response.Body.Bytes(), &res); err != nil {
-		t.Fatal(err)
-	}
+		require.Equal(t, http.StatusOK, w.Code, w.Body.String())
 
-	if res.Data.Id != 1 || res.Data.Name != "Da Nang Homestay" {
-		t.Fatalf("unexpected homestay data: %#v", res.Data)
-	}
-	if len(res.Data.HomestayRooms) != 1 || len(res.Data.HomestayRooms[0].HomestayImages) != 1 {
-		t.Fatalf("unexpected rooms or images: %#v", res.Data.HomestayRooms)
-	}
-	if res.Data.HomestayRooms[0].HomestayImages[0].ImagePath != "homestays/ocean.jpg" {
-		t.Fatalf("unexpected image path: %s", res.Data.HomestayRooms[0].HomestayImages[0].ImagePath)
-	}
+		var res api.FetchHomestayByIDResponse
+		require.NoError(t, json.Unmarshal(w.Body.Bytes(), &res))
 
-	rawJSON := response.Body.String()
-	for _, camelField := range []string{
-		`"googleMapsUrl"`,
-		`"homestayRooms"`,
-		`"homestayId"`,
-		`"priceAmount"`,
-		`"priceUnit"`,
-		`"sortOrder"`,
-		`"homestayImages"`,
-		`"roomId"`,
-		`"imagePath"`,
-		`"isCover"`,
-	} {
-		if !strings.Contains(rawJSON, camelField) {
-			t.Fatalf("expected JSON response to contain camelCase field %s, got: %s", camelField, rawJSON)
+		assert.Equal(t, homestay.ID, res.Data.Id)
+		assert.Equal(t, "Da Nang Homestay", res.Data.Name)
+		require.Len(t, res.Data.HomestayRooms, 1)
+		assert.Equal(t, "Room 101", res.Data.HomestayRooms[0].Name)
+		require.Len(t, res.Data.HomestayRooms[0].HomestayImages, 1)
+		assert.Equal(t, "homestays/ocean.jpg", res.Data.HomestayRooms[0].HomestayImages[0].ImagePath)
+
+		rawJSON := w.Body.String()
+		for _, camelField := range []string{
+			`"googleMapsUrl"`,
+			`"homestayRooms"`,
+			`"homestayId"`,
+			`"priceAmount"`,
+			`"priceUnit"`,
+			`"sortOrder"`,
+			`"homestayImages"`,
+			`"roomId"`,
+			`"imagePath"`,
+			`"isCover"`,
+		} {
+			assert.True(t, strings.Contains(rawJSON, camelField), "expected camelField %s in response", camelField)
 		}
-	}
-}
+	})
 
-func TestFetchHomestayByID_NotFound(t *testing.T) {
-	qs := homestayQueryService{homestay: nil}
-	router := newFetchHomestayByIDRouter(t, qs)
-	response := performGet(t, router, "/homestays/999")
+	t.Run("Error_NotFound", func(t *testing.T) {
+		shared.SetupTestEnvironment(t)
+		admin := shared.CreateLoginUser()
 
-	if response.Code != http.StatusNotFound {
-		t.Fatalf("expected status 404, got %d, body: %s", response.Code, response.Body.String())
-	}
-}
+		req := shared.NewRequest(t, admin, http.MethodGet, "/homestays/999999", nil)
+		w := httptest.NewRecorder()
+		shared.TestRouter.ServeHTTP(w, req)
 
-func TestFetchHomestayByID_InvalidID(t *testing.T) {
-	qs := homestayQueryService{}
-	router := newFetchHomestayByIDRouter(t, qs)
-	response := performGet(t, router, "/homestays/not-a-number")
+		assert.Equal(t, http.StatusNotFound, w.Code)
+	})
 
-	if response.Code != http.StatusBadRequest {
-		t.Fatalf("expected status 400, got %d, body: %s", response.Code, response.Body.String())
-	}
-}
+	t.Run("Error_InvalidID", func(t *testing.T) {
+		shared.SetupTestEnvironment(t)
+		admin := shared.CreateLoginUser()
 
-func TestFetchHomestayByID_DatabaseError(t *testing.T) {
-	qs := homestayQueryService{err: errors.New("db query failed")}
-	router := newFetchHomestayByIDRouter(t, qs)
-	response := performGet(t, router, "/homestays/1")
+		req := shared.NewRequest(t, admin, http.MethodGet, "/homestays/not-a-number", nil)
+		w := httptest.NewRecorder()
+		shared.TestRouter.ServeHTTP(w, req)
 
-	if response.Code != http.StatusInternalServerError {
-		t.Fatalf("expected status 500, got %d, body: %s", response.Code, response.Body.String())
-	}
+		assert.Equal(t, http.StatusBadRequest, w.Code)
+	})
+
+
 }

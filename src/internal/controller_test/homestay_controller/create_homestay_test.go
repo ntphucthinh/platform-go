@@ -1,180 +1,132 @@
 package homestay_controller_test
 
 import (
-	"bytes"
-	"context"
 	"encoding/json"
-	"errors"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 
-	"gorm.io/gorm"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	api "platform-go/generated/api"
 	"platform-go/internal/controller_test/shared"
-	"platform-go/internal/infrastructure/repository"
-	"platform-go/internal/interfaces/controller"
+	"platform-go/internal/infrastructure/dbmodel"
 	homestayusecase "platform-go/internal/usecases/homestays/usecase"
 )
 
-type fakeDB struct {
-	txFunc func(ctx context.Context, fn func(tx *gorm.DB) error) error
-}
+func TestHomestayController_CreateHomestay(t *testing.T) {
+	t.Run("Normal_CreateHomestaySuccess", func(t *testing.T) {
+		shared.SetupTestEnvironment(t)
+		admin := shared.CreateLoginUser()
 
-func (f *fakeDB) GetDB() *gorm.DB { return nil }
-func (f *fakeDB) GetDBByCtx(ctx context.Context) *gorm.DB { return nil }
-func (f *fakeDB) Transaction(ctx context.Context, fn func(tx *gorm.DB) error) error {
-	if f.txFunc != nil {
-		return f.txFunc(ctx, fn)
-	}
-	return nil
-}
-func (f *fakeDB) Close() error { return nil }
+		desc := "A lovely homestay"
+		mapsURL := "https://maps.google.com/?q=dalat"
+		price := 500000.0
+		unit := api.PriceUnitNightPerRoom
+		imagePath := "homestays/test-image-1.jpg"
 
-func newCreateHomestayRouter(t *testing.T, db repository.DBInterface) http.Handler {
-	t.Helper()
-	homestayRepo := repository.NewHomestayRepository(db)
-	fetchUsecase := homestayusecase.NewFetchHomestaysUseCase(nil)
-	createUsecase := homestayusecase.NewCreateHomestayUsecase(db, homestayRepo)
-	fetchByIDUsecase := homestayusecase.NewFetchHomestayByIDUseCase(nil)
-	updateUsecase := homestayusecase.NewUpdateHomestayUsecase(db, homestayRepo)
-	deleteUsecase := homestayusecase.NewDeleteHomestayUsecase(db, homestayRepo)
-	handler := controller.NewHomestayController(fetchUsecase, createUsecase, fetchByIDUsecase, updateUsecase, deleteUsecase)
-	router := shared.NewSetupRouter(t)
-	router.POST("/homestays", handler.CreateHomestay)
-	return router
-}
-
-func performPost(t *testing.T, router http.Handler, body []byte) *httptest.ResponseRecorder {
-	t.Helper()
-	request := httptest.NewRequest(http.MethodPost, "/homestays", bytes.NewReader(body))
-	request.Header.Set("Content-Type", "application/json")
-	response := httptest.NewRecorder()
-	router.ServeHTTP(response, request)
-	return response
-}
-
-func TestCreateHomestay_InvalidBody(t *testing.T) {
-	router := newCreateHomestayRouter(t, &fakeDB{})
-	response := performPost(t, router, []byte("{invalid-json"))
-	if response.Code != http.StatusBadRequest {
-		t.Fatalf("expected status 400, got %d, body: %s", response.Code, response.Body.String())
-	}
-}
-
-func TestCreateHomestay_ValidationErrors(t *testing.T) {
-	router := newCreateHomestayRouter(t, &fakeDB{})
-
-	invalidPayload := map[string]interface{}{
-		"name":    "Test Homestay",
-		"address": "456 Tran Phu, Da Lat",
-		"rooms": []map[string]interface{}{
-			{
-				"name":      "Deluxe Room",
-				"sortOrder": 1,
-				"priceUnit": "invalid_unit",
-			},
-		},
-	}
-	bodyBytes, err := json.Marshal(invalidPayload)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	response := performPost(t, router, bodyBytes)
-	if response.Code != http.StatusBadRequest {
-		t.Fatalf("expected status 400, got %d, body: %s", response.Code, response.Body.String())
-	}
-
-	var res map[string]interface{}
-	if err := json.Unmarshal(response.Body.Bytes(), &res); err != nil {
-		t.Fatal(err)
-	}
-
-	errorsMap, ok := res["errors"].(map[string]interface{})
-	if !ok {
-		t.Fatalf("expected errors object in response, got: %#v", res)
-	}
-	if _, exists := errorsMap["priceUnit"]; !exists {
-		t.Fatalf("expected priceUnit validation error, got: %#v", errorsMap)
-	}
-}
-
-func TestCreateHomestay_DatabaseError(t *testing.T) {
-	db := &fakeDB{
-		txFunc: func(ctx context.Context, fn func(tx *gorm.DB) error) error {
-			return errors.New("database connection failed")
-		},
-	}
-	router := newCreateHomestayRouter(t, db)
-
-	rooms := []api.CreateHomestayRoomInput{}
-	payload := api.CreateHomestayRequest{
-		Name:    "Homestay Error",
-		Address: "Address",
-		Rooms:   &rooms,
-	}
-	bodyBytes, err := json.Marshal(payload)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	response := performPost(t, router, bodyBytes)
-	if response.Code != http.StatusInternalServerError {
-		t.Fatalf("expected status 500, got %d, body: %s", response.Code, response.Body.String())
-	}
-}
-
-func TestCreateHomestay_SuccessWithRealDB(t *testing.T) {
-	db := shared.SetupTestDB(t)
-	schemaDB := repository.NewSchemaDB(db)
-	router := newCreateHomestayRouter(t, schemaDB)
-
-	desc := "A lovely homestay"
-	mapsURL := "https://maps.google.com/?q=dalat"
-	price := 500000.0
-	unit := api.PriceUnitNightPerRoom
-	imagePath := "homestays/test-image-1.jpg"
-
-	payload := api.CreateHomestayRequest{
-		Name:          "Test Homestay",
-		Address:       "456 Tran Phu, Da Lat",
-		Description:   &desc,
-		GoogleMapsUrl: &mapsURL,
-		Rooms: &[]api.CreateHomestayRoomInput{
-			{
-				Name:        "Deluxe Room",
-				Description: &desc,
-				PriceAmount: &price,
-				PriceUnit:   &unit,
-				SortOrder:   1,
-				Images: &[]api.HomestayImageInput{
-					{
-						ImagePath: &imagePath,
-						SortOrder: 1,
-						IsCover:   true,
+		payload := api.CreateHomestayRequest{
+			Name:          "Test Homestay",
+			Address:       "456 Tran Phu, Da Lat",
+			Description:   &desc,
+			GoogleMapsUrl: &mapsURL,
+			Rooms: &[]api.CreateHomestayRoomInput{
+				{
+					Name:        "Deluxe Room",
+					Description: &desc,
+					PriceAmount: &price,
+					PriceUnit:   &unit,
+					SortOrder:   1,
+					Images: &[]api.HomestayImageInput{
+						{
+							ImagePath: &imagePath,
+							SortOrder: 1,
+							IsCover:   true,
+						},
 					},
 				},
 			},
-		},
-	}
+		}
 
-	bodyBytes, err := json.Marshal(payload)
-	if err != nil {
-		t.Fatal(err)
-	}
+		req := shared.NewRequest(t, admin, http.MethodPost, "/homestays", payload)
+		w := httptest.NewRecorder()
+		shared.TestRouter.ServeHTTP(w, req)
 
-	response := performPost(t, router, bodyBytes)
-	if response.Code != http.StatusOK {
-		t.Fatalf("expected status 200, got %d, body: %s", response.Code, response.Body.String())
-	}
+		require.Equal(t, http.StatusOK, w.Code, w.Body.String())
 
-	var res api.MessageOnlyResponse
-	if err := json.Unmarshal(response.Body.Bytes(), &res); err != nil {
-		t.Fatal(err)
-	}
-	if res.Message != homestayusecase.CreateHomestaysUseCaseSuccessMessage {
-		t.Fatalf("expected message %q, got %q", homestayusecase.CreateHomestaysUseCaseSuccessMessage, res.Message)
-	}
+		var res api.MessageOnlyResponse
+		require.NoError(t, json.Unmarshal(w.Body.Bytes(), &res))
+		assert.Equal(t, homestayusecase.CreateHomestaysUseCaseSuccessMessage, res.Message)
+
+		var homestay dbmodel.Homestay
+		require.NoError(t, shared.TestDB.Where("name = ?", "Test Homestay").First(&homestay).Error)
+		assert.Equal(t, "456 Tran Phu, Da Lat", homestay.Address)
+
+		var rooms []dbmodel.HomestayRoom
+		require.NoError(t, shared.TestDB.Where("homestay_id = ?", homestay.ID).Find(&rooms).Error)
+		require.Len(t, rooms, 1)
+		assert.Equal(t, "Deluxe Room", rooms[0].Name)
+
+		var images []dbmodel.HomestayImage
+		require.NoError(t, shared.TestDB.Where("room_id = ?", rooms[0].ID).Find(&images).Error)
+		require.Len(t, images, 1)
+		assert.Equal(t, "homestays/test-image-1.jpg", images[0].ImagePath)
+	})
+
+	t.Run("Error_ValidationErrors", func(t *testing.T) {
+		shared.SetupTestEnvironment(t)
+		admin := shared.CreateLoginUser()
+
+		invalidPayload := map[string]interface{}{
+			"name":    "Test Homestay",
+			"address": "456 Tran Phu, Da Lat",
+			"rooms": []map[string]interface{}{
+				{
+					"name":      "Deluxe Room",
+					"sortOrder": 1,
+					"priceUnit": "invalid_unit",
+				},
+			},
+		}
+
+		req := shared.NewRequest(t, admin, http.MethodPost, "/homestays", invalidPayload)
+		w := httptest.NewRecorder()
+		shared.TestRouter.ServeHTTP(w, req)
+
+		assert.Equal(t, http.StatusBadRequest, w.Code, w.Body.String())
+
+		var res map[string]interface{}
+		require.NoError(t, json.Unmarshal(w.Body.Bytes(), &res))
+		errorsMap, ok := res["errors"].(map[string]interface{})
+		require.True(t, ok, "expected errors object in response")
+		assert.Contains(t, errorsMap, "priceUnit")
+	})
+
+	t.Run("Error_InvalidBody", func(t *testing.T) {
+		shared.SetupTestEnvironment(t)
+		admin := shared.CreateLoginUser()
+
+		req := shared.NewRequest(t, admin, http.MethodPost, "/homestays", strings.NewReader("{invalid-json"))
+		w := httptest.NewRecorder()
+		shared.TestRouter.ServeHTTP(w, req)
+
+		assert.Equal(t, http.StatusBadRequest, w.Code)
+	})
+
+	t.Run("Error_Unauthorized", func(t *testing.T) {
+		shared.SetupTestEnvironment(t)
+
+		payload := api.CreateHomestayRequest{
+			Name:    "Test Homestay",
+			Address: "456 Tran Phu, Da Lat",
+		}
+
+		req := shared.NewUnAuthRequest(t, http.MethodPost, "/homestays", payload)
+		w := httptest.NewRecorder()
+		shared.TestRouter.ServeHTTP(w, req)
+
+		assert.Equal(t, http.StatusUnauthorized, w.Code)
+	})
 }

@@ -96,6 +96,11 @@ func SetupTestDB(t *testing.T) *gorm.DB {
 	cvalidator.AddCustomValidation(cvalidator.Validator(), repository.NewSchemaDB(db))
 	cvalidator.ValidatorTranslate(cvalidator.Validator())
 
+	// Clean up data before test execution
+	if err := CleanTestDB(db); err != nil {
+		t.Fatalf("failed to clean test db before test: %v", err)
+	}
+
 	// Clean up data on successful test run
 	t.Cleanup(func() {
 		if !t.Failed() {

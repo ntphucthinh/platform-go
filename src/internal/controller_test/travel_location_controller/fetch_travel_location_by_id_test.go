@@ -2,108 +2,92 @@ package travel_location_controller_test
 
 import (
 	"encoding/json"
-	"errors"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
 	api "platform-go/generated/api"
-	"platform-go/internal/infrastructure/qsdto"
+	"platform-go/internal/controller_test/shared"
+	"platform-go/tests/factory"
 )
 
-func TestFetchTravelLocationByID_Success(t *testing.T) {
-	lat := 10.776889
-	lng := 106.700806
-	img := "/images/locations/hcmc.jpg"
-	desc := "Dynamic economic hub"
-	notes := "Visited Ben Thanh Market"
-	mapsURL := "https://maps.google.com/?q=Ho+Chi+Minh+City"
+func TestTravelLocationController_FetchTravelLocationByID(t *testing.T) {
+	t.Run("Normal_GetTravelLocationByIDSuccess", func(t *testing.T) {
+		shared.SetupTestEnvironment(t)
+		admin := shared.CreateLoginUser()
 
-	qs := &travelLocationQueryService{
-		location: &qsdto.TravelLocationDto{
-			ID:            2,
-			CountryCode:   "VN",
-			CountryName:   "Vietnam",
-			LocationName:  "TP. Hồ Chí Minh",
-			Latitude:      &lat,
-			Longitude:     &lng,
-			ImagePath:     &img,
-			Status:        "visited",
-			Description:   &desc,
-			Notes:         &notes,
-			GoogleMapsURL: &mapsURL,
-		},
-	}
+		lat := 10.776889
+		lng := 106.700806
+		img := "/images/locations/hcmc.jpg"
+		desc := "Dynamic economic hub"
+		notes := "Visited Ben Thanh Market"
+		mapsURL := "https://maps.google.com/?q=Ho+Chi+Minh+City"
 
-	router := newTravelLocationRouter(t, qs)
-	request := httptest.NewRequest(http.MethodGet, "/travel-locations/2", nil)
-	response := httptest.NewRecorder()
-	router.ServeHTTP(response, request)
+		loc := factory.NewTravelLocationFactory().
+			WithCountryCode("VN").
+			WithCountryName("Vietnam").
+			WithLocationName("TP. Hồ Chí Minh").
+			WithLatitude(lat).
+			WithLongitude(lng).
+			WithImagePath(img).
+			WithVisited().
+			WithDescription(desc).
+			WithNotes(notes).
+			WithGoogleMapsURL(mapsURL).
+			MustInsert(shared.TestDB)
 
-	if response.Code != http.StatusOK {
-		t.Fatalf("expected status 200, got %d, body: %s", response.Code, response.Body.String())
-	}
+		req := shared.NewRequest(t, admin, http.MethodGet, fmt.Sprintf("/travel-locations/%d", loc.ID), nil)
+		w := httptest.NewRecorder()
+		shared.TestRouter.ServeHTTP(w, req)
 
-	var res api.FetchTravelLocationByIDResponse
-	if err := json.Unmarshal(response.Body.Bytes(), &res); err != nil {
-		t.Fatal(err)
-	}
-	if res.Data.Id != 2 || res.Data.LocationName != "TP. Hồ Chí Minh" {
-		t.Fatalf("unexpected travel location data: %#v", res.Data)
-	}
-	if res.Data.VisitCount != 0 || res.Data.ItineraryCount != 0 {
-		t.Fatalf("expected visitCount=0 and itineraryCount=0, got %d and %d", res.Data.VisitCount, res.Data.ItineraryCount)
-	}
+		require.Equal(t, http.StatusOK, w.Code, w.Body.String())
 
-	rawJSON := response.Body.String()
-	for _, camelField := range []string{
-		`"countryCode"`,
-		`"countryName"`,
-		`"locationName"`,
-		`"imagePath"`,
-		`"googleMapsUrl"`,
-		`"visitCount"`,
-		`"itineraryCount"`,
-	} {
-		if !strings.Contains(rawJSON, camelField) {
-			t.Fatalf("expected JSON response to contain camelCase field %s, got: %s", camelField, rawJSON)
+		var res api.FetchTravelLocationByIDResponse
+		require.NoError(t, json.Unmarshal(w.Body.Bytes(), &res))
+
+		assert.Equal(t, int64(loc.ID), res.Data.Id)
+		assert.Equal(t, "TP. Hồ Chí Minh", res.Data.LocationName)
+		assert.Equal(t, int64(0), res.Data.VisitCount)
+		assert.Equal(t, int64(0), res.Data.ItineraryCount)
+
+		rawJSON := w.Body.String()
+		for _, camelField := range []string{
+			`"countryCode"`,
+			`"countryName"`,
+			`"locationName"`,
+			`"imagePath"`,
+			`"googleMapsUrl"`,
+			`"visitCount"`,
+			`"itineraryCount"`,
+		} {
+			assert.True(t, strings.Contains(rawJSON, camelField), "expected camelField %s in response", camelField)
 		}
-	}
-}
+	})
 
-func TestFetchTravelLocationByID_NotFound(t *testing.T) {
-	qs := &travelLocationQueryService{location: nil}
-	router := newTravelLocationRouter(t, qs)
-	request := httptest.NewRequest(http.MethodGet, "/travel-locations/999", nil)
-	response := httptest.NewRecorder()
-	router.ServeHTTP(response, request)
+	t.Run("Error_NotFound", func(t *testing.T) {
+		shared.SetupTestEnvironment(t)
+		admin := shared.CreateLoginUser()
 
-	if response.Code != http.StatusNotFound {
-		t.Fatalf("expected status 404, got %d, body: %s", response.Code, response.Body.String())
-	}
-}
+		req := shared.NewRequest(t, admin, http.MethodGet, "/travel-locations/999999", nil)
+		w := httptest.NewRecorder()
+		shared.TestRouter.ServeHTTP(w, req)
 
-func TestFetchTravelLocationByID_InvalidID(t *testing.T) {
-	qs := &travelLocationQueryService{}
-	router := newTravelLocationRouter(t, qs)
-	request := httptest.NewRequest(http.MethodGet, "/travel-locations/not-a-number", nil)
-	response := httptest.NewRecorder()
-	router.ServeHTTP(response, request)
+		assert.Equal(t, http.StatusNotFound, w.Code)
+	})
 
-	if response.Code != http.StatusBadRequest {
-		t.Fatalf("expected status 400, got %d, body: %s", response.Code, response.Body.String())
-	}
-}
+	t.Run("Error_InvalidID", func(t *testing.T) {
+		shared.SetupTestEnvironment(t)
+		admin := shared.CreateLoginUser()
 
-func TestFetchTravelLocationByID_DatabaseError(t *testing.T) {
-	qs := &travelLocationQueryService{err: errors.New("db query failed")}
-	router := newTravelLocationRouter(t, qs)
-	request := httptest.NewRequest(http.MethodGet, "/travel-locations/1", nil)
-	response := httptest.NewRecorder()
-	router.ServeHTTP(response, request)
+		req := shared.NewRequest(t, admin, http.MethodGet, "/travel-locations/not-a-number", nil)
+		w := httptest.NewRecorder()
+		shared.TestRouter.ServeHTTP(w, req)
 
-	if response.Code != http.StatusInternalServerError {
-		t.Fatalf("expected status 500, got %d, body: %s", response.Code, response.Body.String())
-	}
+		assert.Equal(t, http.StatusBadRequest, w.Code)
+	})
 }

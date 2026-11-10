@@ -3,6 +3,8 @@ package factory
 import (
 	"time"
 
+	"gorm.io/gorm"
+
 	"platform-go/internal/infrastructure/dbmodel"
 )
 
@@ -66,4 +68,22 @@ func (f *TravelMemoryFactory) Build() *dbmodel.TravelMemory {
 		Description:    f.description,
 		CoverImagePath: f.coverImagePath,
 	}
+}
+
+// Insert persists the TravelMemory to the database
+func (f *TravelMemoryFactory) Insert(db *gorm.DB) (*dbmodel.TravelMemory, error) {
+	memory := f.Build()
+	if err := db.Create(memory).Error; err != nil {
+		return nil, err
+	}
+	return memory, nil
+}
+
+// MustInsert persists the TravelMemory to the database, panicking on error
+func (f *TravelMemoryFactory) MustInsert(db *gorm.DB) *dbmodel.TravelMemory {
+	memory, err := f.Insert(db)
+	if err != nil {
+		panic(err)
+	}
+	return memory
 }

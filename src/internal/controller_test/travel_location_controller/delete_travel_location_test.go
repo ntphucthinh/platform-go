@@ -2,82 +2,76 @@ package travel_location_controller_test
 
 import (
 	"encoding/json"
-	"errors"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
 	api "platform-go/generated/api"
-	travellocation "platform-go/internal/domain/travel_location"
+	"platform-go/internal/controller_test/shared"
+	"platform-go/internal/infrastructure/dbmodel"
 	travellocationusecase "platform-go/internal/usecases/travel_locations/usecase"
+	"platform-go/tests/factory"
 )
 
-func performDelete(t *testing.T, router http.Handler, path string) *httptest.ResponseRecorder {
-	t.Helper()
-	request := httptest.NewRequest(http.MethodDelete, path, nil)
-	response := httptest.NewRecorder()
-	router.ServeHTTP(response, request)
-	return response
+func TestTravelLocationController_DeleteTravelLocation(t *testing.T) {
+	t.Run("Normal_DeleteTravelLocationSuccess", func(t *testing.T) {
+		shared.SetupTestEnvironment(t)
+		admin := shared.CreateLoginUser()
+
+		loc := factory.NewTravelLocationFactory().
+			WithCountryCode("VN").
+			WithCountryName("Vietnam").
+			WithLocationName("Đà Lạt").
+			MustInsert(shared.TestDB)
+
+		req := shared.NewRequest(t, admin, http.MethodDelete, fmt.Sprintf("/travel-locations/%d", loc.ID), nil)
+		w := httptest.NewRecorder()
+		shared.TestRouter.ServeHTTP(w, req)
+
+		require.Equal(t, http.StatusOK, w.Code, w.Body.String())
+
+		var res api.MessageOnlyResponse
+		require.NoError(t, json.Unmarshal(w.Body.Bytes(), &res))
+		assert.Equal(t, travellocationusecase.DeleteTravelLocationUseCaseSuccessMessage, res.Message)
+
+		var deleted dbmodel.TravelLocation
+		err := shared.TestDB.First(&deleted, loc.ID).Error
+		assert.Error(t, err, "record should be deleted")
+	})
+
+	t.Run("Error_NotFound", func(t *testing.T) {
+		shared.SetupTestEnvironment(t)
+		admin := shared.CreateLoginUser()
+
+		req := shared.NewRequest(t, admin, http.MethodDelete, "/travel-locations/999999", nil)
+		w := httptest.NewRecorder()
+		shared.TestRouter.ServeHTTP(w, req)
+
+		assert.Equal(t, http.StatusNotFound, w.Code)
+	})
+
+	t.Run("Error_InvalidID", func(t *testing.T) {
+		shared.SetupTestEnvironment(t)
+		admin := shared.CreateLoginUser()
+
+		req := shared.NewRequest(t, admin, http.MethodDelete, "/travel-locations/not-a-number", nil)
+		w := httptest.NewRecorder()
+		shared.TestRouter.ServeHTTP(w, req)
+
+		assert.Equal(t, http.StatusBadRequest, w.Code)
+	})
+
+	t.Run("Error_Unauthorized", func(t *testing.T) {
+		shared.SetupTestEnvironment(t)
+
+		req := shared.NewUnAuthRequest(t, http.MethodDelete, "/travel-locations/1", nil)
+		w := httptest.NewRecorder()
+		shared.TestRouter.ServeHTTP(w, req)
+
+		assert.Equal(t, http.StatusUnauthorized, w.Code)
+	})
 }
-
-func TestDeleteTravelLocation_Success(t *testing.T) {
-	repo := &fakeTravelLocationRepository{
-		existing: &travellocation.TravelLocation{
-			ID:           1,
-			CountryCode:  "VN",
-			CountryName:  "Vietnam",
-			LocationName: "Đà Lạt",
-		},
-	}
-	router := newWriteTravelLocationRouter(t, &fakeDB{}, repo)
-
-	response := performDelete(t, router, "/travel-locations/1")
-	if response.Code != http.StatusOK {
-		t.Fatalf("expected status 200, got %d, body: %s", response.Code, response.Body.String())
-	}
-
-	var res api.MessageOnlyResponse
-	if err := json.Unmarshal(response.Body.Bytes(), &res); err != nil {
-		t.Fatal(err)
-	}
-	if res.Message != travellocationusecase.DeleteTravelLocationUseCaseSuccessMessage {
-		t.Fatalf("unexpected message: %s", res.Message)
-	}
-	if repo.deletedID != 1 {
-		t.Fatalf("expected deletedID=1, got %d", repo.deletedID)
-	}
-}
-
-func TestDeleteTravelLocation_NotFound(t *testing.T) {
-	repo := &fakeTravelLocationRepository{existing: nil}
-	router := newWriteTravelLocationRouter(t, &fakeDB{}, repo)
-
-	response := performDelete(t, router, "/travel-locations/999")
-	if response.Code != http.StatusNotFound {
-		t.Fatalf("expected status 404, got %d, body: %s", response.Code, response.Body.String())
-	}
-}
-
-func TestDeleteTravelLocation_InvalidID(t *testing.T) {
-	repo := &fakeTravelLocationRepository{}
-	router := newWriteTravelLocationRouter(t, &fakeDB{}, repo)
-
-	response := performDelete(t, router, "/travel-locations/not-a-number")
-	if response.Code != http.StatusBadRequest {
-		t.Fatalf("expected status 400, got %d, body: %s", response.Code, response.Body.String())
-	}
-}
-
-func TestDeleteTravelLocation_DatabaseError(t *testing.T) {
-	repo := &fakeTravelLocationRepository{
-		existing:  &travellocation.TravelLocation{ID: 1},
-		deleteErr: errors.New("delete failed"),
-	}
-	router := newWriteTravelLocationRouter(t, &fakeDB{}, repo)
-
-	response := performDelete(t, router, "/travel-locations/1")
-	if response.Code != http.StatusInternalServerError {
-		t.Fatalf("expected status 500, got %d, body: %s", response.Code, response.Body.String())
-	}
-}
-

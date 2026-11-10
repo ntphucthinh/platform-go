@@ -3,6 +3,8 @@ package factory
 import (
 	"time"
 
+	"gorm.io/gorm"
+
 	"platform-go/internal/infrastructure/dbmodel"
 )
 
@@ -43,5 +45,23 @@ func (f *TravelMemoryDayFactory) Build() *dbmodel.TravelMemoryDay {
 		Date:        f.date,
 		Description: f.description,
 	}
+}
+
+// Insert persists the TravelMemoryDay to the database
+func (f *TravelMemoryDayFactory) Insert(db *gorm.DB) (*dbmodel.TravelMemoryDay, error) {
+	day := f.Build()
+	if err := db.Create(day).Error; err != nil {
+		return nil, err
+	}
+	return day, nil
+}
+
+// MustInsert persists the TravelMemoryDay to the database, panicking on error
+func (f *TravelMemoryDayFactory) MustInsert(db *gorm.DB) *dbmodel.TravelMemoryDay {
+	day, err := f.Insert(db)
+	if err != nil {
+		panic(err)
+	}
+	return day
 }
 

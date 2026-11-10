@@ -7,6 +7,9 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
 	api "platform-go/generated/api"
 	"platform-go/internal/usecases/uploads"
 )
@@ -14,28 +17,24 @@ import (
 func TestDeleteUploads(t *testing.T) {
 	client := &fakeAssetClient{}
 	response := performDelete(t, newUploadRouter(t, client), `[{"path":"travel_location/550e8400-e29b-41d4-a716-446655440000.mp4","resourceType":"video"}]`)
-	if response.Code != http.StatusOK {
-		t.Fatalf("status = %d, body = %s", response.Code, response.Body.String())
-	}
-	if len(client.deletes) != 1 || client.deletes[0].PublicID != "travel_location/550e8400-e29b-41d4-a716-446655440000" || client.deletes[0].ResourceType != uploads.ResourceVideo {
-		t.Fatalf("delete request = %#v", client.deletes)
-	}
+	require.Equal(t, http.StatusOK, response.Code, response.Body.String())
+
+	require.Len(t, client.deletes, 1)
+	assert.Equal(t, "travel_location/550e8400-e29b-41d4-a716-446655440000", client.deletes[0].PublicID)
+	assert.Equal(t, uploads.ResourceVideo, client.deletes[0].ResourceType)
 
 	var body api.DeleteUploadsResponse
-	if err := json.Unmarshal(response.Body.Bytes(), &body); err != nil {
-		t.Fatal(err)
-	}
-	if len(body.Data) != 1 || !body.Data[0].Success {
-		t.Fatalf("response = %#v", body)
-	}
+	require.NoError(t, json.Unmarshal(response.Body.Bytes(), &body))
+	require.Len(t, body.Data, 1)
+	assert.True(t, body.Data[0].Success)
 }
 
 func TestDeleteUploadsDoesNotDeleteInvalidPath(t *testing.T) {
 	client := &fakeAssetClient{}
 	response := performDelete(t, newUploadRouter(t, client), `[{"path":"travel_location/not-a-uuid.mp4","resourceType":"video"}]`)
-	if response.Code != http.StatusOK || len(client.deletes) != 0 || !strings.Contains(response.Body.String(), "invalid delete request") {
-		t.Fatalf("status = %d, deletes = %d, body = %s", response.Code, len(client.deletes), response.Body.String())
-	}
+	require.Equal(t, http.StatusOK, response.Code, response.Body.String())
+	assert.Empty(t, client.deletes)
+	assert.Contains(t, response.Body.String(), "invalid delete request")
 }
 
 func performDelete(t *testing.T, router http.Handler, body string) *httptest.ResponseRecorder {

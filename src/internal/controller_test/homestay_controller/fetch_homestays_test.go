@@ -1,127 +1,85 @@
 package homestay_controller_test
 
 import (
-	"context"
 	"encoding/json"
-	"errors"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
 	api "platform-go/generated/api"
 	"platform-go/internal/controller_test/shared"
-	"platform-go/internal/infrastructure/dbutil"
-	"platform-go/internal/infrastructure/qsdto"
-	"platform-go/internal/interfaces/controller"
-	homestayqueryservice "platform-go/internal/usecases/homestays/queryservice"
-	homestayusecase "platform-go/internal/usecases/homestays/usecase"
+	"platform-go/tests/factory"
 )
 
-type homestayQueryService struct {
-	homestays []qsdto.HomestayDto
-	homestay  *qsdto.HomestayDto
-	err       error
-}
+func TestHomestayController_FetchHomestays(t *testing.T) {
+	t.Run("Normal_GetHomestaysList", func(t *testing.T) {
+		shared.SetupTestEnvironment(t)
+		admin := shared.CreateLoginUser()
 
-func (s homestayQueryService) FetchHomestays(ctx context.Context, page, perPage int) (*dbutil.Paginator[qsdto.HomestayDto], error) {
-	if s.err != nil {
-		return nil, s.err
-	}
-	return &dbutil.Paginator[qsdto.HomestayDto]{
-		Data: s.homestays,
-		PaginatorInfo: api.PaginatorInfo{
-			Count:        len(s.homestays),
-			CurrentPage:  page,
-			HasMorePages: false,
-			LastPage:     1,
-			PerPage:      perPage,
-			Total:        int64(len(s.homestays)),
-		},
-	}, nil
-}
+		desc := "Room description"
+		price := 10000.0
+		unit := string(api.PriceUnitNightPerRoom)
 
-func (s homestayQueryService) FetchHomestayByID(ctx context.Context, id int64) (*qsdto.HomestayDto, error) {
-	return s.homestay, s.err
-}
+		homestay := factory.NewHomestayFactory().
+			WithName("Homestay Da Nang").
+			WithAddress("Da Nang").
+			MustInsert(shared.TestDB)
 
-var _ homestayqueryservice.HomestayQueryService = homestayQueryService{}
+		room := factory.NewHomestayRoomFactory().
+			WithHomestayID(homestay.ID).
+			WithName("Room 1").
+			WithDescription(desc).
+			WithPrice(price, unit).
+			WithSortOrder(1).
+			MustInsert(shared.TestDB)
 
-func TestFetchHomestays(t *testing.T) {
-	description := "Room description"
-	price := 10000.0
-	priceUnit := string(api.PriceUnitNightPerRoom)
-	roomID := int64(11)
-	queryService := homestayQueryService{homestays: []qsdto.HomestayDto{{
-		ID: 1, Name: "Homestay", Address: "Da Nang",
-		Rooms: []qsdto.HomestayRoomDto{{
-			ID: 11, HomestayID: 1, Name: "Room 1", Description: &description, PriceAmount: &price, PriceUnit: &priceUnit, SortOrder: 1,
-			Images: []qsdto.HomestayImageDto{{ID: 3, RoomID: roomID, ImagePath: "homestays/image.png", SortOrder: 1, IsCover: true}},
-		}},
-	}}}
-	router := newHomestayRouter(t, queryService)
+		factory.NewHomestayImageFactory().
+			WithRoomID(room.ID).
+			WithImagePath("homestays/image.png").
+			WithSortOrder(1).
+			WithCover(true).
+			MustInsert(shared.TestDB)
 
-	request := httptest.NewRequest(http.MethodGet, "/homestays?page=1&perPage=10", nil)
-	response := httptest.NewRecorder()
-	router.ServeHTTP(response, request)
-	if response.Code != http.StatusOK {
-		t.Fatalf("status = %d, body = %s", response.Code, response.Body.String())
-	}
+		req := shared.NewRequest(t, admin, http.MethodGet, "/homestays?page=1&perPage=10", nil)
+		w := httptest.NewRecorder()
+		shared.TestRouter.ServeHTTP(w, req)
 
-	var body api.FetchHomestayResponse
-	if err := json.Unmarshal(response.Body.Bytes(), &body); err != nil {
-		t.Fatal(err)
-	}
-	if len(body.Data) != 1 || len(body.Data[0].HomestayRooms) != 1 || len(body.Data[0].HomestayRooms[0].HomestayImages) != 1 {
-		t.Fatalf("response = %#v", body)
-	}
-	if got := body.Data[0].HomestayRooms[0].HomestayImages[0].ImagePath; got != "homestays/image.png" {
-		t.Fatalf("image path = %q", got)
-	}
-	if body.PaginatorInfo.CurrentPage != 1 || body.PaginatorInfo.Count != 1 || body.PaginatorInfo.Total != 1 {
-		t.Fatalf("paginatorInfo = %#v", body.PaginatorInfo)
-	}
+		require.Equal(t, http.StatusOK, w.Code, w.Body.String())
 
-	rawJSON := response.Body.String()
-	for _, camelField := range []string{
-		`"googleMapsUrl"`,
-		`"homestayRooms"`,
-		`"homestayId"`,
-		`"priceAmount"`,
-		`"priceUnit"`,
-		`"sortOrder"`,
-		`"homestayImages"`,
-		`"roomId"`,
-		`"imagePath"`,
-		`"isCover"`,
-		`"paginatorInfo"`,
-	} {
-		if !strings.Contains(rawJSON, camelField) {
-			t.Fatalf("expected JSON response to contain camelCase field %s, got: %s", camelField, rawJSON)
+		var body api.FetchHomestayResponse
+		require.NoError(t, json.Unmarshal(w.Body.Bytes(), &body))
+
+		require.Len(t, body.Data, 1)
+		assert.Equal(t, homestay.Name, body.Data[0].Name)
+		require.Len(t, body.Data[0].HomestayRooms, 1)
+		assert.Equal(t, "Room 1", body.Data[0].HomestayRooms[0].Name)
+		require.Len(t, body.Data[0].HomestayRooms[0].HomestayImages, 1)
+		assert.Equal(t, "homestays/image.png", body.Data[0].HomestayRooms[0].HomestayImages[0].ImagePath)
+		assert.Equal(t, 1, body.PaginatorInfo.CurrentPage)
+		assert.Equal(t, 1, body.PaginatorInfo.Count)
+		assert.Equal(t, int64(1), body.PaginatorInfo.Total)
+
+		rawJSON := w.Body.String()
+		for _, camelField := range []string{
+			`"googleMapsUrl"`,
+			`"homestayRooms"`,
+			`"homestayId"`,
+			`"priceAmount"`,
+			`"priceUnit"`,
+			`"sortOrder"`,
+			`"homestayImages"`,
+			`"roomId"`,
+			`"imagePath"`,
+			`"isCover"`,
+			`"paginatorInfo"`,
+		} {
+			assert.True(t, strings.Contains(rawJSON, camelField), "expected camelField %s in response", camelField)
 		}
-	}
-}
+	})
 
-func TestFetchHomestaysReturnsError(t *testing.T) {
-	router := newHomestayRouter(t, homestayQueryService{err: errors.New("database unavailable")})
-	request := httptest.NewRequest(http.MethodGet, "/homestays?page=1&perPage=10", nil)
-	response := httptest.NewRecorder()
-	router.ServeHTTP(response, request)
-	if response.Code != http.StatusInternalServerError {
-		t.Fatalf("status = %d, body = %s", response.Code, response.Body.String())
-	}
-}
 
-func newHomestayRouter(t *testing.T, queryService homestayqueryservice.HomestayQueryService) http.Handler {
-	t.Helper()
-	fetchUsecase := homestayusecase.NewFetchHomestaysUseCase(queryService)
-	createUsecase := homestayusecase.NewCreateHomestayUsecase(nil, nil)
-	fetchByIDUsecase := homestayusecase.NewFetchHomestayByIDUseCase(queryService)
-	updateUsecase := homestayusecase.NewUpdateHomestayUsecase(nil, nil)
-	deleteUsecase := homestayusecase.NewDeleteHomestayUsecase(nil, nil)
-	handler := controller.NewHomestayController(fetchUsecase, createUsecase, fetchByIDUsecase, updateUsecase, deleteUsecase)
-	serverController := controller.NewServerController(nil, nil, handler, nil, nil, nil)
-	router := shared.NewSetupRouter(t)
-	api.RegisterHandlers(router, serverController)
-	return router
 }

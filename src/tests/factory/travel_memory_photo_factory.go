@@ -1,6 +1,8 @@
 package factory
 
 import (
+	"gorm.io/gorm"
+
 	"platform-go/internal/infrastructure/dbmodel"
 )
 
@@ -40,5 +42,23 @@ func (f *TravelMemoryPhotoFactory) Build() *dbmodel.TravelMemoryPhoto {
 		ImagePath:   f.imagePath,
 		SortOrder:   f.sortOrder,
 	}
+}
+
+// Insert persists the TravelMemoryPhoto to the database
+func (f *TravelMemoryPhotoFactory) Insert(db *gorm.DB) (*dbmodel.TravelMemoryPhoto, error) {
+	photo := f.Build()
+	if err := db.Create(photo).Error; err != nil {
+		return nil, err
+	}
+	return photo, nil
+}
+
+// MustInsert persists the TravelMemoryPhoto to the database, panicking on error
+func (f *TravelMemoryPhotoFactory) MustInsert(db *gorm.DB) *dbmodel.TravelMemoryPhoto {
+	photo, err := f.Insert(db)
+	if err != nil {
+		panic(err)
+	}
+	return photo
 }
 

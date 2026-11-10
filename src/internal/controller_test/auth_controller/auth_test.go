@@ -1,141 +1,129 @@
 package auth_controller_test
 
 import (
-	"context"
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
 
-	"github.com/gin-gonic/gin"
-	openapi_types "github.com/oapi-codegen/runtime/types"
-	"golang.org/x/crypto/bcrypt"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	api "platform-go/generated/api"
 	"platform-go/internal/controller_test/shared"
-	"platform-go/internal/domain/user"
-	"platform-go/internal/infrastructure/security"
-	"platform-go/internal/interfaces/controller"
-	"platform-go/internal/middleware"
-	"platform-go/internal/usecases"
+	"platform-go/tests/factory"
 )
 
-type authRepository struct{ account user.AuthUser }
+func TestAuthController_Flow(t *testing.T) {
+	t.Run("Normal_AuthFlowSuccess", func(t *testing.T) {
+		shared.SetupTestEnvironment(t)
 
-func (r authRepository) CreateUser(context.Context, string) (user.User, error) {
-	return user.User{}, nil
-}
-func (r authRepository) FindAuthUserByEmail(_ context.Context, email string) (user.AuthUser, error) {
-	if email == r.account.Email {
-		return r.account, nil
-	}
-	return user.AuthUser{}, nil
-}
-func (r authRepository) FindAuthUserByID(_ context.Context, id int64) (user.AuthUser, error) {
-	if id == r.account.ID {
-		return r.account, nil
-	}
-	return user.AuthUser{}, nil
-}
+		user := factory.NewUserFactory().
+			WithName("Admin User").
+			WithEmail("admin@platform.com").
+			WithActive().
+			MustInsert(shared.TestDB)
 
-func newAuthRouter(t *testing.T) *gin.Engine {
-	t.Helper()
-	hash, err := bcrypt.GenerateFromPassword([]byte("correct-password"), bcrypt.MinCost)
-	if err != nil {
-		t.Fatal(err)
-	}
-	jwt, err := security.NewJWTService("test-secret-with-at-least-thirty-two-characters")
-	if err != nil {
-		t.Fatal(err)
-	}
-	usecase := usecases.NewAuthUsecase(authRepository{account: user.AuthUser{
-		ID:           7,
-		Name:         "Administrator",
-		Email:        "admin@example.com",
-		PasswordHash: string(hash),
-		AccountType:  "admin",
-		Active:       true,
-	}}, jwt)
-	handler := controller.NewAuthController(usecase, false)
-	router := shared.NewSetupRouter(t)
-	router.Use(middleware.JWTAuth(usecase), middleware.CSRFProtection())
-	router.POST("/auth/login", handler.Login)
-	router.POST("/auth/refresh", handler.Refresh)
-	router.POST("/auth/logout", handler.Logout)
-	router.GET("/auth/me", handler.Me)
-	return router
-}
+		// 1. Login
+		loginPayload := api.LoginRequest{
+			Email:    "admin@platform.com",
+			Password: "123456",
+		}
+		loginReq := shared.NewUnAuthRequest(t, http.MethodPost, "/auth/login", loginPayload)
+		loginRec := httptest.NewRecorder()
+		shared.TestRouter.ServeHTTP(loginRec, loginReq)
 
-func TestAuthControllerFlow(t *testing.T) {
-	router := newAuthRouter(t)
-	login := performJSON(router, http.MethodPost, "/auth/login", `{"email":"ADMIN@example.com","password":"correct-password"}`, nil, "")
-	if login.Code != http.StatusOK {
-		t.Fatalf("login status = %d, body = %s", login.Code, login.Body.String())
-	}
+		require.Equal(t, http.StatusOK, loginRec.Code, loginRec.Body.String())
 
-	var loginBody api.AuthResponse
-	if err := json.Unmarshal(login.Body.Bytes(), &loginBody); err != nil {
-		t.Fatal(err)
-	}
-	if loginBody.Data.CsrfToken == "" {
-		t.Fatal("login response did not include csrfToken")
-	}
-	cookies := login.Result().Cookies()
-	jwtCookie := cookie(t, cookies, "jwt")
-	refreshCookie := cookie(t, cookies, "refresh_token")
-	csrfCookie := cookie(t, cookies, "csrf")
-	if refreshCookie.Path != "/" || jwtCookie.HttpOnly != true {
-		t.Fatalf("unexpected auth cookie configuration: jwt=%#v refresh=%#v", jwtCookie, refreshCookie)
-	}
+		var loginBody api.AuthResponse
+		require.NoError(t, json.Unmarshal(loginRec.Body.Bytes(), &loginBody))
+		assert.NotEmpty(t, loginBody.Data.CsrfToken)
 
-	me := performJSON(router, http.MethodGet, "/auth/me", "", []*http.Cookie{jwtCookie, csrfCookie}, csrfCookie.Value)
-	if me.Code != http.StatusOK {
-		t.Fatalf("me status = %d, body = %s", me.Code, me.Body.String())
-	}
-	var meBody api.LoginUser
-	if err := json.Unmarshal(me.Body.Bytes(), &meBody); err != nil {
-		t.Fatal(err)
-	}
-	if meBody.Id != 7 || meBody.Email != openapi_types.Email("admin@example.com") {
-		t.Fatalf("unexpected current user: %#v", meBody)
-	}
+		cookies := loginRec.Result().Cookies()
+		jwtCookie := findCookie(t, cookies, "jwt")
+		refreshCookie := findCookie(t, cookies, "refresh_token")
+		csrfCookie := findCookie(t, cookies, "csrf")
 
-	refresh := performJSON(router, http.MethodPost, "/auth/refresh", "", []*http.Cookie{refreshCookie, csrfCookie}, csrfCookie.Value)
-	if refresh.Code != http.StatusOK {
-		t.Fatalf("refresh status = %d, body = %s", refresh.Code, refresh.Body.String())
-	}
+		assert.Equal(t, "/", refreshCookie.Path)
+		assert.True(t, jwtCookie.HttpOnly)
 
-	logout := performJSON(router, http.MethodPost, "/auth/logout", "", []*http.Cookie{jwtCookie, csrfCookie}, csrfCookie.Value)
-	if logout.Code != http.StatusNoContent {
-		t.Fatalf("logout status = %d", logout.Code)
-	}
-}
+		// 2. Fetch current user (/auth/me)
+		meReq := httptest.NewRequest(http.MethodGet, "/auth/me", nil)
+		meReq.AddCookie(jwtCookie)
+		meReq.AddCookie(csrfCookie)
+		meReq.Header.Set("X-CSRF-Token", csrfCookie.Value)
+		meRec := httptest.NewRecorder()
+		shared.TestRouter.ServeHTTP(meRec, meReq)
 
-func TestAuthControllerRejectsUnauthenticatedMe(t *testing.T) {
-	response := performJSON(newAuthRouter(t), http.MethodGet, "/auth/me", "", nil, "")
-	if response.Code != http.StatusUnauthorized {
-		t.Fatalf("status = %d, body = %s", response.Code, response.Body.String())
-	}
-}
+		require.Equal(t, http.StatusOK, meRec.Code, meRec.Body.String())
 
-func performJSON(router http.Handler, method, path, body string, cookies []*http.Cookie, csrf string) *httptest.ResponseRecorder {
-	request := httptest.NewRequest(method, path, strings.NewReader(body))
-	if body != "" {
-		request.Header.Set("Content-Type", "application/json")
-	}
-	if csrf != "" {
-		request.Header.Set("X-CSRF-Token", csrf)
-	}
-	for _, cookie := range cookies {
-		request.AddCookie(cookie)
-	}
-	response := httptest.NewRecorder()
-	router.ServeHTTP(response, request)
-	return response
+		var meBody api.LoginUser
+		require.NoError(t, json.Unmarshal(meRec.Body.Bytes(), &meBody))
+		assert.Equal(t, int64(user.ID), meBody.Id)
+		assert.Equal(t, "admin@platform.com", string(meBody.Email))
+
+		// 3. Refresh token (/auth/refresh)
+		refreshReq := httptest.NewRequest(http.MethodPost, "/auth/refresh", nil)
+		refreshReq.AddCookie(refreshCookie)
+		refreshReq.AddCookie(csrfCookie)
+		refreshReq.Header.Set("X-CSRF-Token", csrfCookie.Value)
+		refreshRec := httptest.NewRecorder()
+		shared.TestRouter.ServeHTTP(refreshRec, refreshReq)
+
+		require.Equal(t, http.StatusOK, refreshRec.Code, refreshRec.Body.String())
+
+		// 4. Logout (/auth/logout)
+		logoutReq := httptest.NewRequest(http.MethodPost, "/auth/logout", nil)
+		logoutReq.AddCookie(jwtCookie)
+		logoutReq.AddCookie(csrfCookie)
+		logoutReq.Header.Set("X-CSRF-Token", csrfCookie.Value)
+		logoutRec := httptest.NewRecorder()
+		shared.TestRouter.ServeHTTP(logoutRec, logoutReq)
+
+		require.Equal(t, http.StatusNoContent, logoutRec.Code)
+	})
+
+	t.Run("Error_InvalidCredentials", func(t *testing.T) {
+		shared.SetupTestEnvironment(t)
+
+		factory.NewUserFactory().
+			WithEmail("admin@platform.com").
+			MustInsert(shared.TestDB)
+
+		loginPayload := api.LoginRequest{
+			Email:    "admin@platform.com",
+			Password: "wrong-password",
+		}
+		loginReq := shared.NewUnAuthRequest(t, http.MethodPost, "/auth/login", loginPayload)
+		loginRec := httptest.NewRecorder()
+		shared.TestRouter.ServeHTTP(loginRec, loginReq)
+
+		assert.Equal(t, http.StatusUnauthorized, loginRec.Code)
+	})
+
+	t.Run("Error_RejectsUnauthenticatedMe", func(t *testing.T) {
+		shared.SetupTestEnvironment(t)
+
+		req := shared.NewUnAuthRequest(t, http.MethodGet, "/auth/me", nil)
+		w := httptest.NewRecorder()
+		shared.TestRouter.ServeHTTP(w, req)
+
+		assert.Equal(t, http.StatusUnauthorized, w.Code)
+	})
+
+	t.Run("Error_InvalidLoginPayload", func(t *testing.T) {
+		shared.SetupTestEnvironment(t)
+
+		req := shared.NewUnAuthRequest(t, http.MethodPost, "/auth/login", strings.NewReader("{invalid-json"))
+		w := httptest.NewRecorder()
+		shared.TestRouter.ServeHTTP(w, req)
+
+		assert.Equal(t, http.StatusBadRequest, w.Code)
+	})
 }
 
-func cookie(t *testing.T, cookies []*http.Cookie, name string) *http.Cookie {
+func findCookie(t *testing.T, cookies []*http.Cookie, name string) *http.Cookie {
 	t.Helper()
 	for _, cookie := range cookies {
 		if cookie.Name == name {
