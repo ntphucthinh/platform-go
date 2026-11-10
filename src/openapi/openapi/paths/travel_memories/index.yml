@@ -1,0 +1,32 @@
+get:
+  operationId: fetchTravelMemories
+  tags:
+    - travelMemories
+  summary: Get travel memory list
+  description: Retrieve a paginated list of travel memories with optional filtering by location.
+  security:
+    - AccessCookie: []
+  parameters:
+    - name: countryCode
+      in: query
+      required: false
+      description: Filter memories by ISO 3166-1 alpha-2 country code
+      schema:
+        type: string
+        example: VN
+    - $ref: "../../components/schemas/common/query_pagination.yml#/Page"
+    - name: locationId
+      in: query
+      required: false
+      description: Filter memories by travel location ID
+      schema:
+        type: integer
+        format: int64
+  responses:
+    "200":
+      description: Travel memories retrieved successfully
+      content:
+        application/json:
+          schema:
+            $ref: "../../components/schemas/travel_memories/index.yml#/FetchTravelMemoriesResponse"
+

@@ -46,7 +46,7 @@ func newTravelLocationRouter(t *testing.T, queryService travellocationqueryservi
 	updateUsecase := travellocationusecase.NewUpdateTravelLocationUsecase(nil, nil)
 	deleteUsecase := travellocationusecase.NewDeleteTravelLocationUsecase(nil, nil)
 	handler := controller.NewTravelLocationController(fetchUsecase, createUsecase, fetchByIDUsecase, updateUsecase, deleteUsecase)
-	serverController := controller.NewServerController(nil, nil, nil, handler, nil)
+	serverController := controller.NewServerController(nil, nil, nil, handler, nil, nil)
 	router := shared.NewSetupRouter(t)
 	api.RegisterHandlers(router, serverController)
 	return router

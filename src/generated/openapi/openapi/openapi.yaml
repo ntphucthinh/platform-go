@@ -17,6 +17,8 @@ tags:
   name: homestays
 - description: Travel location management
   name: travelLocations
+- description: Travel memory management
+  name: travelMemories
 - description: Generic media upload management
   name: uploads
 paths:
@@ -405,6 +407,75 @@ paths:
       summary: Update a travel location
       tags:
       - travelLocations
+  /travel-memories:
+    get:
+      description: Retrieve a paginated list of travel memories with optional filtering
+        by location.
+      operationId: fetchTravelMemories
+      parameters:
+      - description: Filter memories by ISO 3166-1 alpha-2 country code
+        in: query
+        name: countryCode
+        required: false
+        schema:
+          example: VN
+          type: string
+      - description: Number of pages
+        example: 1
+        in: query
+        name: page
+        required: true
+        schema:
+          default: 1
+          minimum: 1
+          type: integer
+        x-oapi-codegen-extra-tags:
+          binding: "required,number,min=1"
+          label: Number of pages
+      - description: Filter memories by travel location ID
+        in: query
+        name: locationId
+        required: false
+        schema:
+          format: int64
+          type: integer
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FetchTravelMemoriesResponse"
+          description: Travel memories retrieved successfully
+      security:
+      - AccessCookie: []
+      summary: Get travel memory list
+      tags:
+      - travelMemories
+  /travel-memories/{travelMemoryID}:
+    get:
+      description: Retrieve a single travel memory with its days and photos.
+      operationId: fetchTravelMemoryByID
+      parameters:
+      - example: 1
+        in: path
+        name: travelMemoryID
+        required: true
+        schema:
+          format: int64
+          minimum: 1
+          type: integer
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FetchTravelMemoryByIDResponse"
+          description: Travel memory retrieved successfully
+      security:
+      - AccessCookie: []
+      summary: Get travel memory detail
+      tags:
+      - travelMemories
   /uploads:
     delete:
       operationId: deleteUploads
@@ -1237,6 +1308,147 @@ components:
       - locationName
       - status
       type: object
+    FetchTravelMemoriesResponse:
+      example:
+        data:
+        - id: 1
+          locationId: 1
+          locationName: Đà Lạt
+          countryCode: VN
+          title: Chuyến đi mùa hoa dã quỳ Đà Lạt
+          startDate: 2024-11-10
+          endDate: 2024-11-12
+          description: Hành trình săn hoa dã quỳ và thưởng thức cà phê đồi thông.
+          coverImagePath: travel_memories/550e8400-e29b-41d4-a716-446655440000.jpg
+          days:
+          - id: 1
+            memoryId: 1
+            date: 2024-11-10
+            description: "Ngày 1: Đặt chân đến Đà Lạt, dạo quanh bờ Hồ Xuân Hương."
+            photos:
+            - id: 1
+              memoryDayId: 1
+              imagePath: travel_memories/6ba7b810-9dad-11d1-80b4-00c04fd430c8.png
+              sortOrder: 1
+            - id: 1
+              memoryDayId: 1
+              imagePath: travel_memories/6ba7b810-9dad-11d1-80b4-00c04fd430c8.png
+              sortOrder: 1
+          - id: 1
+            memoryId: 1
+            date: 2024-11-10
+            description: "Ngày 1: Đặt chân đến Đà Lạt, dạo quanh bờ Hồ Xuân Hương."
+            photos:
+            - id: 1
+              memoryDayId: 1
+              imagePath: travel_memories/6ba7b810-9dad-11d1-80b4-00c04fd430c8.png
+              sortOrder: 1
+            - id: 1
+              memoryDayId: 1
+              imagePath: travel_memories/6ba7b810-9dad-11d1-80b4-00c04fd430c8.png
+              sortOrder: 1
+        - id: 1
+          locationId: 1
+          locationName: Đà Lạt
+          countryCode: VN
+          title: Chuyến đi mùa hoa dã quỳ Đà Lạt
+          startDate: 2024-11-10
+          endDate: 2024-11-12
+          description: Hành trình săn hoa dã quỳ và thưởng thức cà phê đồi thông.
+          coverImagePath: travel_memories/550e8400-e29b-41d4-a716-446655440000.jpg
+          days:
+          - id: 1
+            memoryId: 1
+            date: 2024-11-10
+            description: "Ngày 1: Đặt chân đến Đà Lạt, dạo quanh bờ Hồ Xuân Hương."
+            photos:
+            - id: 1
+              memoryDayId: 1
+              imagePath: travel_memories/6ba7b810-9dad-11d1-80b4-00c04fd430c8.png
+              sortOrder: 1
+            - id: 1
+              memoryDayId: 1
+              imagePath: travel_memories/6ba7b810-9dad-11d1-80b4-00c04fd430c8.png
+              sortOrder: 1
+          - id: 1
+            memoryId: 1
+            date: 2024-11-10
+            description: "Ngày 1: Đặt chân đến Đà Lạt, dạo quanh bờ Hồ Xuân Hương."
+            photos:
+            - id: 1
+              memoryDayId: 1
+              imagePath: travel_memories/6ba7b810-9dad-11d1-80b4-00c04fd430c8.png
+              sortOrder: 1
+            - id: 1
+              memoryDayId: 1
+              imagePath: travel_memories/6ba7b810-9dad-11d1-80b4-00c04fd430c8.png
+              sortOrder: 1
+        paginatorInfo:
+          count: 1
+          currentPage: 1
+          hasMorePages: false
+          lastPage: 1
+          perPage: 1
+          total: 1
+      properties:
+        data:
+          items:
+            $ref: "#/components/schemas/FetchTravelMemoriesResponse_data_inner"
+          type: array
+        paginatorInfo:
+          $ref: "#/components/schemas/paginator_info"
+      required:
+      - data
+      - paginatorInfo
+      type: object
+    FetchTravelMemoryByIDResponse:
+      example:
+        data:
+          id: 1
+          locationId: 1
+          location:
+            id: 1
+            countryCode: VN
+            countryName: Vietnam
+            locationName: Đà Lạt
+          title: Chuyến đi mùa hoa dã quỳ Đà Lạt
+          startDate: 2024-11-10
+          endDate: 2024-11-12
+          description: Hành trình săn hoa dã quỳ và thưởng thức cà phê đồi thông.
+          coverImagePath: travel_memories/550e8400-e29b-41d4-a716-446655440000.jpg
+          days:
+          - id: 1
+            memoryId: 1
+            date: 2024-11-10
+            description: "Ngày 1: Đặt chân đến Đà Lạt, dạo quanh bờ Hồ Xuân Hương."
+            photos:
+            - id: 1
+              memoryDayId: 1
+              imagePath: travel_memories/6ba7b810-9dad-11d1-80b4-00c04fd430c8.png
+              sortOrder: 1
+            - id: 1
+              memoryDayId: 1
+              imagePath: travel_memories/6ba7b810-9dad-11d1-80b4-00c04fd430c8.png
+              sortOrder: 1
+          - id: 1
+            memoryId: 1
+            date: 2024-11-10
+            description: "Ngày 1: Đặt chân đến Đà Lạt, dạo quanh bờ Hồ Xuân Hương."
+            photos:
+            - id: 1
+              memoryDayId: 1
+              imagePath: travel_memories/6ba7b810-9dad-11d1-80b4-00c04fd430c8.png
+              sortOrder: 1
+            - id: 1
+              memoryDayId: 1
+              imagePath: travel_memories/6ba7b810-9dad-11d1-80b4-00c04fd430c8.png
+              sortOrder: 1
+      properties:
+        data:
+          $ref: "#/components/schemas/FetchTravelMemoryByIDResponse_data"
+      required:
+      - data
+      type: object
     MessageOnlyResponse:
       example:
         message: Create new successfully
@@ -1952,6 +2164,272 @@ components:
       - notes
       - status
       - visitCount
+      type: object
+    FetchTravelMemoriesResponse_data_inner_days_inner_photos_inner:
+      example:
+        id: 1
+        memoryDayId: 1
+        imagePath: travel_memories/6ba7b810-9dad-11d1-80b4-00c04fd430c8.png
+        sortOrder: 1
+      properties:
+        id:
+          example: 1
+          format: int64
+          type: integer
+        memoryDayId:
+          example: 1
+          format: int64
+          type: integer
+        imagePath:
+          example: travel_memories/6ba7b810-9dad-11d1-80b4-00c04fd430c8.png
+          type: string
+        sortOrder:
+          example: 1
+          format: int32
+          type: integer
+      required:
+      - id
+      - imagePath
+      - memoryDayId
+      - sortOrder
+      type: object
+    FetchTravelMemoriesResponse_data_inner_days_inner:
+      example:
+        id: 1
+        memoryId: 1
+        date: 2024-11-10
+        description: "Ngày 1: Đặt chân đến Đà Lạt, dạo quanh bờ Hồ Xuân Hương."
+        photos:
+        - id: 1
+          memoryDayId: 1
+          imagePath: travel_memories/6ba7b810-9dad-11d1-80b4-00c04fd430c8.png
+          sortOrder: 1
+        - id: 1
+          memoryDayId: 1
+          imagePath: travel_memories/6ba7b810-9dad-11d1-80b4-00c04fd430c8.png
+          sortOrder: 1
+      properties:
+        id:
+          example: 1
+          format: int64
+          type: integer
+        memoryId:
+          example: 1
+          format: int64
+          type: integer
+        date:
+          example: 2024-11-10
+          format: date
+          type: string
+        description:
+          example: "Ngày 1: Đặt chân đến Đà Lạt, dạo quanh bờ Hồ Xuân Hương."
+          nullable: true
+          type: string
+        photos:
+          items:
+            $ref: "#/components/schemas/FetchTravelMemoriesResponse_data_inner_days_inner_photos_inner"
+          type: array
+      required:
+      - date
+      - id
+      - memoryId
+      - photos
+      type: object
+    FetchTravelMemoriesResponse_data_inner:
+      example:
+        id: 1
+        locationId: 1
+        locationName: Đà Lạt
+        countryCode: VN
+        title: Chuyến đi mùa hoa dã quỳ Đà Lạt
+        startDate: 2024-11-10
+        endDate: 2024-11-12
+        description: Hành trình săn hoa dã quỳ và thưởng thức cà phê đồi thông.
+        coverImagePath: travel_memories/550e8400-e29b-41d4-a716-446655440000.jpg
+        days:
+        - id: 1
+          memoryId: 1
+          date: 2024-11-10
+          description: "Ngày 1: Đặt chân đến Đà Lạt, dạo quanh bờ Hồ Xuân Hương."
+          photos:
+          - id: 1
+            memoryDayId: 1
+            imagePath: travel_memories/6ba7b810-9dad-11d1-80b4-00c04fd430c8.png
+            sortOrder: 1
+          - id: 1
+            memoryDayId: 1
+            imagePath: travel_memories/6ba7b810-9dad-11d1-80b4-00c04fd430c8.png
+            sortOrder: 1
+        - id: 1
+          memoryId: 1
+          date: 2024-11-10
+          description: "Ngày 1: Đặt chân đến Đà Lạt, dạo quanh bờ Hồ Xuân Hương."
+          photos:
+          - id: 1
+            memoryDayId: 1
+            imagePath: travel_memories/6ba7b810-9dad-11d1-80b4-00c04fd430c8.png
+            sortOrder: 1
+          - id: 1
+            memoryDayId: 1
+            imagePath: travel_memories/6ba7b810-9dad-11d1-80b4-00c04fd430c8.png
+            sortOrder: 1
+      properties:
+        id:
+          example: 1
+          format: int64
+          type: integer
+        locationId:
+          example: 1
+          format: int64
+          type: integer
+        locationName:
+          example: Đà Lạt
+          type: string
+        countryCode:
+          example: VN
+          type: string
+        title:
+          example: Chuyến đi mùa hoa dã quỳ Đà Lạt
+          type: string
+        startDate:
+          example: 2024-11-10
+          format: date
+          type: string
+        endDate:
+          example: 2024-11-12
+          format: date
+          type: string
+        description:
+          example: Hành trình săn hoa dã quỳ và thưởng thức cà phê đồi thông.
+          nullable: true
+          type: string
+        coverImagePath:
+          example: travel_memories/550e8400-e29b-41d4-a716-446655440000.jpg
+          type: string
+        days:
+          items:
+            $ref: "#/components/schemas/FetchTravelMemoriesResponse_data_inner_days_inner"
+          type: array
+      required:
+      - countryCode
+      - coverImagePath
+      - days
+      - endDate
+      - id
+      - locationId
+      - locationName
+      - startDate
+      - title
+      type: object
+    FetchTravelMemoryByIDResponse_data_location:
+      example:
+        id: 1
+        countryCode: VN
+        countryName: Vietnam
+        locationName: Đà Lạt
+      properties:
+        id:
+          example: 1
+          format: int64
+          type: integer
+        countryCode:
+          example: VN
+          type: string
+        countryName:
+          example: Vietnam
+          type: string
+        locationName:
+          example: Đà Lạt
+          type: string
+      required:
+      - countryCode
+      - countryName
+      - id
+      - locationName
+      type: object
+    FetchTravelMemoryByIDResponse_data:
+      example:
+        id: 1
+        locationId: 1
+        location:
+          id: 1
+          countryCode: VN
+          countryName: Vietnam
+          locationName: Đà Lạt
+        title: Chuyến đi mùa hoa dã quỳ Đà Lạt
+        startDate: 2024-11-10
+        endDate: 2024-11-12
+        description: Hành trình săn hoa dã quỳ và thưởng thức cà phê đồi thông.
+        coverImagePath: travel_memories/550e8400-e29b-41d4-a716-446655440000.jpg
+        days:
+        - id: 1
+          memoryId: 1
+          date: 2024-11-10
+          description: "Ngày 1: Đặt chân đến Đà Lạt, dạo quanh bờ Hồ Xuân Hương."
+          photos:
+          - id: 1
+            memoryDayId: 1
+            imagePath: travel_memories/6ba7b810-9dad-11d1-80b4-00c04fd430c8.png
+            sortOrder: 1
+          - id: 1
+            memoryDayId: 1
+            imagePath: travel_memories/6ba7b810-9dad-11d1-80b4-00c04fd430c8.png
+            sortOrder: 1
+        - id: 1
+          memoryId: 1
+          date: 2024-11-10
+          description: "Ngày 1: Đặt chân đến Đà Lạt, dạo quanh bờ Hồ Xuân Hương."
+          photos:
+          - id: 1
+            memoryDayId: 1
+            imagePath: travel_memories/6ba7b810-9dad-11d1-80b4-00c04fd430c8.png
+            sortOrder: 1
+          - id: 1
+            memoryDayId: 1
+            imagePath: travel_memories/6ba7b810-9dad-11d1-80b4-00c04fd430c8.png
+            sortOrder: 1
+      properties:
+        id:
+          example: 1
+          format: int64
+          type: integer
+        locationId:
+          example: 1
+          format: int64
+          type: integer
+        location:
+          $ref: "#/components/schemas/FetchTravelMemoryByIDResponse_data_location"
+        title:
+          example: Chuyến đi mùa hoa dã quỳ Đà Lạt
+          type: string
+        startDate:
+          example: 2024-11-10
+          format: date
+          type: string
+        endDate:
+          example: 2024-11-12
+          format: date
+          type: string
+        description:
+          example: Hành trình săn hoa dã quỳ và thưởng thức cà phê đồi thông.
+          nullable: true
+          type: string
+        coverImagePath:
+          example: travel_memories/550e8400-e29b-41d4-a716-446655440000.jpg
+          type: string
+        days:
+          items:
+            $ref: "#/components/schemas/FetchTravelMemoriesResponse_data_inner_days_inner"
+          type: array
+      required:
+      - coverImagePath
+      - days
+      - endDate
+      - id
+      - location
+      - locationId
+      - startDate
+      - title
       type: object
     ValidationErrorResponse_errors_inner:
       properties:

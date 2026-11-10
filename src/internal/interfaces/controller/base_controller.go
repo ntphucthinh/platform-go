@@ -15,15 +15,17 @@ type ServerController struct {
 	authController           *AuthController
 	homestayController       HomestayController
 	travelLocationController TravelLocationController
+	travelMemoryController   TravelMemoryController
 	uploadController         *UploadController
 }
 
-func NewServerController(userController *UserController, authController *AuthController, homestayController HomestayController, travelLocationController TravelLocationController, uploadController *UploadController) *ServerController {
+func NewServerController(userController *UserController, authController *AuthController, homestayController HomestayController, travelLocationController TravelLocationController, travelMemoryController TravelMemoryController, uploadController *UploadController) *ServerController {
 	return &ServerController{
 		userController:           userController,
 		authController:           authController,
 		homestayController:       homestayController,
 		travelLocationController: travelLocationController,
+		travelMemoryController:   travelMemoryController,
 		uploadController:         uploadController,
 	}
 }
@@ -138,6 +140,22 @@ func (con *ServerController) UpdateTravelLocation(c *gin.Context, travelLocation
 // (DELETE /travel-locations/{travelLocationID})
 func (con *ServerController) DeleteTravelLocation(c *gin.Context, travelLocationID int64) {
 	con.travelLocationController.DeleteTravelLocation(c, travelLocationID)
+}
+
+// -----------------------------------------------------------------------------
+// Travel Memories APIs (TravelMemoryController)
+// -----------------------------------------------------------------------------
+
+// FetchTravelMemories retrieves a paginated list of travel memories.
+// (GET /travel-memories)
+func (con *ServerController) FetchTravelMemories(c *gin.Context, params api.FetchTravelMemoriesParams) {
+	con.travelMemoryController.FetchTravelMemories(c, params)
+}
+
+// FetchTravelMemoryByID retrieves details of a single travel memory by ID.
+// (GET /travel-memories/{travelMemoryID})
+func (con *ServerController) FetchTravelMemoryByID(c *gin.Context, travelMemoryID int64) {
+	con.travelMemoryController.FetchTravelMemoryByID(c, travelMemoryID)
 }
 
 // -----------------------------------------------------------------------------

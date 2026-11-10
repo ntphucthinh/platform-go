@@ -91,7 +91,7 @@ func newWriteTravelLocationRouter(
 	updateUsecase := travellocationusecase.NewUpdateTravelLocationUsecase(db, repo)
 	deleteUsecase := travellocationusecase.NewDeleteTravelLocationUsecase(db, repo)
 	handler := controller.NewTravelLocationController(fetchUsecase, createUsecase, fetchByIDUsecase, updateUsecase, deleteUsecase)
-	serverController := controller.NewServerController(nil, nil, nil, handler, nil)
+	serverController := controller.NewServerController(nil, nil, nil, handler, nil, nil)
 	router := shared.NewSetupRouter(t)
 	api.RegisterHandlers(router, serverController)
 	return router

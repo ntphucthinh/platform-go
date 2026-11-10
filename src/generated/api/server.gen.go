@@ -55,6 +55,12 @@ type ServerInterface interface {
 	// Update a travel location
 	// (PUT /travel-locations/{travelLocationID})
 	UpdateTravelLocation(c *gin.Context, travelLocationID int64)
+	// Get travel memory list
+	// (GET /travel-memories)
+	FetchTravelMemories(c *gin.Context, params FetchTravelMemoriesParams)
+	// Get travel memory detail
+	// (GET /travel-memories/{travelMemoryID})
+	FetchTravelMemoryByID(c *gin.Context, travelMemoryID int64)
 	// Delete unused uploaded files
 	// (DELETE /uploads)
 	DeleteUploads(c *gin.Context)
@@ -412,6 +418,83 @@ func (siw *ServerInterfaceWrapper) UpdateTravelLocation(c *gin.Context) {
 	siw.Handler.UpdateTravelLocation(c, travelLocationID)
 }
 
+// FetchTravelMemories operation middleware
+func (siw *ServerInterfaceWrapper) FetchTravelMemories(c *gin.Context) {
+
+	var err error
+
+	c.Set(AccessCookieScopes, []string{})
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params FetchTravelMemoriesParams
+
+	// ------------- Optional query parameter "countryCode" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "countryCode", c.Request.URL.Query(), &params.CountryCode)
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter countryCode: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	// ------------- Required query parameter "page" -------------
+
+	if paramValue := c.Query("page"); paramValue != "" {
+
+	} else {
+		siw.ErrorHandler(c, fmt.Errorf("Query argument page is required, but not found"), http.StatusBadRequest)
+		return
+	}
+
+	err = runtime.BindQueryParameter("form", true, true, "page", c.Request.URL.Query(), &params.Page)
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter page: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	// ------------- Optional query parameter "locationId" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "locationId", c.Request.URL.Query(), &params.LocationId)
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter locationId: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.FetchTravelMemories(c, params)
+}
+
+// FetchTravelMemoryByID operation middleware
+func (siw *ServerInterfaceWrapper) FetchTravelMemoryByID(c *gin.Context) {
+
+	var err error
+
+	// ------------- Path parameter "travelMemoryID" -------------
+	var travelMemoryID int64
+
+	err = runtime.BindStyledParameterWithOptions("simple", "travelMemoryID", c.Param("travelMemoryID"), &travelMemoryID, runtime.BindStyledParameterOptions{Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter travelMemoryID: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	c.Set(AccessCookieScopes, []string{})
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.FetchTravelMemoryByID(c, travelMemoryID)
+}
+
 // DeleteUploads operation middleware
 func (siw *ServerInterfaceWrapper) DeleteUploads(c *gin.Context) {
 
@@ -509,6 +592,8 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.DELETE(options.BaseURL+"/travel-locations/:travelLocationID", wrapper.DeleteTravelLocation)
 	router.GET(options.BaseURL+"/travel-locations/:travelLocationID", wrapper.FetchTravelLocationByID)
 	router.PUT(options.BaseURL+"/travel-locations/:travelLocationID", wrapper.UpdateTravelLocation)
+	router.GET(options.BaseURL+"/travel-memories", wrapper.FetchTravelMemories)
+	router.GET(options.BaseURL+"/travel-memories/:travelMemoryID", wrapper.FetchTravelMemoryByID)
 	router.DELETE(options.BaseURL+"/uploads", wrapper.DeleteUploads)
 	router.POST(options.BaseURL+"/uploads", wrapper.UploadFiles)
 	router.GET(options.BaseURL+"/users", wrapper.GetUsers)

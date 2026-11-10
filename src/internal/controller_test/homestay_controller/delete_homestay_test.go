@@ -28,7 +28,7 @@ func newDeleteHomestayRouter(t *testing.T, db repository.DBInterface) http.Handl
 	updateUsecase := homestayusecase.NewUpdateHomestayUsecase(db, homestayRepo)
 	deleteUsecase := homestayusecase.NewDeleteHomestayUsecase(db, homestayRepo)
 	handler := controller.NewHomestayController(fetchUsecase, createUsecase, fetchByIDUsecase, updateUsecase, deleteUsecase)
-	serverController := controller.NewServerController(nil, nil, handler, nil, nil)
+	serverController := controller.NewServerController(nil, nil, handler, nil, nil, nil)
 	router := shared.NewSetupRouter(t)
 	api.RegisterHandlers(router, serverController)
 	return router

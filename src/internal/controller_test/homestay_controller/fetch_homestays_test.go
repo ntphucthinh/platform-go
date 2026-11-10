@@ -120,7 +120,7 @@ func newHomestayRouter(t *testing.T, queryService homestayqueryservice.HomestayQ
 	updateUsecase := homestayusecase.NewUpdateHomestayUsecase(nil, nil)
 	deleteUsecase := homestayusecase.NewDeleteHomestayUsecase(nil, nil)
 	handler := controller.NewHomestayController(fetchUsecase, createUsecase, fetchByIDUsecase, updateUsecase, deleteUsecase)
-	serverController := controller.NewServerController(nil, nil, handler, nil, nil)
+	serverController := controller.NewServerController(nil, nil, handler, nil, nil, nil)
 	router := shared.NewSetupRouter(t)
 	api.RegisterHandlers(router, serverController)
 	return router

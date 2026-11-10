@@ -17,12 +17,15 @@ import (
 	homestayusecase "platform-go/internal/usecases/homestays/usecase"
 	travellocationqueryservice "platform-go/internal/usecases/travel_locations/queryservice"
 	travellocationusecase "platform-go/internal/usecases/travel_locations/usecase"
+	travelmemoryqueryservice "platform-go/internal/usecases/travel_memories/queryservice"
+	travelmemoryusecase "platform-go/internal/usecases/travel_memories/usecase"
 )
 
 type TestHandlerSet struct {
 	Handler               *controller.UserController
 	HomestayHandler       controller.HomestayController
 	TravelLocationHandler controller.TravelLocationController
+	TravelMemoryHandler   controller.TravelMemoryController
 	DB                    *gorm.DB
 }
 
@@ -35,8 +38,10 @@ func TestInitializeControllers(t *testing.T, db *gorm.DB) (*TestHandlerSet, erro
 		queryservice.NewUserQueryService,
 		queryservice.NewHomestayQueryService,
 		queryservice.NewTravelLocationQueryService,
+		queryservice.NewTravelMemoryQueryService,
 		wire.Bind(new(homestayqueryservice.HomestayQueryService), new(*queryservice.HomestayQueryService)),
 		wire.Bind(new(travellocationqueryservice.TravelLocationQueryService), new(*queryservice.TravelLocationQueryService)),
+		wire.Bind(new(travelmemoryqueryservice.TravelMemoryQueryService), new(*queryservice.TravelMemoryQueryService)),
 		usecases.NewUserUsecase,
 		homestayusecase.NewFetchHomestaysUseCase,
 		homestayusecase.NewCreateHomestayUsecase,
@@ -48,9 +53,12 @@ func TestInitializeControllers(t *testing.T, db *gorm.DB) (*TestHandlerSet, erro
 		travellocationusecase.NewFetchTravelLocationByIDUsecase,
 		travellocationusecase.NewUpdateTravelLocationUsecase,
 		travellocationusecase.NewDeleteTravelLocationUsecase,
+		travelmemoryusecase.NewFetchTravelMemoriesUseCase,
+		travelmemoryusecase.NewFetchTravelMemoryByIDUseCase,
 		controller.NewUserController,
 		controller.NewHomestayController,
 		controller.NewTravelLocationController,
+		controller.NewTravelMemoryController,
 		wire.Struct(new(TestHandlerSet), "*"),
 	)
 	return nil, nil

@@ -17,6 +17,8 @@ tags:
     description: Homestay management
   - name: travelLocations
     description: Travel location management
+  - name: travelMemories
+    description: Travel memory management
   - name: uploads
     description: Generic media upload management
 
@@ -39,6 +41,10 @@ paths:
     $ref: "./paths/travel_locations/index.yml"
   /travel-locations/{travelLocationID}:
     $ref: "./paths/travel_locations/:travelLocationID.yml"
+  /travel-memories:
+    $ref: "./paths/travel_memories/index.yml"
+  /travel-memories/{travelMemoryID}:
+    $ref: "./paths/travel_memories/:travelMemoryID.yml"
   /uploads:
     $ref: "./paths/uploads.yml"
 
@@ -85,6 +91,10 @@ components:
       $ref: "./components/schemas/travel_locations/index.yml#/CreateTravelLocationRequest"
     UpdateTravelLocationRequest:
       $ref: "./components/schemas/travel_locations/:travelLocationID.yml#/UpdateTravelLocationRequest"
+    FetchTravelMemoriesResponse:
+      $ref: "./components/schemas/travel_memories/index.yml#/FetchTravelMemoriesResponse"
+    FetchTravelMemoryByIDResponse:
+      $ref: "./components/schemas/travel_memories/:travelMemoryID.yml#/FetchTravelMemoryByIDResponse"
     MessageOnlyResponse:
       $ref: "./components/schemas/common/message.yml#/MessageOnlyResponse"
     ValidationErrorResponse:

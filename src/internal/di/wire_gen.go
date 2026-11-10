@@ -16,6 +16,7 @@ import (
 	"platform-go/internal/usecases"
 	"platform-go/internal/usecases/homestays/usecase"
 	usecase2 "platform-go/internal/usecases/travel_locations/usecase"
+	usecase3 "platform-go/internal/usecases/travel_memories/usecase"
 	"platform-go/internal/usecases/uploads"
 )
 
@@ -45,10 +46,14 @@ func InitializeApplication(db *gorm.DB, jwtService *security.JWTService, secureC
 	updateTravelLocationUsecase := usecase2.NewUpdateTravelLocationUsecase(dbInterface, travelLocationRepository)
 	deleteTravelLocationUsecase := usecase2.NewDeleteTravelLocationUsecase(dbInterface, travelLocationRepository)
 	travelLocationController := controller.NewTravelLocationController(fetchTravelLocationsUsecase, createTravelLocationUsecase, fetchTravelLocationByIDUsecase, updateTravelLocationUsecase, deleteTravelLocationUsecase)
+	travelMemoryQueryService := queryservice.NewTravelMemoryQueryService(db)
+	fetchTravelMemoriesUseCase := usecase3.NewFetchTravelMemoriesUseCase(travelMemoryQueryService)
+	fetchTravelMemoryByIDUseCase := usecase3.NewFetchTravelMemoryByIDUseCase(travelMemoryQueryService)
+	travelMemoryController := controller.NewTravelMemoryController(fetchTravelMemoriesUseCase, fetchTravelMemoryByIDUseCase)
 	client := cloudinary.NewClient()
 	useCase := uploads.NewUseCase(client)
 	uploadController := controller.NewUploadController(useCase)
-	serverController := controller.NewServerController(userController, authController, homestayController, travelLocationController, uploadController)
+	serverController := controller.NewServerController(userController, authController, homestayController, travelLocationController, travelMemoryController, uploadController)
 	application := &Application{
 		Controller:  serverController,
 		AuthUsecase: authUsecase,

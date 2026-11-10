@@ -222,6 +222,71 @@ type FetchTravelLocationsResponseDataInner struct {
 	VisitCount     int64                `json:"visitCount"`
 }
 
+// FetchTravelMemoriesResponse defines model for FetchTravelMemoriesResponse.
+type FetchTravelMemoriesResponse struct {
+	Data []FetchTravelMemoriesResponseDataInner `json:"data"`
+
+	// PaginatorInfo Pagination information used in the response
+	PaginatorInfo PaginatorInfo `json:"paginatorInfo"`
+}
+
+// FetchTravelMemoriesResponseDataInner defines model for FetchTravelMemoriesResponse_data_inner.
+type FetchTravelMemoriesResponseDataInner struct {
+	CountryCode    string                                          `json:"countryCode"`
+	CoverImagePath string                                          `json:"coverImagePath"`
+	Days           []FetchTravelMemoriesResponseDataInnerDaysInner `json:"days"`
+	Description    *string                                         `json:"description"`
+	EndDate        openapi_types.Date                              `json:"endDate"`
+	Id             int64                                           `json:"id"`
+	LocationId     int64                                           `json:"locationId"`
+	LocationName   string                                          `json:"locationName"`
+	StartDate      openapi_types.Date                              `json:"startDate"`
+	Title          string                                          `json:"title"`
+}
+
+// FetchTravelMemoriesResponseDataInnerDaysInner defines model for FetchTravelMemoriesResponse_data_inner_days_inner.
+type FetchTravelMemoriesResponseDataInnerDaysInner struct {
+	Date        openapi_types.Date                                         `json:"date"`
+	Description *string                                                    `json:"description"`
+	Id          int64                                                      `json:"id"`
+	MemoryId    int64                                                      `json:"memoryId"`
+	Photos      []FetchTravelMemoriesResponseDataInnerDaysInnerPhotosInner `json:"photos"`
+}
+
+// FetchTravelMemoriesResponseDataInnerDaysInnerPhotosInner defines model for FetchTravelMemoriesResponse_data_inner_days_inner_photos_inner.
+type FetchTravelMemoriesResponseDataInnerDaysInnerPhotosInner struct {
+	Id          int64  `json:"id"`
+	ImagePath   string `json:"imagePath"`
+	MemoryDayId int64  `json:"memoryDayId"`
+	SortOrder   int32  `json:"sortOrder"`
+}
+
+// FetchTravelMemoryByIDResponse defines model for FetchTravelMemoryByIDResponse.
+type FetchTravelMemoryByIDResponse struct {
+	Data FetchTravelMemoryByIDResponseData `json:"data"`
+}
+
+// FetchTravelMemoryByIDResponseData defines model for FetchTravelMemoryByIDResponse_data.
+type FetchTravelMemoryByIDResponseData struct {
+	CoverImagePath string                                          `json:"coverImagePath"`
+	Days           []FetchTravelMemoriesResponseDataInnerDaysInner `json:"days"`
+	Description    *string                                         `json:"description"`
+	EndDate        openapi_types.Date                              `json:"endDate"`
+	Id             int64                                           `json:"id"`
+	Location       FetchTravelMemoryByIDResponseDataLocation       `json:"location"`
+	LocationId     int64                                           `json:"locationId"`
+	StartDate      openapi_types.Date                              `json:"startDate"`
+	Title          string                                          `json:"title"`
+}
+
+// FetchTravelMemoryByIDResponseDataLocation defines model for FetchTravelMemoryByIDResponse_data_location.
+type FetchTravelMemoryByIDResponseDataLocation struct {
+	CountryCode  string `json:"countryCode"`
+	CountryName  string `json:"countryName"`
+	Id           int64  `json:"id"`
+	LocationName string `json:"locationName"`
+}
+
 // HomestayImageInput defines model for HomestayImageInput.
 type HomestayImageInput struct {
 	// ImagePath Path returned by `POST /uploads`.
@@ -463,6 +528,18 @@ type FetchTravelLocationsParams struct {
 
 	// CountryCode Filter by ISO 3166-1 alpha-2 country code
 	CountryCode *string `form:"countryCode,omitempty" json:"countryCode,omitempty"`
+}
+
+// FetchTravelMemoriesParams defines parameters for FetchTravelMemories.
+type FetchTravelMemoriesParams struct {
+	// CountryCode Filter memories by ISO 3166-1 alpha-2 country code
+	CountryCode *string `form:"countryCode,omitempty" json:"countryCode,omitempty"`
+
+	// Page Number of pages
+	Page int `binding:"required,number,min=1" form:"page" json:"page" label:"Number of pages"`
+
+	// LocationId Filter memories by travel location ID
+	LocationId *int64 `form:"locationId,omitempty" json:"locationId,omitempty"`
 }
 
 // LoginJSONRequestBody defines body for Login for application/json ContentType.

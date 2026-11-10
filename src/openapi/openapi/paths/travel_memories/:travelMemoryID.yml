@@ -1,0 +1,25 @@
+get:
+  operationId: fetchTravelMemoryByID
+  parameters:
+    - name: travelMemoryID
+      in: path
+      required: true
+      schema:
+        type: integer
+        format: int64
+        minimum: 1
+      example: 1
+  tags:
+    - travelMemories
+  summary: Get travel memory detail
+  description: Retrieve a single travel memory with its days and photos.
+  security:
+    - AccessCookie: []
+  responses:
+    "200":
+      description: Travel memory retrieved successfully
+      content:
+        application/json:
+          schema:
+            $ref: "../../components/schemas/travel_memories/:travelMemoryID.yml#/FetchTravelMemoryByIDResponse"
+

@@ -1,0 +1,106 @@
+FetchTravelMemoriesResponse:
+  type: object
+  properties:
+    data:
+      type: array
+      items:
+        type: object
+        properties:
+          id:
+            type: integer
+            format: int64
+            example: 1
+          locationId:
+            type: integer
+            format: int64
+            example: 1
+          locationName:
+            type: string
+            example: "Đà Lạt"
+          countryCode:
+            type: string
+            example: "VN"
+          title:
+            type: string
+            example: "Chuyến đi mùa hoa dã quỳ Đà Lạt"
+          startDate:
+            type: string
+            format: date
+            example: "2024-11-10"
+          endDate:
+            type: string
+            format: date
+            example: "2024-11-12"
+          description:
+            type: string
+            nullable: true
+            example: "Hành trình săn hoa dã quỳ và thưởng thức cà phê đồi thông."
+          coverImagePath:
+            type: string
+            example: "travel_memories/550e8400-e29b-41d4-a716-446655440000.jpg"
+          days:
+            type: array
+            items:
+              type: object
+              properties:
+                id:
+                  type: integer
+                  format: int64
+                  example: 1
+                memoryId:
+                  type: integer
+                  format: int64
+                  example: 1
+                date:
+                  type: string
+                  format: date
+                  example: "2024-11-10"
+                description:
+                  type: string
+                  nullable: true
+                  example: "Ngày 1: Đặt chân đến Đà Lạt, dạo quanh bờ Hồ Xuân Hương."
+                photos:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        format: int64
+                        example: 1
+                      memoryDayId:
+                        type: integer
+                        format: int64
+                        example: 1
+                      imagePath:
+                        type: string
+                        example: "travel_memories/6ba7b810-9dad-11d1-80b4-00c04fd430c8.png"
+                      sortOrder:
+                        type: integer
+                        format: int32
+                        example: 1
+                    required:
+                      - id
+                      - memoryDayId
+                      - imagePath
+                      - sortOrder
+              required:
+                - id
+                - memoryId
+                - date
+                - photos
+        required:
+          - id
+          - locationId
+          - locationName
+          - countryCode
+          - title
+          - startDate
+          - endDate
+          - coverImagePath
+          - days
+    paginatorInfo:
+      $ref: "../common/paginator_info.yml"
+  required:
+    - data
+    - paginatorInfo
