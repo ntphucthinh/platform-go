@@ -19,6 +19,8 @@ import (
 	travellocationusecase "platform-go/internal/usecases/travel_locations/usecase"
 	travelmemoryqueryservice "platform-go/internal/usecases/travel_memories/queryservice"
 	travelmemoryusecase "platform-go/internal/usecases/travel_memories/usecase"
+	selectionqueryservice "platform-go/internal/usecases/selections/queryservice"
+	selectionusecase "platform-go/internal/usecases/selections/usecase"
 	"platform-go/internal/usecases/uploads"
 )
 
@@ -40,11 +42,13 @@ func InitializeApplication(db *gorm.DB, jwtService *security.JWTService, secureC
 		queryservice.NewHomestayQueryService,
 		queryservice.NewTravelLocationQueryService,
 		queryservice.NewTravelMemoryQueryService,
+		queryservice.NewSelectionQueryService,
 		cloudinary.NewClient,
 		wire.Bind(new(uploads.AssetClient), new(*cloudinary.Client)),
 		wire.Bind(new(homestayqueryservice.HomestayQueryService), new(*queryservice.HomestayQueryService)),
 		wire.Bind(new(travellocationqueryservice.TravelLocationQueryService), new(*queryservice.TravelLocationQueryService)),
 		wire.Bind(new(travelmemoryqueryservice.TravelMemoryQueryService), new(*queryservice.TravelMemoryQueryService)),
+		wire.Bind(new(selectionqueryservice.SelectionQueryService), new(*queryservice.SelectionQueryService)),
 		usecases.NewUserUsecase,
 		usecases.NewAuthUsecase,
 		uploads.NewUseCase,
@@ -60,11 +64,13 @@ func InitializeApplication(db *gorm.DB, jwtService *security.JWTService, secureC
 		travellocationusecase.NewDeleteTravelLocationUsecase,
 		travelmemoryusecase.NewFetchTravelMemoriesUseCase,
 		travelmemoryusecase.NewFetchTravelMemoryByIDUseCase,
+		selectionusecase.NewFetchSelectionTravelLocationsUseCase,
 		controller.NewUserController,
 		controller.NewAuthController,
 		controller.NewHomestayController,
 		controller.NewTravelLocationController,
 		controller.NewTravelMemoryController,
+		controller.NewSelectionController,
 		controller.NewUploadController,
 		controller.NewServerController,
 		wire.Struct(new(Application), "*"),

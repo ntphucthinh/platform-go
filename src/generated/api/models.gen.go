@@ -329,6 +329,20 @@ type MessageOnlyResponse struct {
 // - "night_per_house": Price per house per night.
 type PriceUnit string
 
+// SelectionTravelLocationResponse defines model for SelectionTravelLocationResponse.
+type SelectionTravelLocationResponse struct {
+	Data []SelectionTravelLocationResponseDataInner `json:"data"`
+}
+
+// SelectionTravelLocationResponseDataInner defines model for SelectionTravelLocationResponse_data_inner.
+type SelectionTravelLocationResponseDataInner struct {
+	// Id Tourist attraction ID
+	Id int64 `json:"id"`
+
+	// Name Tourist attraction name
+	Name string `json:"name"`
+}
+
 // TravelLocationStatus The status of a travel location.
 // - "visited": The user has visited the location.
 // - "wishlist": The user wants to visit the location.
@@ -516,6 +530,12 @@ type FetchHomestaysParams struct {
 
 	// PerPage Number of records per page
 	PerPage int `binding:"required,number,min=2,max=20" form:"perPage" json:"perPage" label:"Number of records per page"`
+}
+
+// FetchSelectionTravelLocationsParams defines parameters for FetchSelectionTravelLocations.
+type FetchSelectionTravelLocationsParams struct {
+	// CountryCode Filter travel locations by ISO 3166-1 alpha-2 country code
+	CountryCode *string `form:"countryCode,omitempty" json:"countryCode,omitempty"`
 }
 
 // FetchTravelLocationsParams defines parameters for FetchTravelLocations.

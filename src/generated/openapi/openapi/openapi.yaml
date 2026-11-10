@@ -21,6 +21,8 @@ tags:
   name: travelMemories
 - description: Generic media upload management
   name: uploads
+- description: Related to pull-down data
+  name: selection
 paths:
   /auth/login:
     post:
@@ -476,6 +478,31 @@ paths:
       summary: Get travel memory detail
       tags:
       - travelMemories
+  /selections/travel-locations:
+    get:
+      description: "Retrieve a lightweight list of travel locations (id and name)\
+        \ for dropdown selection, with optional filtering by country code."
+      operationId: fetchSelectionTravelLocations
+      parameters:
+      - description: Filter travel locations by ISO 3166-1 alpha-2 country code
+        in: query
+        name: countryCode
+        required: false
+        schema:
+          example: VN
+          type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SelectionTravelLocationResponse"
+          description: Travel location selections retrieved successfully
+      security:
+      - AccessCookie: []
+      summary: Get travel locations for selection
+      tags:
+      - selection
   /uploads:
     delete:
       operationId: deleteUploads
@@ -1446,6 +1473,21 @@ components:
       properties:
         data:
           $ref: "#/components/schemas/FetchTravelMemoryByIDResponse_data"
+      required:
+      - data
+      type: object
+    SelectionTravelLocationResponse:
+      example:
+        data:
+        - id: 1
+          name: name
+        - id: 1
+          name: name
+      properties:
+        data:
+          items:
+            $ref: "#/components/schemas/SelectionTravelLocationResponse_data_inner"
+          type: array
       required:
       - data
       type: object
@@ -2430,6 +2472,23 @@ components:
       - locationId
       - startDate
       - title
+      type: object
+    SelectionTravelLocationResponse_data_inner:
+      example:
+        id: 1
+        name: name
+      properties:
+        id:
+          description: Tourist attraction ID
+          example: 1
+          format: int64
+          type: integer
+        name:
+          description: Tourist attraction name
+          type: string
+      required:
+      - id
+      - name
       type: object
     ValidationErrorResponse_errors_inner:
       properties:

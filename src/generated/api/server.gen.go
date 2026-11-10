@@ -40,6 +40,9 @@ type ServerInterface interface {
 	// Update a homestay
 	// (PUT /homestays/{homestayID})
 	UpdateHomestay(c *gin.Context, homestayID int64)
+	// Get travel locations for selection
+	// (GET /selections/travel-locations)
+	FetchSelectionTravelLocations(c *gin.Context, params FetchSelectionTravelLocationsParams)
 	// Get travel location list
 	// (GET /travel-locations)
 	FetchTravelLocations(c *gin.Context, params FetchTravelLocationsParams)
@@ -279,6 +282,34 @@ func (siw *ServerInterfaceWrapper) UpdateHomestay(c *gin.Context) {
 	}
 
 	siw.Handler.UpdateHomestay(c, homestayID)
+}
+
+// FetchSelectionTravelLocations operation middleware
+func (siw *ServerInterfaceWrapper) FetchSelectionTravelLocations(c *gin.Context) {
+
+	var err error
+
+	c.Set(AccessCookieScopes, []string{})
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params FetchSelectionTravelLocationsParams
+
+	// ------------- Optional query parameter "countryCode" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "countryCode", c.Request.URL.Query(), &params.CountryCode)
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter countryCode: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.FetchSelectionTravelLocations(c, params)
 }
 
 // FetchTravelLocations operation middleware
@@ -587,6 +618,7 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.DELETE(options.BaseURL+"/homestays/:homestayID", wrapper.DeleteHomestay)
 	router.GET(options.BaseURL+"/homestays/:homestayID", wrapper.FetchHomestayByID)
 	router.PUT(options.BaseURL+"/homestays/:homestayID", wrapper.UpdateHomestay)
+	router.GET(options.BaseURL+"/selections/travel-locations", wrapper.FetchSelectionTravelLocations)
 	router.GET(options.BaseURL+"/travel-locations", wrapper.FetchTravelLocations)
 	router.POST(options.BaseURL+"/travel-locations", wrapper.CreateTravelLocation)
 	router.DELETE(options.BaseURL+"/travel-locations/:travelLocationID", wrapper.DeleteTravelLocation)

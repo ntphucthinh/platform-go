@@ -1,0 +1,23 @@
+get:
+  operationId: fetchSelectionTravelLocations
+  tags:
+    - selection
+  summary: Get travel locations for selection
+  description: Retrieve a lightweight list of travel locations (id and name) for dropdown selection, with optional filtering by country code.
+  security:
+    - AccessCookie: []
+  parameters:
+    - name: countryCode
+      in: query
+      required: false
+      description: Filter travel locations by ISO 3166-1 alpha-2 country code
+      schema:
+        type: string
+        example: VN
+  responses:
+    "200":
+      description: Travel location selections retrieved successfully
+      content:
+        application/json:
+          schema:
+            $ref: "../../components/schemas/selections/travel_locations.yml#/SelectionTravelLocationResponse"

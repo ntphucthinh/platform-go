@@ -17,9 +17,18 @@ type ServerController struct {
 	travelLocationController TravelLocationController
 	travelMemoryController   TravelMemoryController
 	uploadController         *UploadController
+	selectionController      SelectionController
 }
 
-func NewServerController(userController *UserController, authController *AuthController, homestayController HomestayController, travelLocationController TravelLocationController, travelMemoryController TravelMemoryController, uploadController *UploadController) *ServerController {
+func NewServerController(
+	userController *UserController,
+	authController *AuthController,
+	homestayController HomestayController,
+	travelLocationController TravelLocationController,
+	travelMemoryController TravelMemoryController,
+	uploadController *UploadController,
+	selectionController SelectionController,
+) *ServerController {
 	return &ServerController{
 		userController:           userController,
 		authController:           authController,
@@ -27,6 +36,7 @@ func NewServerController(userController *UserController, authController *AuthCon
 		travelLocationController: travelLocationController,
 		travelMemoryController:   travelMemoryController,
 		uploadController:         uploadController,
+		selectionController:      selectionController,
 	}
 }
 
@@ -156,6 +166,16 @@ func (con *ServerController) FetchTravelMemories(c *gin.Context, params api.Fetc
 // (GET /travel-memories/{travelMemoryID})
 func (con *ServerController) FetchTravelMemoryByID(c *gin.Context, travelMemoryID int64) {
 	con.travelMemoryController.FetchTravelMemoryByID(c, travelMemoryID)
+}
+
+// -----------------------------------------------------------------------------
+// Selections APIs (SelectionController)
+// -----------------------------------------------------------------------------
+
+// FetchSelectionTravelLocations retrieves a lightweight list of travel locations for dropdown selection.
+// (GET /selections/travel-locations)
+func (con *ServerController) FetchSelectionTravelLocations(c *gin.Context, params api.FetchSelectionTravelLocationsParams) {
+	con.selectionController.FetchSelectionTravelLocations(c, params)
 }
 
 // -----------------------------------------------------------------------------

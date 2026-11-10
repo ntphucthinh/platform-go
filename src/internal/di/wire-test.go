@@ -19,6 +19,8 @@ import (
 	travellocationusecase "platform-go/internal/usecases/travel_locations/usecase"
 	travelmemoryqueryservice "platform-go/internal/usecases/travel_memories/queryservice"
 	travelmemoryusecase "platform-go/internal/usecases/travel_memories/usecase"
+	selectionqueryservice "platform-go/internal/usecases/selections/queryservice"
+	selectionusecase "platform-go/internal/usecases/selections/usecase"
 )
 
 type TestHandlerSet struct {
@@ -26,6 +28,7 @@ type TestHandlerSet struct {
 	HomestayHandler       controller.HomestayController
 	TravelLocationHandler controller.TravelLocationController
 	TravelMemoryHandler   controller.TravelMemoryController
+	SelectionHandler      controller.SelectionController
 	DB                    *gorm.DB
 }
 
@@ -39,9 +42,11 @@ func TestInitializeControllers(t *testing.T, db *gorm.DB) (*TestHandlerSet, erro
 		queryservice.NewHomestayQueryService,
 		queryservice.NewTravelLocationQueryService,
 		queryservice.NewTravelMemoryQueryService,
+		queryservice.NewSelectionQueryService,
 		wire.Bind(new(homestayqueryservice.HomestayQueryService), new(*queryservice.HomestayQueryService)),
 		wire.Bind(new(travellocationqueryservice.TravelLocationQueryService), new(*queryservice.TravelLocationQueryService)),
 		wire.Bind(new(travelmemoryqueryservice.TravelMemoryQueryService), new(*queryservice.TravelMemoryQueryService)),
+		wire.Bind(new(selectionqueryservice.SelectionQueryService), new(*queryservice.SelectionQueryService)),
 		usecases.NewUserUsecase,
 		homestayusecase.NewFetchHomestaysUseCase,
 		homestayusecase.NewCreateHomestayUsecase,
@@ -55,10 +60,12 @@ func TestInitializeControllers(t *testing.T, db *gorm.DB) (*TestHandlerSet, erro
 		travellocationusecase.NewDeleteTravelLocationUsecase,
 		travelmemoryusecase.NewFetchTravelMemoriesUseCase,
 		travelmemoryusecase.NewFetchTravelMemoryByIDUseCase,
+		selectionusecase.NewFetchSelectionTravelLocationsUseCase,
 		controller.NewUserController,
 		controller.NewHomestayController,
 		controller.NewTravelLocationController,
 		controller.NewTravelMemoryController,
+		controller.NewSelectionController,
 		wire.Struct(new(TestHandlerSet), "*"),
 	)
 	return nil, nil

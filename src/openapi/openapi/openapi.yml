@@ -21,8 +21,11 @@ tags:
     description: Travel memory management
   - name: uploads
     description: Generic media upload management
+  - name: selection
+    description: Related to pull-down data
 
 paths:
+  # Auth
   /auth/login:
     $ref: "./paths/auth.yml#/~1login"
   /auth/refresh:
@@ -33,10 +36,14 @@ paths:
     $ref: "./paths/auth.yml#/~1me"
   /users:
     $ref: "./paths/users.yml"
+
+  # Homestays
   /homestays:
     $ref: "./paths/homestays/index.yml"
   /homestays/{homestayID}:
     $ref: "./paths/homestays/:homestayID.yml"
+
+  # Travel
   /travel-locations:
     $ref: "./paths/travel_locations/index.yml"
   /travel-locations/{travelLocationID}:
@@ -45,6 +52,12 @@ paths:
     $ref: "./paths/travel_memories/index.yml"
   /travel-memories/{travelMemoryID}:
     $ref: "./paths/travel_memories/:travelMemoryID.yml"
+
+  # Selection
+  /selections/travel-locations:
+    $ref: "./paths/selections/travel_locations.yml"
+
+  # Upload file
   /uploads:
     $ref: "./paths/uploads.yml"
 
@@ -95,6 +108,8 @@ components:
       $ref: "./components/schemas/travel_memories/index.yml#/FetchTravelMemoriesResponse"
     FetchTravelMemoryByIDResponse:
       $ref: "./components/schemas/travel_memories/:travelMemoryID.yml#/FetchTravelMemoryByIDResponse"
+    SelectionTravelLocationResponse:
+      $ref: "./components/schemas/selections/travel_locations.yml#/SelectionTravelLocationResponse"
     MessageOnlyResponse:
       $ref: "./components/schemas/common/message.yml#/MessageOnlyResponse"
     ValidationErrorResponse:
