@@ -336,6 +336,9 @@ type SelectionTravelLocationResponse struct {
 
 // SelectionTravelLocationResponseDataInner defines model for SelectionTravelLocationResponse_data_inner.
 type SelectionTravelLocationResponseDataInner struct {
+	// CountryCode Country code (ISO 3166-1 alpha-2)
+	CountryCode string `json:"countryCode"`
+
 	// Id Tourist attraction ID
 	Id int64 `json:"id"`
 

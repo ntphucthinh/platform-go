@@ -26,8 +26,9 @@ func (uc *FetchSelectionTravelLocationsUseCase) Execute(ctx context.Context, cou
 	data := make([]api.SelectionTravelLocationResponseDataInner, len(items))
 	for i, item := range items {
 		data[i] = api.SelectionTravelLocationResponseDataInner{
-			Id:   item.ID,
-			Name: item.Name,
+			Id:          item.ID,
+			Name:        item.Name,
+			CountryCode: item.CountryCode,
 		}
 	}
 

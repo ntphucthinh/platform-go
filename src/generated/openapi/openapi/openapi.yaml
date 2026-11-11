@@ -1481,8 +1481,10 @@ components:
         data:
         - id: 1
           name: name
+          countryCode: VN
         - id: 1
           name: name
+          countryCode: VN
       properties:
         data:
           items:
@@ -2477,6 +2479,7 @@ components:
       example:
         id: 1
         name: name
+        countryCode: VN
       properties:
         id:
           description: Tourist attraction ID
@@ -2486,7 +2489,12 @@ components:
         name:
           description: Tourist attraction name
           type: string
+        countryCode:
+          description: Country code (ISO 3166-1 alpha-2)
+          example: VN
+          type: string
       required:
+      - countryCode
       - id
       - name
       type: object

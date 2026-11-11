@@ -41,8 +41,13 @@ func TestSelectionController_FetchSelectionTravelLocations(t *testing.T) {
 		require.Len(t, res.Data, 2)
 		assert.Equal(t, loc1.ID, res.Data[0].Id)
 		assert.Equal(t, loc1.LocationName, res.Data[0].Name)
+		assert.Equal(t, "VN", res.Data[0].CountryCode)
 		assert.Equal(t, loc2.ID, res.Data[1].Id)
 		assert.Equal(t, loc2.LocationName, res.Data[1].Name)
+		assert.Equal(t, "JP", res.Data[1].CountryCode)
+
+		rawJSON := w.Body.String()
+		assert.Contains(t, rawJSON, `"countryCode"`)
 	})
 
 	t.Run("Normal_FilterByCountryCode", func(t *testing.T) {

@@ -14,8 +14,13 @@ SelectionTravelLocationResponse:
           name:
             type: string
             description: "Tourist attraction name"
+          countryCode:
+            type: string
+            description: "Country code (ISO 3166-1 alpha-2)"
+            example: "VN"
         required:
           - id
           - name
+          - countryCode
   required:
     - data
