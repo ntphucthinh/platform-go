@@ -29,4 +29,25 @@ get:
         application/json:
           schema:
             $ref: "../../components/schemas/travel_memories/index.yml#/FetchTravelMemoriesResponse"
+post:
+  operationId: createTravelMemory
+  tags:
+    - travelMemories
+  summary: Create a new travel memory
+  description: Create a new travel memory along with its daily records and photos.
+  security:
+    - AccessCookie: []
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: "../../components/schemas/travel_memories/index.yml#/CreateTravelMemoryRequest"
+  responses:
+    "200":
+      description: Travel memory created successfully
+      content:
+        application/json:
+          schema:
+            $ref: "../../components/schemas/common/message.yml#/MessageOnlyResponse"
 

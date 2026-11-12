@@ -453,6 +453,27 @@ paths:
       summary: Get travel memory list
       tags:
       - travelMemories
+    post:
+      description: Create a new travel memory along with its daily records and photos.
+      operationId: createTravelMemory
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateTravelMemoryRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageOnlyResponse"
+          description: Travel memory created successfully
+      security:
+      - AccessCookie: []
+      summary: Create a new travel memory
+      tags:
+      - travelMemories
   /travel-memories/{travelMemoryID}:
     get:
       description: Retrieve a single travel memory with its days and photos.
@@ -1476,6 +1497,97 @@ components:
       required:
       - data
       type: object
+    CreateTravelMemoryRequest:
+      example:
+        locationId: 1
+        title: Chuyến đi mùa hoa dã quỳ Đà Lạt
+        startDate: 2024-11-10
+        endDate: 2024-11-12
+        description: Hành trình săn hoa dã quỳ và thưởng thức cà phê đồi thông.
+        coverImagePath: travel_memories/550e8400-e29b-41d4-a716-446655440000.jpg
+        days:
+        - date: 2024-11-10
+          description: "Ngày 1: Đặt chân đến Đà Lạt, dạo quanh bờ Hồ Xuân Hương."
+          photos:
+          - imagePath: travel_memories/6ba7b810-9dad-11d1-80b4-00c04fd430c8.png
+          - imagePath: travel_memories/6ba7b810-9dad-11d1-80b4-00c04fd430c8.png
+        - date: 2024-11-10
+          description: "Ngày 1: Đặt chân đến Đà Lạt, dạo quanh bờ Hồ Xuân Hương."
+          photos:
+          - imagePath: travel_memories/6ba7b810-9dad-11d1-80b4-00c04fd430c8.png
+          - imagePath: travel_memories/6ba7b810-9dad-11d1-80b4-00c04fd430c8.png
+      properties:
+        locationId:
+          description: Travel location ID
+          example: 1
+          format: int64
+          type: integer
+          x-order: 1
+          x-go-name: LocationId
+          x-oapi-codegen-extra-tags:
+            binding: "required,validateTravelLocationID"
+        title:
+          description: Travel memory title
+          example: Chuyến đi mùa hoa dã quỳ Đà Lạt
+          maxLength: 255
+          minLength: 1
+          type: string
+          x-order: 2
+          x-go-name: Title
+          x-oapi-codegen-extra-tags:
+            binding: "required,min=1,max=255"
+        startDate:
+          description: Trip start date (YYYY-MM-DD)
+          example: 2024-11-10
+          format: date
+          type: string
+          x-order: 3
+          x-go-name: StartDate
+          x-oapi-codegen-extra-tags:
+            binding: required
+        endDate:
+          description: Trip end date (YYYY-MM-DD)
+          example: 2024-11-12
+          format: date
+          type: string
+          x-order: 4
+          x-go-name: EndDate
+          x-oapi-codegen-extra-tags:
+            binding: required
+        description:
+          description: General trip description
+          example: Hành trình săn hoa dã quỳ và thưởng thức cà phê đồi thông.
+          nullable: true
+          type: string
+          x-order: 5
+          x-go-name: Description
+          x-oapi-codegen-extra-tags:
+            binding: omitempty
+        coverImagePath:
+          description: Cover image path returned by POST /uploads
+          example: travel_memories/550e8400-e29b-41d4-a716-446655440000.jpg
+          maxLength: 255
+          nullable: true
+          type: string
+          x-order: 6
+          x-go-name: CoverImagePath
+          x-oapi-codegen-extra-tags:
+            binding: "omitempty,max=255"
+        days:
+          description: List of daily memory entries
+          items:
+            $ref: "#/components/schemas/CreateTravelMemoryDayInput"
+          type: array
+          x-order: 7
+          x-go-name: Days
+          x-oapi-codegen-extra-tags:
+            binding: "omitempty,dive"
+      required:
+      - endDate
+      - locationId
+      - startDate
+      - title
+      type: object
     SelectionTravelLocationResponse:
       example:
         data:
@@ -1828,6 +1940,61 @@ components:
       - isCover
       - sortOrder
       type: object
+    CreateTravelMemoryDayInput:
+      example:
+        date: 2024-11-10
+        description: "Ngày 1: Đặt chân đến Đà Lạt, dạo quanh bờ Hồ Xuân Hương."
+        photos:
+        - imagePath: travel_memories/6ba7b810-9dad-11d1-80b4-00c04fd430c8.png
+        - imagePath: travel_memories/6ba7b810-9dad-11d1-80b4-00c04fd430c8.png
+      properties:
+        date:
+          description: Day date (YYYY-MM-DD)
+          example: 2024-11-10
+          format: date
+          type: string
+          x-order: 1
+          x-go-name: Date
+          x-oapi-codegen-extra-tags:
+            binding: required
+        description:
+          description: Daily notes or description
+          example: "Ngày 1: Đặt chân đến Đà Lạt, dạo quanh bờ Hồ Xuân Hương."
+          maxLength: 500
+          nullable: true
+          type: string
+          x-order: 2
+          x-go-name: Description
+          x-oapi-codegen-extra-tags:
+            binding: "omitempty,max=500"
+        photos:
+          description: List of photos for this day
+          items:
+            $ref: "#/components/schemas/TravelMemoryPhotoInput"
+          type: array
+          x-order: 3
+          x-go-name: Photos
+          x-oapi-codegen-extra-tags:
+            binding: "omitempty,dive"
+      required:
+      - date
+      type: object
+    TravelMemoryPhotoInput:
+      example:
+        imagePath: travel_memories/6ba7b810-9dad-11d1-80b4-00c04fd430c8.png
+      properties:
+        imagePath:
+          description: Image path returned by POST /uploads
+          example: travel_memories/6ba7b810-9dad-11d1-80b4-00c04fd430c8.png
+          maxLength: 255
+          type: string
+          x-order: 1
+          x-go-name: ImagePath
+          x-oapi-codegen-extra-tags:
+            binding: "required,max=255"
+      required:
+      - imagePath
+      type: object
     UploadItem:
       example:
         fileName: my-room.png
@@ -1955,6 +2122,7 @@ components:
           enum:
           - homestays
           - travel_location
+          - travel_memories
           type: string
       required:
       - files

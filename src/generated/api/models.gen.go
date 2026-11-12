@@ -36,6 +36,7 @@ const (
 const (
 	Homestays      UploadFilesRequestFolder = "homestays"
 	TravelLocation UploadFilesRequestFolder = "travel_location"
+	TravelMemories UploadFilesRequestFolder = "travel_memories"
 )
 
 // AuthResponse defines model for AuthResponse.
@@ -119,6 +120,42 @@ type CreateTravelLocationRequest struct {
 
 	// GoogleMapsUrl Google Maps URL
 	GoogleMapsUrl *string `binding:"omitempty,max=255" json:"googleMapsUrl"`
+}
+
+// CreateTravelMemoryDayInput defines model for CreateTravelMemoryDayInput.
+type CreateTravelMemoryDayInput struct {
+	// Date Day date (YYYY-MM-DD)
+	Date openapi_types.Date `binding:"required" json:"date"`
+
+	// Description Daily notes or description
+	Description *string `binding:"omitempty,max=500" json:"description"`
+
+	// Photos List of photos for this day
+	Photos *[]TravelMemoryPhotoInput `binding:"omitempty,dive" json:"photos,omitempty"`
+}
+
+// CreateTravelMemoryRequest defines model for CreateTravelMemoryRequest.
+type CreateTravelMemoryRequest struct {
+	// LocationId Travel location ID
+	LocationId int64 `binding:"required,validateTravelLocationID" json:"locationId"`
+
+	// Title Travel memory title
+	Title string `binding:"required,min=1,max=255" json:"title"`
+
+	// StartDate Trip start date (YYYY-MM-DD)
+	StartDate openapi_types.Date `binding:"required" json:"startDate"`
+
+	// EndDate Trip end date (YYYY-MM-DD)
+	EndDate openapi_types.Date `binding:"required" json:"endDate"`
+
+	// Description General trip description
+	Description *string `binding:"omitempty" json:"description"`
+
+	// CoverImagePath Cover image path returned by POST /uploads
+	CoverImagePath *string `binding:"omitempty,max=255" json:"coverImagePath"`
+
+	// Days List of daily memory entries
+	Days *[]CreateTravelMemoryDayInput `binding:"omitempty,dive" json:"days,omitempty"`
 }
 
 // CreateUser defines model for CreateUser.
@@ -351,6 +388,12 @@ type SelectionTravelLocationResponseDataInner struct {
 // - "wishlist": The user wants to visit the location.
 type TravelLocationStatus string
 
+// TravelMemoryPhotoInput defines model for TravelMemoryPhotoInput.
+type TravelMemoryPhotoInput struct {
+	// ImagePath Image path returned by POST /uploads
+	ImagePath string `binding:"required,max=255" json:"imagePath"`
+}
+
 // UpdateHomestayImageInput defines model for UpdateHomestayImageInput.
 type UpdateHomestayImageInput struct {
 	// Id Existing image ID. Omit or set to null to create a new image.
@@ -579,6 +622,9 @@ type CreateTravelLocationJSONRequestBody = CreateTravelLocationRequest
 
 // UpdateTravelLocationJSONRequestBody defines body for UpdateTravelLocation for application/json ContentType.
 type UpdateTravelLocationJSONRequestBody = UpdateTravelLocationRequest
+
+// CreateTravelMemoryJSONRequestBody defines body for CreateTravelMemory for application/json ContentType.
+type CreateTravelMemoryJSONRequestBody = CreateTravelMemoryRequest
 
 // DeleteUploadsJSONRequestBody defines body for DeleteUploads for application/json ContentType.
 type DeleteUploadsJSONRequestBody = DeleteUploadsRequest

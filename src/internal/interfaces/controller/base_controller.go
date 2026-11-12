@@ -162,6 +162,12 @@ func (con *ServerController) FetchTravelMemories(c *gin.Context, params api.Fetc
 	con.travelMemoryController.FetchTravelMemories(c, params)
 }
 
+// CreateTravelMemory creates a new travel memory along with its days and photos.
+// (POST /travel-memories)
+func (con *ServerController) CreateTravelMemory(c *gin.Context) {
+	con.travelMemoryController.CreateTravelMemory(c)
+}
+
 // FetchTravelMemoryByID retrieves details of a single travel memory by ID.
 // (GET /travel-memories/{travelMemoryID})
 func (con *ServerController) FetchTravelMemoryByID(c *gin.Context, travelMemoryID int64) {

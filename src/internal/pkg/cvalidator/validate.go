@@ -8,6 +8,7 @@ import (
 	ut "github.com/go-playground/universal-translator"
 	"github.com/go-playground/validator/v10"
 	en_translations "github.com/go-playground/validator/v10/translations/en"
+	openapi_types "github.com/oapi-codegen/runtime/types"
 )
 
 var v *validator.Validate
@@ -61,6 +62,12 @@ func init() {
 func NewValidate() {
 	v = validator.New(validator.WithRequiredStructEnabled())
 	v.SetTagName("binding")
+	v.RegisterCustomTypeFunc(func(field reflect.Value) interface{} {
+		if d, ok := field.Interface().(openapi_types.Date); ok {
+			return d.Time
+		}
+		return nil
+	}, openapi_types.Date{})
 
 	enLocale := en.New()
 	uni := ut.New(enLocale, enLocale)

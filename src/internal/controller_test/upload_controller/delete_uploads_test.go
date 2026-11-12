@@ -27,6 +27,15 @@ func TestDeleteUploads(t *testing.T) {
 	require.NoError(t, json.Unmarshal(response.Body.Bytes(), &body))
 	require.Len(t, body.Data, 1)
 	assert.True(t, body.Data[0].Success)
+
+	t.Run("deletes travel_memories path", func(t *testing.T) {
+		memClient := &fakeAssetClient{}
+		memResp := performDelete(t, newUploadRouter(t, memClient), `[{"path":"travel_memories/550e8400-e29b-41d4-a716-446655440000.jpg","resourceType":"image"}]`)
+		require.Equal(t, http.StatusOK, memResp.Code, memResp.Body.String())
+		require.Len(t, memClient.deletes, 1)
+		assert.Equal(t, "travel_memories/550e8400-e29b-41d4-a716-446655440000", memClient.deletes[0].PublicID)
+		assert.Equal(t, uploads.ResourceImage, memClient.deletes[0].ResourceType)
+	})
 }
 
 func TestDeleteUploadsDoesNotDeleteInvalidPath(t *testing.T) {

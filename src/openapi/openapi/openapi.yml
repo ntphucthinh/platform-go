@@ -108,6 +108,8 @@ components:
       $ref: "./components/schemas/travel_memories/index.yml#/FetchTravelMemoriesResponse"
     FetchTravelMemoryByIDResponse:
       $ref: "./components/schemas/travel_memories/:travelMemoryID.yml#/FetchTravelMemoryByIDResponse"
+    CreateTravelMemoryRequest:
+      $ref: "./components/schemas/travel_memories/index.yml#/CreateTravelMemoryRequest"
     SelectionTravelLocationResponse:
       $ref: "./components/schemas/selections/travel_locations.yml#/SelectionTravelLocationResponse"
     MessageOnlyResponse:

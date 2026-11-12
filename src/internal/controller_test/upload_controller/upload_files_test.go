@@ -90,6 +90,11 @@ func TestUploadFilesValidation(t *testing.T) {
 		require.Equal(t, http.StatusOK, response.Code, response.Body.String())
 	})
 
+	t.Run("accepts travel_memories folder", func(t *testing.T) {
+		response := performUpload(t, newUploadRouter(t, &fakeAssetClient{}), "travel_memories", "photo.png", pngContent())
+		require.Equal(t, http.StatusOK, response.Code, response.Body.String())
+	})
+
 	cases := []struct {
 		name, folder, fileName string
 		content                []byte

@@ -61,6 +61,9 @@ type ServerInterface interface {
 	// Get travel memory list
 	// (GET /travel-memories)
 	FetchTravelMemories(c *gin.Context, params FetchTravelMemoriesParams)
+	// Create a new travel memory
+	// (POST /travel-memories)
+	CreateTravelMemory(c *gin.Context)
 	// Get travel memory detail
 	// (GET /travel-memories/{travelMemoryID})
 	FetchTravelMemoryByID(c *gin.Context, travelMemoryID int64)
@@ -500,6 +503,21 @@ func (siw *ServerInterfaceWrapper) FetchTravelMemories(c *gin.Context) {
 	siw.Handler.FetchTravelMemories(c, params)
 }
 
+// CreateTravelMemory operation middleware
+func (siw *ServerInterfaceWrapper) CreateTravelMemory(c *gin.Context) {
+
+	c.Set(AccessCookieScopes, []string{})
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.CreateTravelMemory(c)
+}
+
 // FetchTravelMemoryByID operation middleware
 func (siw *ServerInterfaceWrapper) FetchTravelMemoryByID(c *gin.Context) {
 
@@ -625,6 +643,7 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.GET(options.BaseURL+"/travel-locations/:travelLocationID", wrapper.FetchTravelLocationByID)
 	router.PUT(options.BaseURL+"/travel-locations/:travelLocationID", wrapper.UpdateTravelLocation)
 	router.GET(options.BaseURL+"/travel-memories", wrapper.FetchTravelMemories)
+	router.POST(options.BaseURL+"/travel-memories", wrapper.CreateTravelMemory)
 	router.GET(options.BaseURL+"/travel-memories/:travelMemoryID", wrapper.FetchTravelMemoryByID)
 	router.DELETE(options.BaseURL+"/uploads", wrapper.DeleteUploads)
 	router.POST(options.BaseURL+"/uploads", wrapper.UploadFiles)
