@@ -37,6 +37,8 @@ func InitializeApplication(db *gorm.DB, jwtService *security.JWTService, secureC
 		repository.NewSchemaDB,
 		repository.NewMySQLUserRepository,
 		repository.NewHomestayRepository,
+		repository.NewHomestayRoomRepository,
+		repository.NewHomestayImageRepository,
 		repository.NewTravelLocationRepository,
 		repository.NewTravelMemoryRepository,
 		repository.NewTravelMemoryDayRepository,

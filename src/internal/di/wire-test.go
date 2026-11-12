@@ -37,6 +37,8 @@ func TestInitializeControllers(t *testing.T, db *gorm.DB) (*TestHandlerSet, erro
 		repository.NewSchemaDB,
 		repository.NewMySQLUserRepository,
 		repository.NewHomestayRepository,
+		repository.NewHomestayRoomRepository,
+		repository.NewHomestayImageRepository,
 		repository.NewTravelLocationRepository,
 		repository.NewTravelMemoryRepository,
 		repository.NewTravelMemoryDayRepository,

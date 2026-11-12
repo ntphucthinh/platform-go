@@ -7,6 +7,8 @@ import (
 
 	api "platform-go/generated/api"
 	"platform-go/internal/domain/homestay"
+	homestayimage "platform-go/internal/domain/homestay_image"
+	homestayroom "platform-go/internal/domain/homestay_room"
 	"platform-go/internal/infrastructure/repository"
 )
 
@@ -15,15 +17,21 @@ const DeleteHomestaysUseCaseSuccessMessage = "Delete homestay successfully"
 type DeleteHomestayUsecase struct {
 	db           repository.DBInterface
 	homestayRepo homestay.HomestayRepository
+	roomRepo     homestayroom.HomestayRoomRepository
+	imageRepo    homestayimage.HomestayImageRepository
 }
 
 func NewDeleteHomestayUsecase(
 	db repository.DBInterface,
 	homestayRepo homestay.HomestayRepository,
+	roomRepo homestayroom.HomestayRoomRepository,
+	imageRepo homestayimage.HomestayImageRepository,
 ) *DeleteHomestayUsecase {
 	return &DeleteHomestayUsecase{
 		db:           db,
 		homestayRepo: homestayRepo,
+		roomRepo:     roomRepo,
+		imageRepo:    imageRepo,
 	}
 }
 
@@ -39,7 +47,7 @@ func (uc *DeleteHomestayUsecase) Execute(ctx context.Context, homestayID int64) 
 			return ErrHomestayNotFound
 		}
 
-		rooms, err := uc.homestayRepo.FindRoomsByHomestayID(txCtx, homestayID)
+		rooms, err := uc.roomRepo.FindRoomsByHomestayID(txCtx, homestayID)
 		if err != nil {
 			return err
 		}
@@ -49,10 +57,10 @@ func (uc *DeleteHomestayUsecase) Execute(ctx context.Context, homestayID int64) 
 			for i, r := range rooms {
 				roomIDs[i] = r.ID
 			}
-			if err := uc.homestayRepo.DeleteImagesByRoomIDs(txCtx, roomIDs); err != nil {
+			if err := uc.imageRepo.DeleteImagesByRoomIDs(txCtx, roomIDs); err != nil {
 				return err
 			}
-			if err := uc.homestayRepo.DeleteRoomsByIDs(txCtx, roomIDs); err != nil {
+			if err := uc.roomRepo.DeleteRoomsByIDs(txCtx, roomIDs); err != nil {
 				return err
 			}
 		}

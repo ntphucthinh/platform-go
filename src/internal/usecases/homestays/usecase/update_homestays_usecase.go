@@ -9,6 +9,8 @@ import (
 
 	api "platform-go/generated/api"
 	"platform-go/internal/domain/homestay"
+	homestayimage "platform-go/internal/domain/homestay_image"
+	homestayroom "platform-go/internal/domain/homestay_room"
 	"platform-go/internal/infrastructure/repository"
 )
 
@@ -35,15 +37,21 @@ var (
 type UpdateHomestayUsecase struct {
 	db           repository.DBInterface
 	homestayRepo homestay.HomestayRepository
+	roomRepo     homestayroom.HomestayRoomRepository
+	imageRepo    homestayimage.HomestayImageRepository
 }
 
 func NewUpdateHomestayUsecase(
 	db repository.DBInterface,
 	homestayRepo homestay.HomestayRepository,
+	roomRepo homestayroom.HomestayRoomRepository,
+	imageRepo homestayimage.HomestayImageRepository,
 ) *UpdateHomestayUsecase {
 	return &UpdateHomestayUsecase{
 		db:           db,
 		homestayRepo: homestayRepo,
+		roomRepo:     roomRepo,
+		imageRepo:    imageRepo,
 	}
 }
 
@@ -86,12 +94,12 @@ func (uc *UpdateHomestayUsecase) Execute(
 		}
 
 		// Load existing rooms belonging to this homestay.
-		existingRooms, err := uc.homestayRepo.FindRoomsByHomestayID(txCtx, homestayID)
+		existingRooms, err := uc.roomRepo.FindRoomsByHomestayID(txCtx, homestayID)
 		if err != nil {
 			return err
 		}
 
-		existingRoomMap := make(map[int64]homestay.HomestayRoom, len(existingRooms))
+		existingRoomMap := make(map[int64]homestayroom.HomestayRoom, len(existingRooms))
 		for _, room := range existingRooms {
 			existingRoomMap[room.ID] = room
 		}
@@ -143,18 +151,18 @@ func (uc *UpdateHomestayUsecase) Execute(
 		}
 
 		if len(roomIDsToDelete) > 0 {
-			if err := uc.homestayRepo.DeleteImagesByRoomIDs(txCtx, roomIDsToDelete); err != nil {
+			if err := uc.imageRepo.DeleteImagesByRoomIDs(txCtx, roomIDsToDelete); err != nil {
 				return err
 			}
 
-			if err := uc.homestayRepo.DeleteRoomsByIDs(txCtx, roomIDsToDelete); err != nil {
+			if err := uc.roomRepo.DeleteRoomsByIDs(txCtx, roomIDsToDelete); err != nil {
 				return err
 			}
 		}
 
 		// Create or update rooms.
 		for _, roomRequest := range *request.Rooms {
-			room := homestay.NewHomestayRoom(
+			room := homestayroom.NewHomestayRoom(
 				homestayID,
 				roomRequest.Name,
 				roomRequest.Description,
@@ -165,11 +173,11 @@ func (uc *UpdateHomestayUsecase) Execute(
 
 			if roomRequest.Id != nil && *roomRequest.Id > 0 {
 				room.ID = *roomRequest.Id
-				if err := uc.homestayRepo.UpdateHomestayRoom(txCtx, &room); err != nil {
+				if err := uc.roomRepo.UpdateHomestayRoom(txCtx, &room); err != nil {
 					return err
 				}
 			} else {
-				if err := uc.homestayRepo.CreateHomestayRoom(txCtx, &room); err != nil {
+				if err := uc.roomRepo.CreateHomestayRoom(txCtx, &room); err != nil {
 					return err
 				}
 			}
@@ -183,13 +191,13 @@ func (uc *UpdateHomestayUsecase) Execute(
 			}
 
 			// Load images belonging to the current room only.
-			existingImages, err := uc.homestayRepo.FindImagesByRoomID(txCtx, roomID)
+			existingImages, err := uc.imageRepo.FindImagesByRoomID(txCtx, roomID)
 			if err != nil {
 				return err
 			}
 
 			existingImageMap := make(
-				map[int64]homestay.HomestayImage,
+				map[int64]homestayimage.HomestayImage,
 				len(existingImages),
 			)
 
@@ -244,14 +252,14 @@ func (uc *UpdateHomestayUsecase) Execute(
 			}
 
 			if len(imageIDsToDelete) > 0 {
-				if err := uc.homestayRepo.DeleteImagesByIDs(txCtx, imageIDsToDelete); err != nil {
+				if err := uc.imageRepo.DeleteImagesByIDs(txCtx, imageIDsToDelete); err != nil {
 					return err
 				}
 			}
 
 			// Create or update images.
 			for _, imageRequest := range *roomRequest.Images {
-				img := homestay.NewHomestayImage(
+				img := homestayimage.NewHomestayImage(
 					roomID,
 					imageRequest.ImagePath,
 					imageRequest.SortOrder,
@@ -260,11 +268,11 @@ func (uc *UpdateHomestayUsecase) Execute(
 
 				if imageRequest.Id != nil && *imageRequest.Id > 0 {
 					img.ID = *imageRequest.Id
-					if err := uc.homestayRepo.UpdateHomestayImage(txCtx, &img); err != nil {
+					if err := uc.imageRepo.UpdateHomestayImage(txCtx, &img); err != nil {
 						return err
 					}
 				} else {
-					if err := uc.homestayRepo.CreateHomestayImage(txCtx, []homestay.HomestayImage{img}); err != nil {
+					if err := uc.imageRepo.CreateHomestayImages(txCtx, []homestayimage.HomestayImage{img}); err != nil {
 						return err
 					}
 				}

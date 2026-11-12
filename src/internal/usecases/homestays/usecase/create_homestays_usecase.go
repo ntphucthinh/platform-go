@@ -8,6 +8,8 @@ import (
 
 	api "platform-go/generated/api"
 	"platform-go/internal/domain/homestay"
+	homestayimage "platform-go/internal/domain/homestay_image"
+	homestayroom "platform-go/internal/domain/homestay_room"
 	"platform-go/internal/infrastructure/repository"
 )
 
@@ -18,15 +20,21 @@ var ErrInvalidHomestayInput = errors.New("invalid homestay input")
 type CreateHomestayUsecase struct {
 	db           repository.DBInterface
 	homestayRepo homestay.HomestayRepository
+	roomRepo     homestayroom.HomestayRoomRepository
+	imageRepo    homestayimage.HomestayImageRepository
 }
 
 func NewCreateHomestayUsecase(
 	db repository.DBInterface,
 	homestayRepo homestay.HomestayRepository,
+	roomRepo homestayroom.HomestayRoomRepository,
+	imageRepo homestayimage.HomestayImageRepository,
 ) *CreateHomestayUsecase {
 	return &CreateHomestayUsecase{
 		db:           db,
 		homestayRepo: homestayRepo,
+		roomRepo:     roomRepo,
+		imageRepo:    imageRepo,
 	}
 }
 
@@ -46,7 +54,7 @@ func (uc *CreateHomestayUsecase) Execute(ctx context.Context, request api.Create
 
 		if request.Rooms != nil {
 			for _, r := range *request.Rooms {
-				room := homestay.NewHomestayRoom(
+				room := homestayroom.NewHomestayRoom(
 					h.ID,
 					r.Name,
 					r.Description,
@@ -54,21 +62,21 @@ func (uc *CreateHomestayUsecase) Execute(ctx context.Context, request api.Create
 					(*string)(r.PriceUnit),
 					r.SortOrder,
 				)
-				if err := uc.homestayRepo.CreateHomestayRoom(txCtx, &room); err != nil {
+				if err := uc.roomRepo.CreateHomestayRoom(txCtx, &room); err != nil {
 					return err
 				}
 
 				if r.Images != nil && len(*r.Images) > 0 {
-					images := make([]homestay.HomestayImage, len(*r.Images))
+					images := make([]homestayimage.HomestayImage, len(*r.Images))
 					for i, img := range *r.Images {
-						images[i] = homestay.NewHomestayImage(
+						images[i] = homestayimage.NewHomestayImage(
 							room.ID,
 							img.ImagePath,
 							img.SortOrder,
 							img.IsCover,
 						)
 					}
-					if err := uc.homestayRepo.CreateHomestayImage(txCtx, images); err != nil {
+					if err := uc.imageRepo.CreateHomestayImages(txCtx, images); err != nil {
 						return err
 					}
 				}
