@@ -142,20 +142,56 @@ func trustedProxies() []string {
 }
 
 func loadEnv() {
-	if app.IsLocal() {
-		// Load .env.local
-		err := godotenv.Overload(".env.local")
-		if err != nil {
-			log.Println("Could not load .env.local, using system environment variables")
+	// 1. Cho phép chỉ định file cấu hình cụ thể qua biến ENV_FILE nếu cần
+	if envFile := os.Getenv("ENV_FILE"); envFile != "" {
+		if err := godotenv.Overload(envFile); err == nil {
+			log.Printf("[INFO] Loaded environment from %s", envFile)
+			return
 		}
-	} else if app.IsStaging() {
-		// Load .env.staging or env.staging if present
-		err := godotenv.Overload(".env.staging")
-		if err != nil {
-			err = godotenv.Overload("env.staging")
+		log.Printf("[WARN] Could not load specified ENV_FILE %q, falling back", envFile)
+	}
+
+	// 2. Nếu đã khai báo rõ APP_ENV từ shell/system (vd: export APP_ENV=staging từ service.sh hoặc Docker)
+	appEnv := strings.TrimSpace(os.Getenv("APP_ENV"))
+	if appEnv != "" && appEnv != "local" {
+		targetFile := ".env." + appEnv
+		if _, err := os.Stat(targetFile); err == nil {
+			if err := godotenv.Overload(targetFile); err == nil {
+				log.Printf("[INFO] Loaded environment from %s", targetFile)
+				return
+			}
 		}
-		if err != nil {
-			log.Println("Could not load .env.staging/env.staging, using system environment variables")
+		if _, err := os.Stat(".env"); err == nil {
+			if err := godotenv.Overload(".env"); err == nil {
+				log.Printf("[INFO] Loaded environment from .env (for APP_ENV=%s)", appEnv)
+				return
+			}
 		}
+	}
+
+	// 3. Môi trường local dev: ưu tiên .env.local, sau đó đến .env
+	if _, err := os.Stat(".env.local"); err == nil {
+		if err := godotenv.Overload(".env.local"); err == nil {
+			log.Println("[INFO] Loaded environment from .env.local")
+			return
+		}
+		log.Println("[WARN] Found .env.local but could not parse it, falling back")
+	}
+
+	if _, err := os.Stat(".env"); err == nil {
+		if err := godotenv.Overload(".env"); err == nil {
+			log.Println("[INFO] Loaded environment from .env")
+			return
+		}
+		log.Println("[WARN] Found .env but could not parse it, falling back")
+	}
+
+	// 4. Dự phòng nếu chỉ có .env.staging hoặc .env.production
+	if _, err := os.Stat(".env.staging"); err == nil {
+		_ = godotenv.Overload(".env.staging")
+		log.Println("[INFO] Loaded environment from .env.staging")
+	} else if _, err := os.Stat(".env.production"); err == nil {
+		_ = godotenv.Overload(".env.production")
+		log.Println("[INFO] Loaded environment from .env.production")
 	}
 }

@@ -23,16 +23,29 @@ const (
 // CORSMiddleware handles Cross-Origin Resource Sharing (CORS).
 // Allowed origins are loaded and validated once when the middleware is initialized.
 func CORSMiddleware() gin.HandlerFunc {
-	allowedOrigins := parseAllowedOrigins(
-		os.Getenv(corsAllowOriginsEnv),
-	)
+	rawOrigins := os.Getenv(corsAllowOriginsEnv)
+	allowAll := false
+
+	parts := strings.FieldsFunc(rawOrigins, func(r rune) bool {
+		return r == ',' || r == ' ' || r == '\t' ||
+			r == '\n' || r == '\r'
+	})
+
+	for _, part := range parts {
+		if strings.TrimSpace(part) == "*" {
+			allowAll = true
+			break
+		}
+	}
+
+	allowedOrigins := parseAllowedOrigins(rawOrigins)
 
 	allowedOriginSet := make(map[string]struct{}, len(allowedOrigins))
 	for _, origin := range allowedOrigins {
 		allowedOriginSet[origin] = struct{}{}
 	}
 
-	if len(allowedOriginSet) == 0 {
+	if !allowAll && len(allowedOriginSet) == 0 {
 		log.Printf(
 			"[WARN] %s is missing or contains no valid origins; cross-origin requests will not be allowed",
 			corsAllowOriginsEnv,
@@ -49,11 +62,16 @@ func CORSMiddleware() gin.HandlerFunc {
 			normalizedOrigin, valid := normalizeAllowedOrigin(requestOrigin)
 
 			if valid {
-				if _, allowed := allowedOriginSet[normalizedOrigin]; allowed &&
-					requestOrigin == normalizedOrigin {
-					header.Set("Access-Control-Allow-Origin", normalizedOrigin)
+				_, allowed := allowedOriginSet[normalizedOrigin]
+				if allowAll || allowed {
+					allowHeaders := corsAllowHeaders
+					if reqHeaders := c.GetHeader("Access-Control-Request-Headers"); reqHeaders != "" {
+						allowHeaders = corsAllowHeaders + ", " + reqHeaders
+					}
+
+					header.Set("Access-Control-Allow-Origin", requestOrigin)
 					header.Set("Access-Control-Allow-Credentials", "true")
-					header.Set("Access-Control-Allow-Headers", corsAllowHeaders)
+					header.Set("Access-Control-Allow-Headers", allowHeaders)
 					header.Set("Access-Control-Allow-Methods", corsAllowMethods)
 					header.Set("Access-Control-Max-Age", "600")
 				}
@@ -81,6 +99,10 @@ func parseAllowedOrigins(raw string) []string {
 	seen := make(map[string]struct{}, len(parts))
 
 	for _, part := range parts {
+		if strings.TrimSpace(part) == "*" {
+			continue
+		}
+
 		origin, ok := normalizeAllowedOrigin(part)
 		if !ok {
 			log.Printf("[WARN] Ignoring invalid CORS origin: %q", part)
