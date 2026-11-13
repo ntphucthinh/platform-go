@@ -150,7 +150,6 @@ func (uc *CreateTravelMemoryUseCase) buildAndValidatePhotos(
 		}
 
 		dayID := days[i].ID
-		seenImages := make(map[string]struct{}, len(*d.Photos))
 
 		for photoIdx, p := range *d.Photos {
 			sortOrder := int32(photoIdx + 1)
@@ -162,11 +161,6 @@ func (uc *CreateTravelMemoryUseCase) buildAndValidatePhotos(
 			if err != nil {
 				return nil, err
 			}
-
-			if _, exists := seenImages[photo.ImagePath]; exists {
-				return nil, travelmemoryphoto.ErrDuplicateImagePath
-			}
-			seenImages[photo.ImagePath] = struct{}{}
 
 			allPhotos = append(allPhotos, photo)
 		}

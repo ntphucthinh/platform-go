@@ -70,6 +70,8 @@ func InitializeApplication(db *gorm.DB, jwtService *security.JWTService, secureC
 		travelmemoryusecase.NewFetchTravelMemoriesUseCase,
 		travelmemoryusecase.NewCreateTravelMemoryUseCase,
 		travelmemoryusecase.NewFetchTravelMemoryByIDUseCase,
+		travelmemoryusecase.NewUpdateTravelMemoryUseCase,
+		travelmemoryusecase.NewDeleteTravelMemoryUseCase,
 		selectionusecase.NewFetchSelectionTravelLocationsUseCase,
 		controller.NewUserController,
 		controller.NewAuthController,

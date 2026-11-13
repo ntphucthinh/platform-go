@@ -174,6 +174,18 @@ func (con *ServerController) FetchTravelMemoryByID(c *gin.Context, travelMemoryI
 	con.travelMemoryController.FetchTravelMemoryByID(c, travelMemoryID)
 }
 
+// UpdateTravelMemory updates an existing travel memory by ID.
+// (PUT /travel-memories/{travelMemoryID})
+func (con *ServerController) UpdateTravelMemory(c *gin.Context, travelMemoryID int64) {
+	con.travelMemoryController.UpdateTravelMemory(c, travelMemoryID)
+}
+
+// DeleteTravelMemory deletes an existing travel memory by ID.
+// (DELETE /travel-memories/{travelMemoryID})
+func (con *ServerController) DeleteTravelMemory(c *gin.Context, travelMemoryID int64) {
+	con.travelMemoryController.DeleteTravelMemory(c, travelMemoryID)
+}
+
 // -----------------------------------------------------------------------------
 // Selections APIs (SelectionController)
 // -----------------------------------------------------------------------------

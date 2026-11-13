@@ -66,6 +66,8 @@ func TestInitializeControllers(t *testing.T, db *gorm.DB) (*TestHandlerSet, erro
 		travelmemoryusecase.NewFetchTravelMemoriesUseCase,
 		travelmemoryusecase.NewCreateTravelMemoryUseCase,
 		travelmemoryusecase.NewFetchTravelMemoryByIDUseCase,
+		travelmemoryusecase.NewUpdateTravelMemoryUseCase,
+		travelmemoryusecase.NewDeleteTravelMemoryUseCase,
 		selectionusecase.NewFetchSelectionTravelLocationsUseCase,
 		controller.NewUserController,
 		controller.NewHomestayController,

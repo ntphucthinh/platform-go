@@ -117,3 +117,158 @@ FetchTravelMemoryByIDResponse:
   required:
     - data
 
+# ---------------------------------------------------------------------------
+# Update travel memory (PUT /travel-memories/{travelMemoryID})
+# ---------------------------------------------------------------------------
+
+UpdateTravelMemoryRequest:
+  type: object
+  properties:
+    locationId:
+      type: integer
+      format: int64
+      x-order: 1
+      x-go-name: LocationId
+      description: "Travel location ID"
+      example: 1
+      x-oapi-codegen-extra-tags:
+        binding: "required,validateTravelLocationID"
+
+    title:
+      type: string
+      minLength: 1
+      maxLength: 255
+      x-order: 2
+      x-go-name: Title
+      description: "Travel memory title"
+      example: "Chuyến đi mùa hoa dã quỳ Đà Lạt"
+      x-oapi-codegen-extra-tags:
+        binding: "required,min=1,max=255"
+
+    startDate:
+      type: string
+      format: date
+      x-order: 3
+      x-go-name: StartDate
+      description: "Trip start date (YYYY-MM-DD)"
+      example: "2024-11-10"
+      x-oapi-codegen-extra-tags:
+        binding: "required"
+
+    endDate:
+      type: string
+      format: date
+      x-order: 4
+      x-go-name: EndDate
+      description: "Trip end date (YYYY-MM-DD)"
+      example: "2024-11-12"
+      x-oapi-codegen-extra-tags:
+        binding: "required"
+
+    description:
+      type: string
+      nullable: true
+      x-order: 5
+      x-go-name: Description
+      description: "General trip description"
+      example: "Hành trình săn hoa dã quỳ và thưởng thức cà phê đồi thông."
+      x-oapi-codegen-extra-tags:
+        binding: "omitempty"
+
+    coverImagePath:
+      type: string
+      maxLength: 255
+      nullable: true
+      x-order: 6
+      x-go-name: CoverImagePath
+      description: "Cover image path returned by POST /uploads"
+      example: "travel_memories/550e8400-e29b-41d4-a716-446655440000.jpg"
+      x-oapi-codegen-extra-tags:
+        binding: "omitempty,max=255"
+
+    days:
+      type: array
+      x-order: 7
+      x-go-name: Days
+      description: "List of daily memory entries. A nil days field means days remain unchanged."
+      items:
+        $ref: "#/UpdateTravelMemoryDayInput"
+      x-oapi-codegen-extra-tags:
+        binding: "omitempty,dive"
+
+  required:
+    - locationId
+    - title
+    - startDate
+    - endDate
+
+UpdateTravelMemoryDayInput:
+  type: object
+  properties:
+    id:
+      type: integer
+      format: int64
+      nullable: true
+      x-order: 1
+      x-go-name: Id
+      description: "Existing day ID. Omit or set to null to create a new day."
+      example: 1
+
+    date:
+      type: string
+      format: date
+      x-order: 2
+      x-go-name: Date
+      description: "Day date (YYYY-MM-DD)"
+      example: "2024-11-10"
+      x-oapi-codegen-extra-tags:
+        binding: "required"
+
+    description:
+      type: string
+      maxLength: 500
+      nullable: true
+      x-order: 3
+      x-go-name: Description
+      description: "Daily notes or description"
+      example: "Ngày 1: Đặt chân đến Đà Lạt, dạo quanh bờ Hồ Xuân Hương."
+      x-oapi-codegen-extra-tags:
+        binding: "omitempty,max=500"
+
+    photos:
+      type: array
+      x-order: 4
+      x-go-name: Photos
+      description: "List of photos for this day. A nil photos field means photos remain unchanged."
+      items:
+        $ref: "#/UpdateTravelMemoryPhotoInput"
+      x-oapi-codegen-extra-tags:
+        binding: "omitempty,dive"
+
+  required:
+    - date
+
+UpdateTravelMemoryPhotoInput:
+  type: object
+  properties:
+    id:
+      type: integer
+      format: int64
+      nullable: true
+      x-order: 1
+      x-go-name: Id
+      description: "Existing photo ID. Omit or set to null to create a new photo."
+      example: 1
+
+    imagePath:
+      type: string
+      maxLength: 255
+      x-order: 2
+      x-go-name: ImagePath
+      description: "Image path returned by POST /uploads"
+      example: "travel_memories/6ba7b810-9dad-11d1-80b4-00c04fd430c8.png"
+      x-oapi-codegen-extra-tags:
+        binding: "required,max=255"
+
+  required:
+    - imagePath

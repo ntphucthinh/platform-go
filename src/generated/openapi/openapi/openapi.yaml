@@ -475,6 +475,31 @@ paths:
       tags:
       - travelMemories
   /travel-memories/{travelMemoryID}:
+    delete:
+      description: Delete a travel memory together with all its associated days and
+        photos.
+      operationId: deleteTravelMemory
+      parameters:
+      - example: 1
+        in: path
+        name: travelMemoryID
+        required: true
+        schema:
+          format: int64
+          minimum: 1
+          type: integer
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageOnlyResponse"
+          description: Travel memory deleted successfully
+      security:
+      - AccessCookie: []
+      summary: Delete a travel memory
+      tags:
+      - travelMemories
     get:
       description: Retrieve a single travel memory with its days and photos.
       operationId: fetchTravelMemoryByID
@@ -497,6 +522,40 @@ paths:
       security:
       - AccessCookie: []
       summary: Get travel memory detail
+      tags:
+      - travelMemories
+    put:
+      description: |
+        Replace a travel memory together with its days and photos (full-state sync).
+        - Day / photo with `id` → updated.
+        - Day / photo without `id` → created.
+        - Existing day / photo not present in the request → deleted.
+      operationId: updateTravelMemory
+      parameters:
+      - example: 1
+        in: path
+        name: travelMemoryID
+        required: true
+        schema:
+          format: int64
+          minimum: 1
+          type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateTravelMemoryRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageOnlyResponse"
+          description: Travel memory updated successfully
+      security:
+      - AccessCookie: []
+      summary: Update a travel memory
       tags:
       - travelMemories
   /selections/travel-locations:
@@ -1989,6 +2048,180 @@ components:
           maxLength: 255
           type: string
           x-order: 1
+          x-go-name: ImagePath
+          x-oapi-codegen-extra-tags:
+            binding: "required,max=255"
+      required:
+      - imagePath
+      type: object
+    UpdateTravelMemoryRequest:
+      example:
+        locationId: 1
+        title: Chuyến đi mùa hoa dã quỳ Đà Lạt
+        startDate: 2024-11-10
+        endDate: 2024-11-12
+        description: Hành trình săn hoa dã quỳ và thưởng thức cà phê đồi thông.
+        coverImagePath: travel_memories/550e8400-e29b-41d4-a716-446655440000.jpg
+        days:
+        - id: 1
+          date: 2024-11-10
+          description: "Ngày 1: Đặt chân đến Đà Lạt, dạo quanh bờ Hồ Xuân Hương."
+          photos:
+          - id: 1
+            imagePath: travel_memories/6ba7b810-9dad-11d1-80b4-00c04fd430c8.png
+          - id: 1
+            imagePath: travel_memories/6ba7b810-9dad-11d1-80b4-00c04fd430c8.png
+        - id: 1
+          date: 2024-11-10
+          description: "Ngày 1: Đặt chân đến Đà Lạt, dạo quanh bờ Hồ Xuân Hương."
+          photos:
+          - id: 1
+            imagePath: travel_memories/6ba7b810-9dad-11d1-80b4-00c04fd430c8.png
+          - id: 1
+            imagePath: travel_memories/6ba7b810-9dad-11d1-80b4-00c04fd430c8.png
+      properties:
+        locationId:
+          description: Travel location ID
+          example: 1
+          format: int64
+          type: integer
+          x-order: 1
+          x-go-name: LocationId
+          x-oapi-codegen-extra-tags:
+            binding: "required,validateTravelLocationID"
+        title:
+          description: Travel memory title
+          example: Chuyến đi mùa hoa dã quỳ Đà Lạt
+          maxLength: 255
+          minLength: 1
+          type: string
+          x-order: 2
+          x-go-name: Title
+          x-oapi-codegen-extra-tags:
+            binding: "required,min=1,max=255"
+        startDate:
+          description: Trip start date (YYYY-MM-DD)
+          example: 2024-11-10
+          format: date
+          type: string
+          x-order: 3
+          x-go-name: StartDate
+          x-oapi-codegen-extra-tags:
+            binding: required
+        endDate:
+          description: Trip end date (YYYY-MM-DD)
+          example: 2024-11-12
+          format: date
+          type: string
+          x-order: 4
+          x-go-name: EndDate
+          x-oapi-codegen-extra-tags:
+            binding: required
+        description:
+          description: General trip description
+          example: Hành trình săn hoa dã quỳ và thưởng thức cà phê đồi thông.
+          nullable: true
+          type: string
+          x-order: 5
+          x-go-name: Description
+          x-oapi-codegen-extra-tags:
+            binding: omitempty
+        coverImagePath:
+          description: Cover image path returned by POST /uploads
+          example: travel_memories/550e8400-e29b-41d4-a716-446655440000.jpg
+          maxLength: 255
+          nullable: true
+          type: string
+          x-order: 6
+          x-go-name: CoverImagePath
+          x-oapi-codegen-extra-tags:
+            binding: "omitempty,max=255"
+        days:
+          description: List of daily memory entries. A nil days field means days remain
+            unchanged.
+          items:
+            $ref: "#/components/schemas/UpdateTravelMemoryDayInput"
+          type: array
+          x-order: 7
+          x-go-name: Days
+          x-oapi-codegen-extra-tags:
+            binding: "omitempty,dive"
+      required:
+      - endDate
+      - locationId
+      - startDate
+      - title
+      type: object
+    UpdateTravelMemoryDayInput:
+      example:
+        id: 1
+        date: 2024-11-10
+        description: "Ngày 1: Đặt chân đến Đà Lạt, dạo quanh bờ Hồ Xuân Hương."
+        photos:
+        - id: 1
+          imagePath: travel_memories/6ba7b810-9dad-11d1-80b4-00c04fd430c8.png
+        - id: 1
+          imagePath: travel_memories/6ba7b810-9dad-11d1-80b4-00c04fd430c8.png
+      properties:
+        id:
+          description: Existing day ID. Omit or set to null to create a new day.
+          example: 1
+          format: int64
+          nullable: true
+          type: integer
+          x-order: 1
+          x-go-name: Id
+        date:
+          description: Day date (YYYY-MM-DD)
+          example: 2024-11-10
+          format: date
+          type: string
+          x-order: 2
+          x-go-name: Date
+          x-oapi-codegen-extra-tags:
+            binding: required
+        description:
+          description: Daily notes or description
+          example: "Ngày 1: Đặt chân đến Đà Lạt, dạo quanh bờ Hồ Xuân Hương."
+          maxLength: 500
+          nullable: true
+          type: string
+          x-order: 3
+          x-go-name: Description
+          x-oapi-codegen-extra-tags:
+            binding: "omitempty,max=500"
+        photos:
+          description: List of photos for this day. A nil photos field means photos
+            remain unchanged.
+          items:
+            $ref: "#/components/schemas/UpdateTravelMemoryPhotoInput"
+          type: array
+          x-order: 4
+          x-go-name: Photos
+          x-oapi-codegen-extra-tags:
+            binding: "omitempty,dive"
+      required:
+      - date
+      type: object
+    UpdateTravelMemoryPhotoInput:
+      example:
+        id: 1
+        imagePath: travel_memories/6ba7b810-9dad-11d1-80b4-00c04fd430c8.png
+      properties:
+        id:
+          description: Existing photo ID. Omit or set to null to create a new photo.
+          example: 1
+          format: int64
+          nullable: true
+          type: integer
+          x-order: 1
+          x-go-name: Id
+        imagePath:
+          description: Image path returned by POST /uploads
+          example: travel_memories/6ba7b810-9dad-11d1-80b4-00c04fd430c8.png
+          maxLength: 255
+          type: string
+          x-order: 2
           x-go-name: ImagePath
           x-oapi-codegen-extra-tags:
             binding: "required,max=255"

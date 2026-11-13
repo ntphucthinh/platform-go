@@ -22,4 +22,61 @@ get:
         application/json:
           schema:
             $ref: "../../components/schemas/travel_memories/:travelMemoryID.yml#/FetchTravelMemoryByIDResponse"
-
+put:
+  operationId: updateTravelMemory
+  parameters:
+    - name: travelMemoryID
+      in: path
+      required: true
+      schema:
+        type: integer
+        format: int64
+        minimum: 1
+      example: 1
+  tags:
+    - travelMemories
+  summary: Update a travel memory
+  description: |
+    Replace a travel memory together with its days and photos (full-state sync).
+    - Day / photo with `id` → updated.
+    - Day / photo without `id` → created.
+    - Existing day / photo not present in the request → deleted.
+  security:
+    - AccessCookie: []
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: "../../components/schemas/travel_memories/:travelMemoryID.yml#/UpdateTravelMemoryRequest"
+  responses:
+    "200":
+      description: Travel memory updated successfully
+      content:
+        application/json:
+          schema:
+            $ref: "../../components/schemas/common/message.yml#/MessageOnlyResponse"
+delete:
+  operationId: deleteTravelMemory
+  parameters:
+    - name: travelMemoryID
+      in: path
+      required: true
+      schema:
+        type: integer
+        format: int64
+        minimum: 1
+      example: 1
+  tags:
+    - travelMemories
+  summary: Delete a travel memory
+  description: Delete a travel memory together with all its associated days and photos.
+  security:
+    - AccessCookie: []
+  responses:
+    "200":
+      description: Travel memory deleted successfully
+      content:
+        application/json:
+          schema:
+            $ref: "../../components/schemas/common/message.yml#/MessageOnlyResponse"

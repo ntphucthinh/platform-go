@@ -18,23 +18,31 @@ type TravelMemoryController interface {
 	FetchTravelMemories(c *gin.Context, params api.FetchTravelMemoriesParams)
 	CreateTravelMemory(c *gin.Context)
 	FetchTravelMemoryByID(c *gin.Context, travelMemoryID int64)
+	UpdateTravelMemory(c *gin.Context, travelMemoryID int64)
+	DeleteTravelMemory(c *gin.Context, travelMemoryID int64)
 }
 
 type travelMemoryController struct {
 	fetchTravelMemoriesUseCase   *travelmemoryusecase.FetchTravelMemoriesUseCase
 	createTravelMemoryUseCase    *travelmemoryusecase.CreateTravelMemoryUseCase
 	fetchTravelMemoryByIDUseCase *travelmemoryusecase.FetchTravelMemoryByIDUseCase
+	updateTravelMemoryUseCase    *travelmemoryusecase.UpdateTravelMemoryUseCase
+	deleteTravelMemoryUseCase    *travelmemoryusecase.DeleteTravelMemoryUseCase
 }
 
 func NewTravelMemoryController(
 	fetchTravelMemoriesUseCase *travelmemoryusecase.FetchTravelMemoriesUseCase,
 	createTravelMemoryUseCase *travelmemoryusecase.CreateTravelMemoryUseCase,
 	fetchTravelMemoryByIDUseCase *travelmemoryusecase.FetchTravelMemoryByIDUseCase,
+	updateTravelMemoryUseCase *travelmemoryusecase.UpdateTravelMemoryUseCase,
+	deleteTravelMemoryUseCase *travelmemoryusecase.DeleteTravelMemoryUseCase,
 ) TravelMemoryController {
 	return &travelMemoryController{
 		fetchTravelMemoriesUseCase:   fetchTravelMemoriesUseCase,
 		createTravelMemoryUseCase:    createTravelMemoryUseCase,
 		fetchTravelMemoryByIDUseCase: fetchTravelMemoryByIDUseCase,
+		updateTravelMemoryUseCase:    updateTravelMemoryUseCase,
+		deleteTravelMemoryUseCase:    deleteTravelMemoryUseCase,
 	}
 }
 
@@ -71,7 +79,6 @@ func (con *travelMemoryController) CreateTravelMemory(c *gin.Context) {
 			errors.Is(err, travelmemoryday.ErrDuplicateDayDate) ||
 			errors.Is(err, travelmemory.ErrInvalidImagePath) ||
 			errors.Is(err, travelmemoryphoto.ErrInvalidImagePath) ||
-			errors.Is(err, travelmemoryphoto.ErrDuplicateImagePath) ||
 			errors.Is(err, travelmemoryphoto.ErrInvalidSortOrder) {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
@@ -93,6 +100,62 @@ func (con *travelMemoryController) FetchTravelMemoryByID(c *gin.Context, travelM
 			return
 		}
 		common.IsErrorWithMessage(c, err, "Failed to fetch travel memory detail")
+		return
+	}
+
+	c.JSON(http.StatusOK, res)
+}
+
+// Update travel memory
+// (PUT /travel-memories/{travelMemoryID})
+func (con *travelMemoryController) UpdateTravelMemory(c *gin.Context, travelMemoryID int64) {
+	var request api.UpdateTravelMemoryRequest
+	if err := common.BindJSON(c, &request); err != nil {
+		return
+	}
+
+	res, err := con.updateTravelMemoryUseCase.Execute(c.Request.Context(), travelMemoryID, request)
+	if err != nil {
+		if errors.Is(err, travelmemoryusecase.ErrTravelMemoryNotFound) {
+			c.JSON(http.StatusNotFound, gin.H{"error": "Travel memory not found"})
+			return
+		}
+		if errors.Is(err, travelmemoryusecase.ErrUpdateTravelMemoryInvalidID) ||
+			errors.Is(err, travelmemoryusecase.ErrUpdateTravelMemoryInvalidDayID) ||
+			errors.Is(err, travelmemoryusecase.ErrUpdateTravelMemoryDuplicateDayID) ||
+			errors.Is(err, travelmemoryusecase.ErrUpdateTravelMemoryInvalidPhotoID) ||
+			errors.Is(err, travelmemoryusecase.ErrUpdateTravelMemoryDuplicatePhotoID) ||
+			errors.Is(err, travelmemory.ErrInvalidDateRange) ||
+			errors.Is(err, travelmemoryday.ErrInvalidDayDate) ||
+			errors.Is(err, travelmemoryday.ErrDuplicateDayDate) ||
+			errors.Is(err, travelmemory.ErrInvalidImagePath) ||
+			errors.Is(err, travelmemoryphoto.ErrInvalidImagePath) ||
+			errors.Is(err, travelmemoryphoto.ErrInvalidSortOrder) {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+		common.IsErrorWithMessage(c, err, "Failed to update travel memory")
+		return
+	}
+
+	c.JSON(http.StatusOK, res)
+}
+
+// Delete travel memory
+// (DELETE /travel-memories/{travelMemoryID})
+func (con *travelMemoryController) DeleteTravelMemory(c *gin.Context, travelMemoryID int64) {
+	if travelMemoryID <= 0 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Travel memory ID must be greater than zero"})
+		return
+	}
+
+	res, err := con.deleteTravelMemoryUseCase.Execute(c.Request.Context(), travelMemoryID)
+	if err != nil {
+		if errors.Is(err, travelmemoryusecase.ErrTravelMemoryNotFound) {
+			c.JSON(http.StatusNotFound, gin.H{"error": "Travel memory not found"})
+			return
+		}
+		common.IsErrorWithMessage(c, err, "Failed to delete travel memory")
 		return
 	}
 

@@ -8,9 +8,8 @@ import (
 )
 
 var (
-	ErrInvalidImagePath   = errors.New("image path must start with travel_memories/")
-	ErrDuplicateImagePath = errors.New("duplicate photo image path")
-	ErrInvalidSortOrder   = errors.New("sort order must be greater than or equal to zero")
+	ErrInvalidImagePath = errors.New("image path must start with travel_memories/")
+	ErrInvalidSortOrder = errors.New("sort order must be greater than or equal to zero")
 )
 
 type TravelMemoryPhoto struct {
@@ -27,20 +26,29 @@ func NewTravelMemoryPhoto(
 	imagePath string,
 	sortOrder int32,
 ) (TravelMemoryPhoto, error) {
+	photo := TravelMemoryPhoto{MemoryDayID: memoryDayID}
+	if err := photo.Update(imagePath, sortOrder); err != nil {
+		return TravelMemoryPhoto{}, err
+	}
+	return photo, nil
+}
+
+func (p *TravelMemoryPhoto) Update(
+	imagePath string,
+	sortOrder int32,
+) error {
 	trimmedPath := strings.TrimSpace(imagePath)
 	if !isValidImagePath(trimmedPath) {
-		return TravelMemoryPhoto{}, ErrInvalidImagePath
+		return ErrInvalidImagePath
 	}
 
 	if sortOrder < 0 {
-		return TravelMemoryPhoto{}, ErrInvalidSortOrder
+		return ErrInvalidSortOrder
 	}
 
-	return TravelMemoryPhoto{
-		MemoryDayID: memoryDayID,
-		ImagePath:   trimmedPath,
-		SortOrder:   sortOrder,
-	}, nil
+	p.ImagePath = trimmedPath
+	p.SortOrder = sortOrder
+	return nil
 }
 
 func isValidImagePath(value string) bool {

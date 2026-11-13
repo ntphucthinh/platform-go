@@ -318,47 +318,6 @@ func TestTravelMemoryController_CreateTravelMemory(t *testing.T) {
 		assert.Contains(t, w.Body.String(), travelmemoryphoto.ErrInvalidImagePath.Error())
 	})
 
-	t.Run("Error_DuplicatePhotoImagePath", func(t *testing.T) {
-		shared.SetupTestEnvironment(t)
-		admin := shared.CreateLoginUser()
-
-		loc := factory.NewTravelLocationFactory().
-			WithLocationName("Đà Lạt").
-			WithCountryCode("VN").
-			WithCountryName("Vietnam").
-			MustInsert(shared.TestDB)
-
-		startDate := openapi_types.Date{Time: time.Date(2024, 11, 10, 0, 0, 0, 0, time.UTC)}
-		endDate := openapi_types.Date{Time: time.Date(2024, 11, 12, 0, 0, 0, 0, time.UTC)}
-
-		payload := api.CreateTravelMemoryRequest{
-			LocationId: loc.ID,
-			Title:      "Chuyến đi Đà Lạt",
-			StartDate:  startDate,
-			EndDate:    endDate,
-			Days: &[]api.CreateTravelMemoryDayInput{
-				{
-					Date: startDate,
-					Photos: &[]api.TravelMemoryPhotoInput{
-						{
-							ImagePath: "travel_memories/6ba7b810-9dad-11d1-80b4-00c04fd430c8.png",
-						},
-						{
-							ImagePath: "travel_memories/6ba7b810-9dad-11d1-80b4-00c04fd430c8.png",
-						},
-					},
-				},
-			},
-		}
-
-		req := shared.NewRequest(t, admin, http.MethodPost, "/travel-memories", payload)
-		w := httptest.NewRecorder()
-		shared.TestRouter.ServeHTTP(w, req)
-
-		assert.Equal(t, http.StatusBadRequest, w.Code, w.Body.String())
-		assert.Contains(t, w.Body.String(), travelmemoryphoto.ErrDuplicateImagePath.Error())
-	})
-
 	t.Run("Error_InvalidBody", func(t *testing.T) {
 		shared.SetupTestEnvironment(t)
 		admin := shared.CreateLoginUser()

@@ -64,9 +64,15 @@ type ServerInterface interface {
 	// Create a new travel memory
 	// (POST /travel-memories)
 	CreateTravelMemory(c *gin.Context)
+	// Delete a travel memory
+	// (DELETE /travel-memories/{travelMemoryID})
+	DeleteTravelMemory(c *gin.Context, travelMemoryID int64)
 	// Get travel memory detail
 	// (GET /travel-memories/{travelMemoryID})
 	FetchTravelMemoryByID(c *gin.Context, travelMemoryID int64)
+	// Update a travel memory
+	// (PUT /travel-memories/{travelMemoryID})
+	UpdateTravelMemory(c *gin.Context, travelMemoryID int64)
 	// Delete unused uploaded files
 	// (DELETE /uploads)
 	DeleteUploads(c *gin.Context)
@@ -518,6 +524,32 @@ func (siw *ServerInterfaceWrapper) CreateTravelMemory(c *gin.Context) {
 	siw.Handler.CreateTravelMemory(c)
 }
 
+// DeleteTravelMemory operation middleware
+func (siw *ServerInterfaceWrapper) DeleteTravelMemory(c *gin.Context) {
+
+	var err error
+
+	// ------------- Path parameter "travelMemoryID" -------------
+	var travelMemoryID int64
+
+	err = runtime.BindStyledParameterWithOptions("simple", "travelMemoryID", c.Param("travelMemoryID"), &travelMemoryID, runtime.BindStyledParameterOptions{Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter travelMemoryID: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	c.Set(AccessCookieScopes, []string{})
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.DeleteTravelMemory(c, travelMemoryID)
+}
+
 // FetchTravelMemoryByID operation middleware
 func (siw *ServerInterfaceWrapper) FetchTravelMemoryByID(c *gin.Context) {
 
@@ -542,6 +574,32 @@ func (siw *ServerInterfaceWrapper) FetchTravelMemoryByID(c *gin.Context) {
 	}
 
 	siw.Handler.FetchTravelMemoryByID(c, travelMemoryID)
+}
+
+// UpdateTravelMemory operation middleware
+func (siw *ServerInterfaceWrapper) UpdateTravelMemory(c *gin.Context) {
+
+	var err error
+
+	// ------------- Path parameter "travelMemoryID" -------------
+	var travelMemoryID int64
+
+	err = runtime.BindStyledParameterWithOptions("simple", "travelMemoryID", c.Param("travelMemoryID"), &travelMemoryID, runtime.BindStyledParameterOptions{Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter travelMemoryID: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	c.Set(AccessCookieScopes, []string{})
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.UpdateTravelMemory(c, travelMemoryID)
 }
 
 // DeleteUploads operation middleware
@@ -644,7 +702,9 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.PUT(options.BaseURL+"/travel-locations/:travelLocationID", wrapper.UpdateTravelLocation)
 	router.GET(options.BaseURL+"/travel-memories", wrapper.FetchTravelMemories)
 	router.POST(options.BaseURL+"/travel-memories", wrapper.CreateTravelMemory)
+	router.DELETE(options.BaseURL+"/travel-memories/:travelMemoryID", wrapper.DeleteTravelMemory)
 	router.GET(options.BaseURL+"/travel-memories/:travelMemoryID", wrapper.FetchTravelMemoryByID)
+	router.PUT(options.BaseURL+"/travel-memories/:travelMemoryID", wrapper.UpdateTravelMemory)
 	router.DELETE(options.BaseURL+"/uploads", wrapper.DeleteUploads)
 	router.POST(options.BaseURL+"/uploads", wrapper.UploadFiles)
 	router.GET(options.BaseURL+"/users", wrapper.GetUsers)

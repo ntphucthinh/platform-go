@@ -484,6 +484,54 @@ type UpdateTravelLocationRequest struct {
 	GoogleMapsUrl *string `binding:"omitempty,max=255" json:"googleMapsUrl"`
 }
 
+// UpdateTravelMemoryDayInput defines model for UpdateTravelMemoryDayInput.
+type UpdateTravelMemoryDayInput struct {
+	// Id Existing day ID. Omit or set to null to create a new day.
+	Id *int64 `json:"id"`
+
+	// Date Day date (YYYY-MM-DD)
+	Date openapi_types.Date `binding:"required" json:"date"`
+
+	// Description Daily notes or description
+	Description *string `binding:"omitempty,max=500" json:"description"`
+
+	// Photos List of photos for this day. A nil photos field means photos remain unchanged.
+	Photos *[]UpdateTravelMemoryPhotoInput `binding:"omitempty,dive" json:"photos,omitempty"`
+}
+
+// UpdateTravelMemoryPhotoInput defines model for UpdateTravelMemoryPhotoInput.
+type UpdateTravelMemoryPhotoInput struct {
+	// Id Existing photo ID. Omit or set to null to create a new photo.
+	Id *int64 `json:"id"`
+
+	// ImagePath Image path returned by POST /uploads
+	ImagePath string `binding:"required,max=255" json:"imagePath"`
+}
+
+// UpdateTravelMemoryRequest defines model for UpdateTravelMemoryRequest.
+type UpdateTravelMemoryRequest struct {
+	// LocationId Travel location ID
+	LocationId int64 `binding:"required,validateTravelLocationID" json:"locationId"`
+
+	// Title Travel memory title
+	Title string `binding:"required,min=1,max=255" json:"title"`
+
+	// StartDate Trip start date (YYYY-MM-DD)
+	StartDate openapi_types.Date `binding:"required" json:"startDate"`
+
+	// EndDate Trip end date (YYYY-MM-DD)
+	EndDate openapi_types.Date `binding:"required" json:"endDate"`
+
+	// Description General trip description
+	Description *string `binding:"omitempty" json:"description"`
+
+	// CoverImagePath Cover image path returned by POST /uploads
+	CoverImagePath *string `binding:"omitempty,max=255" json:"coverImagePath"`
+
+	// Days List of daily memory entries. A nil days field means days remain unchanged.
+	Days *[]UpdateTravelMemoryDayInput `binding:"omitempty,dive" json:"days,omitempty"`
+}
+
 // UploadItem defines model for UploadItem.
 type UploadItem struct {
 	FileName        string            `json:"fileName"`
@@ -625,6 +673,9 @@ type UpdateTravelLocationJSONRequestBody = UpdateTravelLocationRequest
 
 // CreateTravelMemoryJSONRequestBody defines body for CreateTravelMemory for application/json ContentType.
 type CreateTravelMemoryJSONRequestBody = CreateTravelMemoryRequest
+
+// UpdateTravelMemoryJSONRequestBody defines body for UpdateTravelMemory for application/json ContentType.
+type UpdateTravelMemoryJSONRequestBody = UpdateTravelMemoryRequest
 
 // DeleteUploadsJSONRequestBody defines body for DeleteUploads for application/json ContentType.
 type DeleteUploadsJSONRequestBody = DeleteUploadsRequest

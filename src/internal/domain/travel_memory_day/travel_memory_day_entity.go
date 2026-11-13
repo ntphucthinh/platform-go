@@ -25,20 +25,29 @@ func NewTravelMemoryDay(
 	date, memoryStartDate, memoryEndDate time.Time,
 	description *string,
 ) (TravelMemoryDay, error) {
+	day := TravelMemoryDay{MemoryID: memoryID}
+	if err := day.Update(date, memoryStartDate, memoryEndDate, description); err != nil {
+		return TravelMemoryDay{}, err
+	}
+	return day, nil
+}
+
+func (d *TravelMemoryDay) Update(
+	date, memoryStartDate, memoryEndDate time.Time,
+	description *string,
+) error {
 	normDate := normalizeDate(date)
 	normStart := normalizeDate(memoryStartDate)
 	normEnd := normalizeDate(memoryEndDate)
 
 	if normDate.IsZero() || normStart.IsZero() || normEnd.IsZero() ||
 		normDate.Before(normStart) || normDate.After(normEnd) {
-		return TravelMemoryDay{}, ErrInvalidDayDate
+		return ErrInvalidDayDate
 	}
 
-	return TravelMemoryDay{
-		MemoryID:    memoryID,
-		Date:        normDate,
-		Description: trimOptionalString(description),
-	}, nil
+	d.Date = normDate
+	d.Description = trimOptionalString(description)
+	return nil
 }
 
 func normalizeDate(t time.Time) time.Time {

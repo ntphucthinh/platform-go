@@ -29,8 +29,8 @@ func (TravelMemory) TableName() string {
 // TravelMemoryDay represents the travel_memory_days table
 type TravelMemoryDay struct {
 	ID          int64               `gorm:"primaryKey;autoIncrement"`
-	MemoryID    int64               `gorm:"column:memory_id;not null;index"`
-	Date        time.Time           `gorm:"column:date;type:date;not null"`
+	MemoryID    int64               `gorm:"column:memory_id;not null;index;uniqueIndex:uq_travel_memory_days_date"`
+	Date        time.Time           `gorm:"column:date;type:date;not null;uniqueIndex:uq_travel_memory_days_date"`
 	Description *string             `gorm:"column:description;size:500"`
 	CreatedAt   time.Time           `gorm:"type:timestamp;default:CURRENT_TIMESTAMP"`
 	UpdatedAt   time.Time           `gorm:"type:timestamp;default:CURRENT_TIMESTAMP;autoUpdateTime"`
@@ -54,4 +54,3 @@ type TravelMemoryPhoto struct {
 func (TravelMemoryPhoto) TableName() string {
 	return "travel_memory_photos"
 }
-
