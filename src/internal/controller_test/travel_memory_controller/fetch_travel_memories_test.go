@@ -224,6 +224,101 @@ func TestTravelMemoryController_FetchTravelMemories(t *testing.T) {
 		assert.Equal(t, mem.ID, body.Data[0].Id)
 	})
 
+	t.Run("Normal_FilterByYear_CrossingTwoYears", func(t *testing.T) {
+		shared.SetupTestEnvironment(t)
+		admin := shared.CreateLoginUser()
+
+		loc := factory.NewTravelLocationFactory().
+			WithLocationName("Đà Lạt").
+			WithCountryCode("VN").
+			MustInsert(shared.TestDB)
+
+		// 1. Chuyến đi hoàn toàn trong năm 2024
+		mem2024 := factory.NewTravelMemoryFactory().
+			WithLocationID(loc.ID).
+			WithTitle("Chuyến đi hè 2024").
+			WithDates(time.Date(2024, 5, 10, 0, 0, 0, 0, time.UTC), time.Date(2024, 5, 15, 0, 0, 0, 0, time.UTC)).
+			MustInsert(shared.TestDB)
+
+		// 2. Chuyến đi đón giao thừa giao thoa giữa năm 2024 và 2025
+		memCrossing := factory.NewTravelMemoryFactory().
+			WithLocationID(loc.ID).
+			WithTitle("Chuyến đi đón Giao thừa Countdown 2024-2025").
+			WithDates(time.Date(2024, 12, 28, 0, 0, 0, 0, time.UTC), time.Date(2025, 1, 3, 0, 0, 0, 0, time.UTC)).
+			MustInsert(shared.TestDB)
+
+		// 3. Chuyến đi hoàn toàn trong năm 2025
+		mem2025 := factory.NewTravelMemoryFactory().
+			WithLocationID(loc.ID).
+			WithTitle("Chuyến đi hè 2025").
+			WithDates(time.Date(2025, 6, 1, 0, 0, 0, 0, time.UTC), time.Date(2025, 6, 5, 0, 0, 0, 0, time.UTC)).
+			MustInsert(shared.TestDB)
+
+		// Query year=2024: Phải bao gồm chuyến hè 2024 và chuyến giao thoa Countdown
+		{
+			req := shared.NewRequest(t, admin, http.MethodGet, "/travel-memories?page=1&year=2024", nil)
+			w := httptest.NewRecorder()
+			shared.TestRouter.ServeHTTP(w, req)
+			require.Equal(t, http.StatusOK, w.Code, w.Body.String())
+
+			var body api.FetchTravelMemoriesResponse
+			require.NoError(t, json.Unmarshal(w.Body.Bytes(), &body))
+			require.Len(t, body.Data, 2)
+			assert.Equal(t, memCrossing.ID, body.Data[0].Id)
+			assert.Equal(t, mem2024.ID, body.Data[1].Id)
+		}
+
+		// Query year=2025: Phải bao gồm chuyến hè 2025 và chuyến giao thoa Countdown
+		{
+			req := shared.NewRequest(t, admin, http.MethodGet, "/travel-memories?page=1&year=2025", nil)
+			w := httptest.NewRecorder()
+			shared.TestRouter.ServeHTTP(w, req)
+			require.Equal(t, http.StatusOK, w.Code, w.Body.String())
+
+			var body api.FetchTravelMemoriesResponse
+			require.NoError(t, json.Unmarshal(w.Body.Bytes(), &body))
+			require.Len(t, body.Data, 2)
+			assert.Equal(t, mem2025.ID, body.Data[0].Id)
+			assert.Equal(t, memCrossing.ID, body.Data[1].Id)
+		}
+
+		// Query year=2023: Không có chuyến đi nào
+		{
+			req := shared.NewRequest(t, admin, http.MethodGet, "/travel-memories?page=1&year=2023", nil)
+			w := httptest.NewRecorder()
+			shared.TestRouter.ServeHTTP(w, req)
+			require.Equal(t, http.StatusOK, w.Code, w.Body.String())
+
+			var body api.FetchTravelMemoriesResponse
+			require.NoError(t, json.Unmarshal(w.Body.Bytes(), &body))
+			assert.Empty(t, body.Data)
+		}
+
+		// Query year=2026: Không có chuyến đi nào
+		{
+			req := shared.NewRequest(t, admin, http.MethodGet, "/travel-memories?page=1&year=2026", nil)
+			w := httptest.NewRecorder()
+			shared.TestRouter.ServeHTTP(w, req)
+			require.Equal(t, http.StatusOK, w.Code, w.Body.String())
+
+			var body api.FetchTravelMemoriesResponse
+			require.NoError(t, json.Unmarshal(w.Body.Bytes(), &body))
+			assert.Empty(t, body.Data)
+		}
+	})
+
+	t.Run("Error_InvalidYear", func(t *testing.T) {
+		shared.SetupTestEnvironment(t)
+		admin := shared.CreateLoginUser()
+
+		req := shared.NewRequest(t, admin, http.MethodGet, "/travel-memories?page=1&year=999", nil)
+		w := httptest.NewRecorder()
+		shared.TestRouter.ServeHTTP(w, req)
+
+		assert.Equal(t, http.StatusBadRequest, w.Code)
+		assert.Contains(t, w.Body.String(), "invalid year parameter")
+	})
+
 	t.Run("Error_MissingRequiredParams", func(t *testing.T) {
 		shared.SetupTestEnvironment(t)
 		admin := shared.CreateLoginUser()

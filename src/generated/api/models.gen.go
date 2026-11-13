@@ -651,6 +651,9 @@ type FetchTravelMemoriesParams struct {
 
 	// LocationId Filter memories by travel location ID
 	LocationId *int64 `form:"locationId,omitempty" json:"locationId,omitempty"`
+
+	// Year Filter memories by year (including trips crossing between years)
+	Year *int `form:"year,omitempty" json:"year,omitempty"`
 }
 
 // LoginJSONRequestBody defines body for Login for application/json ContentType.

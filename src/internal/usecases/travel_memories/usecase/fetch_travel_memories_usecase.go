@@ -22,8 +22,8 @@ func NewFetchTravelMemoriesUseCase(queryService travelmemoryqueryservice.TravelM
 	}
 }
 
-func (uc *FetchTravelMemoriesUseCase) Execute(ctx context.Context, page int, countryCode *string, locationID *int64) (*api.FetchTravelMemoriesResponse, error) {
-	paginated, err := uc.queryService.FetchTravelMemories(ctx, page, defaultTravelMemoriesPerPage, countryCode, locationID)
+func (uc *FetchTravelMemoriesUseCase) Execute(ctx context.Context, page int, countryCode *string, locationID *int64, year *int) (*api.FetchTravelMemoriesResponse, error) {
+	paginated, err := uc.queryService.FetchTravelMemories(ctx, page, defaultTravelMemoriesPerPage, countryCode, locationID, year)
 	if err != nil {
 		return nil, err
 	}

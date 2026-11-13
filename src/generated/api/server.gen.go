@@ -491,6 +491,14 @@ func (siw *ServerInterfaceWrapper) FetchTravelMemories(c *gin.Context) {
 		return
 	}
 
+	// ------------- Optional query parameter "year" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "year", c.Request.URL.Query(), &params.Year)
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter year: %w", err), http.StatusBadRequest)
+		return
+	}
+
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
 		if c.IsAborted() {

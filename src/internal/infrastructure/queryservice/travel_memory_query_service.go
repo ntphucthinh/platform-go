@@ -3,6 +3,7 @@ package queryservice
 import (
 	"context"
 	"errors"
+	"fmt"
 	"strings"
 
 	"gorm.io/gorm"
@@ -37,7 +38,7 @@ const travelMemorySelectColumns = `
 
 const travelMemoryLocationJoin = "LEFT JOIN travel_locations ON travel_locations.id = travel_memories.location_id"
 
-func (qs *TravelMemoryQueryService) FetchTravelMemories(ctx context.Context, page, perPage int, countryCode *string, locationID *int64) (*dbutil.Paginator[qsdto.TravelMemoryDto], error) {
+func (qs *TravelMemoryQueryService) FetchTravelMemories(ctx context.Context, page, perPage int, countryCode *string, locationID *int64, year *int) (*dbutil.Paginator[qsdto.TravelMemoryDto], error) {
 	query := qs.db.WithContext(ctx).
 		Model(&dbmodel.TravelMemory{}).
 		Select(travelMemorySelectColumns).
@@ -49,6 +50,12 @@ func (qs *TravelMemoryQueryService) FetchTravelMemories(ctx context.Context, pag
 
 	if locationID != nil {
 		query = query.Where("travel_memories.location_id = ?", *locationID)
+	}
+
+	if year != nil {
+		startOfYear := fmt.Sprintf("%04d-01-01", *year)
+		endOfYear := fmt.Sprintf("%04d-12-31", *year)
+		query = query.Where("travel_memories.start_date <= ? AND travel_memories.end_date >= ?", endOfYear, startOfYear)
 	}
 
 	query = query.Order("travel_memories.start_date DESC, travel_memories.id DESC")

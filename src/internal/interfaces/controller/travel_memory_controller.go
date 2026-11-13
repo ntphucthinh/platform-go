@@ -49,13 +49,18 @@ func NewTravelMemoryController(
 // Get travel memory list
 // (GET /travel-memories)
 func (con *travelMemoryController) FetchTravelMemories(c *gin.Context, params api.FetchTravelMemoriesParams) {
+	if params.Year != nil && (*params.Year < 1000 || *params.Year > 9999) {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid year parameter"})
+		return
+	}
+
 	if params.CountryCode == nil {
 		if cc := c.Query("country_code"); cc != "" {
 			params.CountryCode = &cc
 		}
 	}
 
-	res, err := con.fetchTravelMemoriesUseCase.Execute(c.Request.Context(), params.Page, params.CountryCode, params.LocationId)
+	res, err := con.fetchTravelMemoriesUseCase.Execute(c.Request.Context(), params.Page, params.CountryCode, params.LocationId, params.Year)
 	if err != nil {
 		common.IsErrorWithMessage(c, err, "Failed to fetch travel memories")
 		return
