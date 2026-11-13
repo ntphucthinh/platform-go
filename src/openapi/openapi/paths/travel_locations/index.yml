@@ -15,12 +15,6 @@ get:
         binding: "omitempty,oneof=visited wishlist"
       schema:
         $ref: "../../components/schemas/enum/travel_location_status.yml#/TravelLocationStatus"
-    - name: locationName
-      in: query
-      required: false
-      description: Filter by location name
-      schema:
-        type: string
     - name: countryCode
       in: query
       required: false

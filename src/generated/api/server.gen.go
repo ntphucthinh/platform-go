@@ -339,14 +339,6 @@ func (siw *ServerInterfaceWrapper) FetchTravelLocations(c *gin.Context) {
 		return
 	}
 
-	// ------------- Optional query parameter "locationName" -------------
-
-	err = runtime.BindQueryParameter("form", true, false, "locationName", c.Request.URL.Query(), &params.LocationName)
-	if err != nil {
-		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter locationName: %w", err), http.StatusBadRequest)
-		return
-	}
-
 	// ------------- Optional query parameter "countryCode" -------------
 
 	err = runtime.BindQueryParameter("form", true, false, "countryCode", c.Request.URL.Query(), &params.CountryCode)

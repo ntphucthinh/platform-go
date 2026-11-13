@@ -637,9 +637,6 @@ type FetchTravelLocationsParams struct {
 	// Status Filter by travel location status (visited or wishlist)
 	Status *TravelLocationStatus `binding:"omitempty,oneof=visited wishlist" form:"status,omitempty" json:"status,omitempty"`
 
-	// LocationName Filter by location name
-	LocationName *string `form:"locationName,omitempty" json:"locationName,omitempty"`
-
 	// CountryCode Filter by ISO 3166-1 alpha-2 country code
 	CountryCode *string `form:"countryCode,omitempty" json:"countryCode,omitempty"`
 }

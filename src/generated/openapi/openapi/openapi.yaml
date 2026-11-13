@@ -285,12 +285,6 @@ paths:
           $ref: "#/components/schemas/TravelLocationStatus"
         x-oapi-codegen-extra-tags:
           binding: "omitempty,oneof=visited wishlist"
-      - description: Filter by location name
-        in: query
-        name: locationName
-        required: false
-        schema:
-          type: string
       - description: Filter by ISO 3166-1 alpha-2 country code
         in: query
         name: countryCode

@@ -57,11 +57,6 @@ func (con *travelLocationController) FetchTravelLocations(c *gin.Context, params
 			params.CountryCode = &cc
 		}
 	}
-	if params.LocationName == nil {
-		if ln := c.Query("name"); ln != "" {
-			params.LocationName = &ln
-		}
-	}
 
 	res, err := con.fetchTravelLocationsUsecase.Execute(c.Request.Context(), params)
 	if err != nil {

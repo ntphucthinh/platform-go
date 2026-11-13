@@ -24,9 +24,8 @@ func (uc *FetchTravelLocationsUsecase) Execute(ctx context.Context, params api.F
 	}
 
 	filter := qsdto.TravelLocationFilter{
-		Status:       status,
-		LocationName: params.LocationName,
-		CountryCode:  params.CountryCode,
+		Status:      status,
+		CountryCode: params.CountryCode,
 	}
 
 	locations, total, err := uc.queryService.FetchTravelLocations(ctx, filter)

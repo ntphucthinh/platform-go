@@ -17,8 +17,6 @@ type TravelLocationDto struct {
 }
 
 type TravelLocationFilter struct {
-	Status       *string
-	LocationName *string
-	CountryCode  *string
+	Status      *string
+	CountryCode *string
 }
-

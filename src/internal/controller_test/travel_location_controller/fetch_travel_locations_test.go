@@ -39,7 +39,7 @@ func TestTravelLocationController_FetchTravelLocations(t *testing.T) {
 			WithGoogleMapsURL(mapsURL).
 			MustInsert(shared.TestDB)
 
-		req := shared.NewRequest(t, admin, http.MethodGet, "/travel-locations?status=visited&locationName=Đà+Lạt&countryCode=VN", nil)
+		req := shared.NewRequest(t, admin, http.MethodGet, "/travel-locations?status=visited&countryCode=VN", nil)
 		w := httptest.NewRecorder()
 		shared.TestRouter.ServeHTTP(w, req)
 
@@ -68,6 +68,67 @@ func TestTravelLocationController_FetchTravelLocations(t *testing.T) {
 		} {
 			assert.Contains(t, rawJSON, camelField)
 		}
+	})
+
+	t.Run("Normal_FilterByCountryCodeAndStatusOnly", func(t *testing.T) {
+		shared.SetupTestEnvironment(t)
+		admin := shared.CreateLoginUser()
+
+		factory.NewTravelLocationFactory().
+			WithCountryCode("VN").
+			WithLocationName("Hà Nội").
+			WithVisited().
+			MustInsert(shared.TestDB)
+
+		factory.NewTravelLocationFactory().
+			WithCountryCode("VN").
+			WithLocationName("Đà Nẵng").
+			WithWishlist().
+			MustInsert(shared.TestDB)
+
+		factory.NewTravelLocationFactory().
+			WithCountryCode("JP").
+			WithLocationName("Tokyo").
+			WithVisited().
+			MustInsert(shared.TestDB)
+
+		// Filter by status=visited: should return VN (Hà Nội) and JP (Tokyo)
+		reqVisited := shared.NewRequest(t, admin, http.MethodGet, "/travel-locations?status=visited", nil)
+		wVisited := httptest.NewRecorder()
+		shared.TestRouter.ServeHTTP(wVisited, reqVisited)
+		require.Equal(t, http.StatusOK, wVisited.Code)
+		var bodyVisited api.FetchTravelLocationsResponse
+		require.NoError(t, json.Unmarshal(wVisited.Body.Bytes(), &bodyVisited))
+		assert.Equal(t, int64(2), bodyVisited.Total)
+
+		// Filter by countryCode=VN: should return Hà Nội and Đà Nẵng
+		reqVN := shared.NewRequest(t, admin, http.MethodGet, "/travel-locations?countryCode=VN", nil)
+		wVN := httptest.NewRecorder()
+		shared.TestRouter.ServeHTTP(wVN, reqVN)
+		require.Equal(t, http.StatusOK, wVN.Code)
+		var bodyVN api.FetchTravelLocationsResponse
+		require.NoError(t, json.Unmarshal(wVN.Body.Bytes(), &bodyVN))
+		assert.Equal(t, int64(2), bodyVN.Total)
+
+		// Filter by both countryCode=VN and status=wishlist: should return only Đà Nẵng
+		reqVNWishlist := shared.NewRequest(t, admin, http.MethodGet, "/travel-locations?countryCode=VN&status=wishlist", nil)
+		wVNWishlist := httptest.NewRecorder()
+		shared.TestRouter.ServeHTTP(wVNWishlist, reqVNWishlist)
+		require.Equal(t, http.StatusOK, wVNWishlist.Code)
+		var bodyVNWishlist api.FetchTravelLocationsResponse
+		require.NoError(t, json.Unmarshal(wVNWishlist.Body.Bytes(), &bodyVNWishlist))
+		require.Len(t, bodyVNWishlist.Data, 1)
+		assert.Equal(t, "Đà Nẵng", bodyVNWishlist.Data[0].LocationName)
+
+		// Passing locationName query parameter should not filter by location name anymore
+		reqWithIgnoredParam := shared.NewRequest(t, admin, http.MethodGet, "/travel-locations?countryCode=VN&status=visited&locationName=NonExistent", nil)
+		wWithIgnoredParam := httptest.NewRecorder()
+		shared.TestRouter.ServeHTTP(wWithIgnoredParam, reqWithIgnoredParam)
+		require.Equal(t, http.StatusOK, wWithIgnoredParam.Code)
+		var bodyIgnored api.FetchTravelLocationsResponse
+		require.NoError(t, json.Unmarshal(wWithIgnoredParam.Body.Bytes(), &bodyIgnored))
+		require.Len(t, bodyIgnored.Data, 1)
+		assert.Equal(t, "Hà Nội", bodyIgnored.Data[0].LocationName)
 	})
 
 	t.Run("Normal_CountryCodeQuerySnakeCase", func(t *testing.T) {
