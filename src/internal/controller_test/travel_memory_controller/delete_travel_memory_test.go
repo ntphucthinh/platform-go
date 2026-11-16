@@ -128,4 +128,3 @@ func TestTravelMemoryController_DeleteTravelMemory(t *testing.T) {
 		assert.Equal(t, http.StatusUnauthorized, w.Code, w.Body.String())
 	})
 }
-

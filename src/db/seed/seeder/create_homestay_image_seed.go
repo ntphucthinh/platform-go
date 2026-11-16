@@ -47,4 +47,3 @@ func CreateHomestayImages(db repository.DBInterface, rooms []dbmodel.HomestayRoo
 
 	return models
 }
-

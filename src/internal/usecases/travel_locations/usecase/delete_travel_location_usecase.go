@@ -49,4 +49,3 @@ func (uc *DeleteTravelLocationUsecase) Execute(ctx context.Context, travelLocati
 		Message: DeleteTravelLocationUseCaseSuccessMessage,
 	}, nil
 }
-

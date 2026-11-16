@@ -34,4 +34,3 @@ func NewHomestayRoom(
 		SortOrder:   sortOrder,
 	}
 }
-

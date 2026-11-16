@@ -13,4 +13,3 @@ type TravelLocationRepository interface {
 	// DeleteTravelLocationByID soft-deletes a travel location record by its ID.
 	DeleteTravelLocationByID(ctx context.Context, id int64) error
 }
-

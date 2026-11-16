@@ -201,4 +201,3 @@ func (f *TravelLocationFactory) MustInsert(db *gorm.DB) *dbmodel.TravelLocation 
 	}
 	return loc
 }
-

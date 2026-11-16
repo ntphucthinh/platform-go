@@ -13,4 +13,3 @@ type HomestayRoomRepository interface {
 	// DeleteRoomsByIDs deletes multiple homestay room records matching the given room IDs.
 	DeleteRoomsByIDs(ctx context.Context, ids []int64) error
 }
-

@@ -158,4 +158,3 @@ func CreateHomestayRooms(db repository.DBInterface, homestays []dbmodel.Homestay
 
 	return models
 }
-

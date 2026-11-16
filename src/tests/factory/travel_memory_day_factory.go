@@ -64,4 +64,3 @@ func (f *TravelMemoryDayFactory) MustInsert(db *gorm.DB) *dbmodel.TravelMemoryDa
 	}
 	return day
 }
-

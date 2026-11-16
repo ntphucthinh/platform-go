@@ -80,4 +80,3 @@ func (r *homestayRoomRepository) DeleteRoomsByIDs(ctx context.Context, ids []int
 		Where("id IN ?", ids).
 		Delete(&dbmodel.HomestayRoom{}).Error
 }
-

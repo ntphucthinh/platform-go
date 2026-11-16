@@ -81,5 +81,4 @@ func TestHomestayController_FetchHomestays(t *testing.T) {
 		}
 	})
 
-
 }

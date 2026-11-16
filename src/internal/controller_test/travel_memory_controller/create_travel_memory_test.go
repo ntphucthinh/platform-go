@@ -349,4 +349,3 @@ func TestTravelMemoryController_CreateTravelMemory(t *testing.T) {
 		assert.Equal(t, http.StatusUnauthorized, w.Code)
 	})
 }
-

@@ -32,4 +32,3 @@ type TravelMemoryPhotoDto struct {
 	ImagePath   string `gorm:"column:image_path"`
 	SortOrder   int32  `gorm:"column:sort_order"`
 }
-

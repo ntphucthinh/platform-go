@@ -15,4 +15,3 @@ type HomestayImageRepository interface {
 	// DeleteImagesByIDs deletes multiple homestay image records matching the given image IDs.
 	DeleteImagesByIDs(ctx context.Context, ids []int64) error
 }
-

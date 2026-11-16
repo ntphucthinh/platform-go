@@ -36,4 +36,3 @@ func (uc *FetchSelectionTravelLocationsUseCase) Execute(ctx context.Context, cou
 		Data: data,
 	}, nil
 }
-

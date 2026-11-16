@@ -92,4 +92,3 @@ func NewUnAuthRequest(t *testing.T, method, path string, body any) *http.Request
 	t.Helper()
 	return NewRequest(t, nil, method, path, body)
 }
-

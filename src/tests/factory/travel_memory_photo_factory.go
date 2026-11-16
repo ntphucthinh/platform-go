@@ -61,4 +61,3 @@ func (f *TravelMemoryPhotoFactory) MustInsert(db *gorm.DB) *dbmodel.TravelMemory
 	}
 	return photo
 }
-

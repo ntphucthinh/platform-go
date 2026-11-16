@@ -27,4 +27,3 @@ func NewHomestayImage(roomID int64, imagePath *string, sortOrder int32, isCover 
 		IsCover:   isCover,
 	}
 }
-

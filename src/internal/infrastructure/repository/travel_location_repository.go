@@ -90,4 +90,3 @@ func (r *travelLocationRepository) DeleteTravelLocationByID(ctx context.Context,
 		Where("id = ?", id).
 		Delete(&dbmodel.TravelLocation{}).Error
 }
-

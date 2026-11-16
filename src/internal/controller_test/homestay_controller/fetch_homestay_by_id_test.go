@@ -104,5 +104,4 @@ func TestHomestayController_FetchHomestayByID(t *testing.T) {
 		assert.Equal(t, http.StatusBadRequest, w.Code)
 	})
 
-
 }

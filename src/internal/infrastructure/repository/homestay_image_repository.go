@@ -95,4 +95,3 @@ func (r *homestayImageRepository) DeleteImagesByIDs(ctx context.Context, ids []i
 		Where("id IN ?", ids).
 		Delete(&dbmodel.HomestayImage{}).Error
 }
-
