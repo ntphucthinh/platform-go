@@ -17,14 +17,11 @@ type daySeedDefinition struct {
 
 // CreateTravelMemoryDays creates initial travel memory day seed data based on the provided travel memories.
 func CreateTravelMemoryDays(db repository.DBInterface, memories []dbmodel.TravelMemory) []dbmodel.TravelMemoryDay {
-	// Check if travel memory day data already exists
-	var existingDay dbmodel.TravelMemoryDay
-	result := db.GetDB().First(&existingDay)
-	if result.Error == nil {
-		fmt.Println("Travel memory day data already exists. Skipping travel memory day seed.")
-		var days []dbmodel.TravelMemoryDay
-		db.GetDB().Find(&days)
-		return days
+	var existingDays []dbmodel.TravelMemoryDay
+	db.GetDB().Find(&existingDays)
+	memoriesWithDays := make(map[int64]bool)
+	for _, d := range existingDays {
+		memoriesWithDays[d.MemoryID] = true
 	}
 
 	dayTemplates := map[string][]daySeedDefinition{
@@ -92,6 +89,10 @@ func CreateTravelMemoryDays(db repository.DBInterface, memories []dbmodel.Travel
 
 	var models []dbmodel.TravelMemoryDay
 	for _, memory := range memories {
+		if memoriesWithDays[memory.ID] {
+			continue
+		}
+
 		definitions, exists := dayTemplates[memory.Title]
 		if !exists {
 			// Default days based on StartDate and EndDate
@@ -124,5 +125,7 @@ func CreateTravelMemoryDays(db repository.DBInterface, memories []dbmodel.Travel
 		fmt.Printf("Seeded %d travel memory days successfully.\n", len(models))
 	}
 
-	return models
+	var allDays []dbmodel.TravelMemoryDay
+	db.GetDB().Find(&allDays)
+	return allDays
 }

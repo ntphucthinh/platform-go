@@ -12,14 +12,20 @@ import (
 
 // CreateTravelMemoryPhotos creates initial travel memory photo seed data based on the provided travel memory days.
 func CreateTravelMemoryPhotos(db repository.DBInterface, days []dbmodel.TravelMemoryDay) []dbmodel.TravelMemoryPhoto {
-	// Check if travel memory photo data already exists
-	var existingPhoto dbmodel.TravelMemoryPhoto
-	result := db.GetDB().First(&existingPhoto)
-	if result.Error == nil {
-		fmt.Println("Travel memory photo data already exists. Skipping travel memory photo seed.")
-		var photos []dbmodel.TravelMemoryPhoto
-		db.GetDB().Find(&photos)
-		return photos
+	// Only seed photos for featured memories that have non-empty coverImagePath.
+	// Memories without coverImagePath do not have photos as requested ("không cần image").
+	var memoriesWithCover []dbmodel.TravelMemory
+	db.GetDB().Where("cover_image_path != ''").Find(&memoriesWithCover)
+	memoriesWithCoverMap := make(map[int64]bool)
+	for _, m := range memoriesWithCover {
+		memoriesWithCoverMap[m.ID] = true
+	}
+
+	var existingPhotos []dbmodel.TravelMemoryPhoto
+	db.GetDB().Find(&existingPhotos)
+	daysWithPhotos := make(map[int64]bool)
+	for _, p := range existingPhotos {
+		daysWithPhotos[p.MemoryDayID] = true
 	}
 
 	photoPool := []string{
@@ -35,6 +41,10 @@ func CreateTravelMemoryPhotos(db repository.DBInterface, days []dbmodel.TravelMe
 
 	var models []dbmodel.TravelMemoryPhoto
 	for idx, day := range days {
+		if !memoriesWithCoverMap[day.MemoryID] || daysWithPhotos[day.ID] {
+			continue
+		}
+
 		// Provide 2 photos per day
 		img1 := photoPool[(idx*2)%len(photoPool)]
 		img2 := photoPool[(idx*2+1)%len(photoPool)]
@@ -59,5 +69,7 @@ func CreateTravelMemoryPhotos(db repository.DBInterface, days []dbmodel.TravelMe
 		fmt.Printf("Seeded %d travel memory photos successfully.\n", len(models))
 	}
 
-	return models
+	var allPhotos []dbmodel.TravelMemoryPhoto
+	db.GetDB().Find(&allPhotos)
+	return allPhotos
 }
