@@ -196,6 +196,12 @@ func (con *ServerController) FetchSelectionTravelLocations(c *gin.Context, param
 	con.selectionController.FetchSelectionTravelLocations(c, params)
 }
 
+// FetchSelectionTravelThemes retrieves a lightweight list of travel themes for dropdown selection.
+// (GET /selections/travel-themes)
+func (con *ServerController) FetchSelectionTravelThemes(c *gin.Context) {
+	con.selectionController.FetchSelectionTravelThemes(c)
+}
+
 // -----------------------------------------------------------------------------
 // Users APIs (UserController)
 // -----------------------------------------------------------------------------

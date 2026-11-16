@@ -56,6 +56,8 @@ paths:
   # Selection
   /selections/travel-locations:
     $ref: "./paths/selections/travel_locations.yml"
+  /selections/travel-themes:
+    $ref: "./paths/selections/travel_themes.yml"
 
   # Upload file
   /uploads:
@@ -112,6 +114,8 @@ components:
       $ref: "./components/schemas/travel_memories/index.yml#/CreateTravelMemoryRequest"
     SelectionTravelLocationResponse:
       $ref: "./components/schemas/selections/travel_locations.yml#/SelectionTravelLocationResponse"
+    SelectionTravelThemeResponse:
+      $ref: "./components/schemas/selections/travel_themes.yml#/SelectionTravelThemeResponse"
     MessageOnlyResponse:
       $ref: "./components/schemas/common/message.yml#/MessageOnlyResponse"
     ValidationErrorResponse:

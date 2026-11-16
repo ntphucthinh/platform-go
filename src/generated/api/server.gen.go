@@ -43,6 +43,9 @@ type ServerInterface interface {
 	// Get travel locations for selection
 	// (GET /selections/travel-locations)
 	FetchSelectionTravelLocations(c *gin.Context, params FetchSelectionTravelLocationsParams)
+	// Get travel themes for selection
+	// (GET /selections/travel-themes)
+	FetchSelectionTravelThemes(c *gin.Context)
 	// Get travel location list
 	// (GET /travel-locations)
 	FetchTravelLocations(c *gin.Context, params FetchTravelLocationsParams)
@@ -319,6 +322,21 @@ func (siw *ServerInterfaceWrapper) FetchSelectionTravelLocations(c *gin.Context)
 	}
 
 	siw.Handler.FetchSelectionTravelLocations(c, params)
+}
+
+// FetchSelectionTravelThemes operation middleware
+func (siw *ServerInterfaceWrapper) FetchSelectionTravelThemes(c *gin.Context) {
+
+	c.Set(AccessCookieScopes, []string{})
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.FetchSelectionTravelThemes(c)
 }
 
 // FetchTravelLocations operation middleware
@@ -695,6 +713,7 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.GET(options.BaseURL+"/homestays/:homestayID", wrapper.FetchHomestayByID)
 	router.PUT(options.BaseURL+"/homestays/:homestayID", wrapper.UpdateHomestay)
 	router.GET(options.BaseURL+"/selections/travel-locations", wrapper.FetchSelectionTravelLocations)
+	router.GET(options.BaseURL+"/selections/travel-themes", wrapper.FetchSelectionTravelThemes)
 	router.GET(options.BaseURL+"/travel-locations", wrapper.FetchTravelLocations)
 	router.POST(options.BaseURL+"/travel-locations", wrapper.CreateTravelLocation)
 	router.DELETE(options.BaseURL+"/travel-locations/:travelLocationID", wrapper.DeleteTravelLocation)

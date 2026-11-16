@@ -67,6 +67,7 @@ func main() {
 
 	//Travel map
 	locations := seeder.CreateTravelLocations(schemaDB)
+	seeder.CreateTravelThemes(schemaDB)
 
 	//Travel memories
 	memories := seeder.CreateTravelMemories(schemaDB, locations)

@@ -5,3 +5,8 @@ type SelectionTravelLocationDto struct {
 	Name        string `gorm:"column:name"`
 	CountryCode string `gorm:"column:country_code"`
 }
+
+type SelectionTravelThemeDto struct {
+	ID   int64  `gorm:"column:id"`
+	Name string `gorm:"column:name"`
+}

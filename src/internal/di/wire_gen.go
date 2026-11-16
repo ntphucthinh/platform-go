@@ -64,7 +64,8 @@ func InitializeApplication(db *gorm.DB, jwtService *security.JWTService, secureC
 	uploadController := controller.NewUploadController(useCase)
 	selectionQueryService := queryservice.NewSelectionQueryService(db)
 	fetchSelectionTravelLocationsUseCase := usecase4.NewFetchSelectionTravelLocationsUseCase(selectionQueryService)
-	selectionController := controller.NewSelectionController(fetchSelectionTravelLocationsUseCase)
+	fetchSelectionTravelThemesUseCase := usecase4.NewFetchSelectionTravelThemesUseCase(selectionQueryService)
+	selectionController := controller.NewSelectionController(fetchSelectionTravelLocationsUseCase, fetchSelectionTravelThemesUseCase)
 	serverController := controller.NewServerController(userController, authController, homestayController, travelLocationController, travelMemoryController, uploadController, selectionController)
 	application := &Application{
 		Controller:  serverController,

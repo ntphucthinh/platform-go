@@ -21,4 +21,3 @@ func Environment() string {
 	}
 	return env
 }
-

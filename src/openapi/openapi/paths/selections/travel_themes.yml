@@ -1,0 +1,15 @@
+get:
+  operationId: fetchSelectionTravelThemes
+  tags:
+    - selection
+  summary: Get travel themes for selection
+  description: Retrieve a lightweight list of travel themes (id and name) for dropdown selection.
+  security:
+    - AccessCookie: []
+  responses:
+    "200":
+      description: Travel theme selections retrieved successfully
+      content:
+        application/json:
+          schema:
+            $ref: "../../components/schemas/selections/travel_themes.yml#/SelectionTravelThemeResponse"

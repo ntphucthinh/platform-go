@@ -15,12 +15,12 @@ import (
 	"platform-go/internal/usecases"
 	homestayqueryservice "platform-go/internal/usecases/homestays/queryservice"
 	homestayusecase "platform-go/internal/usecases/homestays/usecase"
+	selectionqueryservice "platform-go/internal/usecases/selections/queryservice"
+	selectionusecase "platform-go/internal/usecases/selections/usecase"
 	travellocationqueryservice "platform-go/internal/usecases/travel_locations/queryservice"
 	travellocationusecase "platform-go/internal/usecases/travel_locations/usecase"
 	travelmemoryqueryservice "platform-go/internal/usecases/travel_memories/queryservice"
 	travelmemoryusecase "platform-go/internal/usecases/travel_memories/usecase"
-	selectionqueryservice "platform-go/internal/usecases/selections/queryservice"
-	selectionusecase "platform-go/internal/usecases/selections/usecase"
 )
 
 type TestHandlerSet struct {
@@ -69,6 +69,7 @@ func TestInitializeControllers(t *testing.T, db *gorm.DB) (*TestHandlerSet, erro
 		travelmemoryusecase.NewUpdateTravelMemoryUseCase,
 		travelmemoryusecase.NewDeleteTravelMemoryUseCase,
 		selectionusecase.NewFetchSelectionTravelLocationsUseCase,
+		selectionusecase.NewFetchSelectionTravelThemesUseCase,
 		controller.NewUserController,
 		controller.NewHomestayController,
 		controller.NewTravelLocationController,

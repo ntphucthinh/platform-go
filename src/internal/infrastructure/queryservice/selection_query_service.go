@@ -35,3 +35,16 @@ func (qs *SelectionQueryService) FetchTravelLocations(ctx context.Context, count
 	return results, nil
 }
 
+func (qs *SelectionQueryService) FetchTravelThemes(ctx context.Context) ([]qsdto.SelectionTravelThemeDto, error) {
+	var results []qsdto.SelectionTravelThemeDto
+	err := qs.db.WithContext(ctx).
+		Model(&dbmodel.TravelTheme{}).
+		Select("id, name").
+		Order("id ASC").
+		Find(&results).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return results, nil
+}

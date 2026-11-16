@@ -1,0 +1,22 @@
+SelectionTravelThemeResponse:
+  type: object
+  properties:
+    data:
+      type: array
+      items:
+        type: object
+        properties:
+          id:
+            type: integer
+            format: int64
+            description: "Travel theme ID"
+            example: 1
+          name:
+            type: string
+            description: "Travel theme name"
+            example: "Thiên nhiên"
+        required:
+          - id
+          - name
+  required:
+    - data

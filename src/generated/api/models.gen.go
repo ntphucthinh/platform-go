@@ -383,6 +383,20 @@ type SelectionTravelLocationResponseDataInner struct {
 	Name string `json:"name"`
 }
 
+// SelectionTravelThemeResponse defines model for SelectionTravelThemeResponse.
+type SelectionTravelThemeResponse struct {
+	Data []SelectionTravelThemeResponseDataInner `json:"data"`
+}
+
+// SelectionTravelThemeResponseDataInner defines model for SelectionTravelThemeResponse_data_inner.
+type SelectionTravelThemeResponseDataInner struct {
+	// Id Travel theme ID
+	Id int64 `json:"id"`
+
+	// Name Travel theme name
+	Name string `json:"name"`
+}
+
 // TravelLocationStatus The status of a travel location.
 // - "visited": The user has visited the location.
 // - "wishlist": The user wants to visit the location.

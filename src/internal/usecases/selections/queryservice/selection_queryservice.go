@@ -8,5 +8,5 @@ import (
 
 type SelectionQueryService interface {
 	FetchTravelLocations(ctx context.Context, countryCode *string) ([]qsdto.SelectionTravelLocationDto, error)
+	FetchTravelThemes(ctx context.Context) ([]qsdto.SelectionTravelThemeDto, error)
 }
-
