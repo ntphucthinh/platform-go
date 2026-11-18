@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS itineraries (
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     deleted_at TIMESTAMP NULL DEFAULT NULL,
 
-    KEY idx_itineraries_location_id (location_id, deleted_at),
+    KEY idx_itineraries_location_deleted_id (location_id, deleted_at, id),
 
     CONSTRAINT fk_itineraries_location FOREIGN KEY (location_id) REFERENCES travel_locations(id) ON DELETE SET NULL
 ) ENGINE=InnoDB

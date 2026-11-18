@@ -13,7 +13,7 @@ CREATE TABLE IF NOT EXISTS itinerary_activities (
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
-    KEY idx_itinerary_activities_day_id (itinerary_day_id),
+    KEY idx_itinerary_activities_day_time (itinerary_day_id, start_time, id),
 
     CONSTRAINT fk_itinerary_activities_day FOREIGN KEY (itinerary_day_id) REFERENCES itinerary_days(id) ON DELETE CASCADE
 ) ENGINE=InnoDB
