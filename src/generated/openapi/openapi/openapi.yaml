@@ -610,6 +610,32 @@ paths:
       summary: Get itinerary list
       tags:
       - itineraries
+  /itineraries/{itineraryID}:
+    get:
+      description: "Retrieve a single itinerary with its themes, featured images,\
+        \ days, and activities."
+      operationId: fetchItineraryByID
+      parameters:
+      - example: 1
+        in: path
+        name: itineraryID
+        required: true
+        schema:
+          format: int64
+          minimum: 1
+          type: integer
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FetchItineraryByIDResponse"
+          description: Itinerary retrieved successfully
+      security:
+      - AccessCookie: []
+      summary: Get itinerary detail
+      tags:
+      - itineraries
   /selections/travel-locations:
     get:
       description: "Retrieve a lightweight list of travel locations (id and name)\
@@ -1716,6 +1742,33 @@ components:
       - startDate
       - title
       type: object
+    ItineraryActivityCategory:
+      description: |-
+        Loại hoạt động trong lịch trình:
+        - dining: Ăn uống
+        - sightseeing: Tham quan
+        - nature: Thiên nhiên
+        - cafe: Cà phê
+        - shopping: Mua sắm
+        - relax: Nghỉ ngơi
+        - other: Khác
+      enum:
+      - dining
+      - sightseeing
+      - nature
+      - cafe
+      - shopping
+      - relax
+      - other
+      type: string
+      x-enum-varnames:
+      - ItineraryActivityCategoryDining
+      - ItineraryActivityCategorySightseeing
+      - ItineraryActivityCategoryNature
+      - ItineraryActivityCategoryCafe
+      - ItineraryActivityCategoryShopping
+      - ItineraryActivityCategoryRelax
+      - ItineraryActivityCategoryOther
     FetchItinerariesResponse:
       example:
         data:
@@ -1758,6 +1811,101 @@ components:
       required:
       - data
       - paginatorInfo
+      type: object
+    FetchItineraryByIDResponse:
+      example:
+        data:
+          id: 1
+          itineraryName: Khám phá Đà Lạt
+          locationId: 1
+          locationName: Lâm Đồng
+          durationDays: 2
+          durationNights: 1
+          duration: 2 ngày 1 đêm
+          suitableFor: "Cặp đôi, nhóm bạn, gia đình"
+          activityCount: 11
+          themes:
+          - id: 1
+            name: Thiên nhiên
+          - id: 1
+            name: Thiên nhiên
+          description: Một hành trình nhẹ nhàng để cảm nhận trọn vẹn vẻ đẹp của Đà
+            Lạt.
+          coverImagePath: itineraries/dalat-cover.jpg
+          travelTips:
+          - "Thời tiết Đà Lạt se lạnh vào sáng sớm và ban đêm, nên chuẩn bị áo ấm."
+          - Thuê xe máy sẽ giúp chủ động di chuyển.
+          featuredImages:
+          - id: 1
+            imagePath: itineraries/featured/dalat-1.jpg
+          - id: 1
+            imagePath: itineraries/featured/dalat-1.jpg
+          days:
+          - id: 1
+            dayNumber: 1
+            title: Ngày 1 – Khám phá trung tâm Đà Lạt
+            subtitle: Làm quen với thành phố ngàn hoa.
+            summary: Cảm nhận không khí mát lành của trung tâm thành phố.
+            imagePath: itineraries/days/dalat-day-1.jpg
+            dayTips:
+            - "Trời se lạnh (15–22°C), nên mang theo áo khoác nhẹ."
+            - Nên mang giày thể thao đế bám tốt.
+            activities:
+            - id: 1
+              startTime: 07:30
+              title: Ăn sáng tại chợ Đà Lạt
+              activityCategory: dining
+              durationMinutes: 60
+              location: Chợ Đà Lạt
+              googleMapsUrl: "https://www.google.com/maps?q=11.9427,108.4373"
+              description: Thưởng thức bánh căn và sữa đậu nành nóng.
+              notes: Nên đi sớm trước 8h00 để không phải chờ bàn.
+              imagePath: itineraries/activities/dalat-banh-can.jpg
+            - id: 1
+              startTime: 07:30
+              title: Ăn sáng tại chợ Đà Lạt
+              activityCategory: dining
+              durationMinutes: 60
+              location: Chợ Đà Lạt
+              googleMapsUrl: "https://www.google.com/maps?q=11.9427,108.4373"
+              description: Thưởng thức bánh căn và sữa đậu nành nóng.
+              notes: Nên đi sớm trước 8h00 để không phải chờ bàn.
+              imagePath: itineraries/activities/dalat-banh-can.jpg
+          - id: 1
+            dayNumber: 1
+            title: Ngày 1 – Khám phá trung tâm Đà Lạt
+            subtitle: Làm quen với thành phố ngàn hoa.
+            summary: Cảm nhận không khí mát lành của trung tâm thành phố.
+            imagePath: itineraries/days/dalat-day-1.jpg
+            dayTips:
+            - "Trời se lạnh (15–22°C), nên mang theo áo khoác nhẹ."
+            - Nên mang giày thể thao đế bám tốt.
+            activities:
+            - id: 1
+              startTime: 07:30
+              title: Ăn sáng tại chợ Đà Lạt
+              activityCategory: dining
+              durationMinutes: 60
+              location: Chợ Đà Lạt
+              googleMapsUrl: "https://www.google.com/maps?q=11.9427,108.4373"
+              description: Thưởng thức bánh căn và sữa đậu nành nóng.
+              notes: Nên đi sớm trước 8h00 để không phải chờ bàn.
+              imagePath: itineraries/activities/dalat-banh-can.jpg
+            - id: 1
+              startTime: 07:30
+              title: Ăn sáng tại chợ Đà Lạt
+              activityCategory: dining
+              durationMinutes: 60
+              location: Chợ Đà Lạt
+              googleMapsUrl: "https://www.google.com/maps?q=11.9427,108.4373"
+              description: Thưởng thức bánh căn và sữa đậu nành nóng.
+              notes: Nên đi sớm trước 8h00 để không phải chờ bàn.
+              imagePath: itineraries/activities/dalat-banh-can.jpg
+      properties:
+        data:
+          $ref: "#/components/schemas/FetchItineraryByIDResponse_data"
+      required:
+      - data
       type: object
     SelectionTravelLocationResponse:
       example:
@@ -3061,6 +3209,327 @@ components:
       - durationNights
       - id
       - itineraryName
+      type: object
+    FetchItineraryByIDResponse_data_themes_inner:
+      example:
+        id: 1
+        name: Thiên nhiên
+      properties:
+        id:
+          example: 1
+          format: int64
+          type: integer
+        name:
+          example: Thiên nhiên
+          type: string
+      required:
+      - id
+      - name
+      type: object
+    FetchItineraryByIDResponse_data_featuredImages_inner:
+      example:
+        id: 1
+        imagePath: itineraries/featured/dalat-1.jpg
+      properties:
+        id:
+          example: 1
+          format: int64
+          type: integer
+        imagePath:
+          example: itineraries/featured/dalat-1.jpg
+          type: string
+      required:
+      - id
+      - imagePath
+      type: object
+    FetchItineraryByIDResponse_data_days_inner_activities_inner:
+      example:
+        id: 1
+        startTime: 07:30
+        title: Ăn sáng tại chợ Đà Lạt
+        activityCategory: dining
+        durationMinutes: 60
+        location: Chợ Đà Lạt
+        googleMapsUrl: "https://www.google.com/maps?q=11.9427,108.4373"
+        description: Thưởng thức bánh căn và sữa đậu nành nóng.
+        notes: Nên đi sớm trước 8h00 để không phải chờ bàn.
+        imagePath: itineraries/activities/dalat-banh-can.jpg
+      properties:
+        id:
+          example: 1
+          format: int64
+          type: integer
+        startTime:
+          example: 07:30
+          type: string
+        title:
+          example: Ăn sáng tại chợ Đà Lạt
+          type: string
+        activityCategory:
+          allOf:
+          - $ref: "#/components/schemas/ItineraryActivityCategory"
+          example: dining
+          nullable: true
+        durationMinutes:
+          example: 60
+          nullable: true
+          type: integer
+        location:
+          example: Chợ Đà Lạt
+          nullable: true
+          type: string
+        googleMapsUrl:
+          example: "https://www.google.com/maps?q=11.9427,108.4373"
+          nullable: true
+          type: string
+        description:
+          example: Thưởng thức bánh căn và sữa đậu nành nóng.
+          nullable: true
+          type: string
+        notes:
+          example: Nên đi sớm trước 8h00 để không phải chờ bàn.
+          nullable: true
+          type: string
+        imagePath:
+          example: itineraries/activities/dalat-banh-can.jpg
+          nullable: true
+          type: string
+      required:
+      - id
+      - startTime
+      - title
+      type: object
+    FetchItineraryByIDResponse_data_days_inner:
+      example:
+        id: 1
+        dayNumber: 1
+        title: Ngày 1 – Khám phá trung tâm Đà Lạt
+        subtitle: Làm quen với thành phố ngàn hoa.
+        summary: Cảm nhận không khí mát lành của trung tâm thành phố.
+        imagePath: itineraries/days/dalat-day-1.jpg
+        dayTips:
+        - "Trời se lạnh (15–22°C), nên mang theo áo khoác nhẹ."
+        - Nên mang giày thể thao đế bám tốt.
+        activities:
+        - id: 1
+          startTime: 07:30
+          title: Ăn sáng tại chợ Đà Lạt
+          activityCategory: dining
+          durationMinutes: 60
+          location: Chợ Đà Lạt
+          googleMapsUrl: "https://www.google.com/maps?q=11.9427,108.4373"
+          description: Thưởng thức bánh căn và sữa đậu nành nóng.
+          notes: Nên đi sớm trước 8h00 để không phải chờ bàn.
+          imagePath: itineraries/activities/dalat-banh-can.jpg
+        - id: 1
+          startTime: 07:30
+          title: Ăn sáng tại chợ Đà Lạt
+          activityCategory: dining
+          durationMinutes: 60
+          location: Chợ Đà Lạt
+          googleMapsUrl: "https://www.google.com/maps?q=11.9427,108.4373"
+          description: Thưởng thức bánh căn và sữa đậu nành nóng.
+          notes: Nên đi sớm trước 8h00 để không phải chờ bàn.
+          imagePath: itineraries/activities/dalat-banh-can.jpg
+      properties:
+        id:
+          example: 1
+          format: int64
+          type: integer
+        dayNumber:
+          example: 1
+          type: integer
+        title:
+          example: Ngày 1 – Khám phá trung tâm Đà Lạt
+          type: string
+        subtitle:
+          example: Làm quen với thành phố ngàn hoa.
+          nullable: true
+          type: string
+        summary:
+          example: Cảm nhận không khí mát lành của trung tâm thành phố.
+          nullable: true
+          type: string
+        imagePath:
+          example: itineraries/days/dalat-day-1.jpg
+          nullable: true
+          type: string
+        dayTips:
+          example:
+          - "Trời se lạnh (15–22°C), nên mang theo áo khoác nhẹ."
+          - Nên mang giày thể thao đế bám tốt.
+          items:
+            type: string
+          type: array
+        activities:
+          items:
+            $ref: "#/components/schemas/FetchItineraryByIDResponse_data_days_inner_activities_inner"
+          type: array
+      required:
+      - activities
+      - dayNumber
+      - dayTips
+      - id
+      - title
+      type: object
+    FetchItineraryByIDResponse_data:
+      example:
+        id: 1
+        itineraryName: Khám phá Đà Lạt
+        locationId: 1
+        locationName: Lâm Đồng
+        durationDays: 2
+        durationNights: 1
+        duration: 2 ngày 1 đêm
+        suitableFor: "Cặp đôi, nhóm bạn, gia đình"
+        activityCount: 11
+        themes:
+        - id: 1
+          name: Thiên nhiên
+        - id: 1
+          name: Thiên nhiên
+        description: Một hành trình nhẹ nhàng để cảm nhận trọn vẹn vẻ đẹp của Đà Lạt.
+        coverImagePath: itineraries/dalat-cover.jpg
+        travelTips:
+        - "Thời tiết Đà Lạt se lạnh vào sáng sớm và ban đêm, nên chuẩn bị áo ấm."
+        - Thuê xe máy sẽ giúp chủ động di chuyển.
+        featuredImages:
+        - id: 1
+          imagePath: itineraries/featured/dalat-1.jpg
+        - id: 1
+          imagePath: itineraries/featured/dalat-1.jpg
+        days:
+        - id: 1
+          dayNumber: 1
+          title: Ngày 1 – Khám phá trung tâm Đà Lạt
+          subtitle: Làm quen với thành phố ngàn hoa.
+          summary: Cảm nhận không khí mát lành của trung tâm thành phố.
+          imagePath: itineraries/days/dalat-day-1.jpg
+          dayTips:
+          - "Trời se lạnh (15–22°C), nên mang theo áo khoác nhẹ."
+          - Nên mang giày thể thao đế bám tốt.
+          activities:
+          - id: 1
+            startTime: 07:30
+            title: Ăn sáng tại chợ Đà Lạt
+            activityCategory: dining
+            durationMinutes: 60
+            location: Chợ Đà Lạt
+            googleMapsUrl: "https://www.google.com/maps?q=11.9427,108.4373"
+            description: Thưởng thức bánh căn và sữa đậu nành nóng.
+            notes: Nên đi sớm trước 8h00 để không phải chờ bàn.
+            imagePath: itineraries/activities/dalat-banh-can.jpg
+          - id: 1
+            startTime: 07:30
+            title: Ăn sáng tại chợ Đà Lạt
+            activityCategory: dining
+            durationMinutes: 60
+            location: Chợ Đà Lạt
+            googleMapsUrl: "https://www.google.com/maps?q=11.9427,108.4373"
+            description: Thưởng thức bánh căn và sữa đậu nành nóng.
+            notes: Nên đi sớm trước 8h00 để không phải chờ bàn.
+            imagePath: itineraries/activities/dalat-banh-can.jpg
+        - id: 1
+          dayNumber: 1
+          title: Ngày 1 – Khám phá trung tâm Đà Lạt
+          subtitle: Làm quen với thành phố ngàn hoa.
+          summary: Cảm nhận không khí mát lành của trung tâm thành phố.
+          imagePath: itineraries/days/dalat-day-1.jpg
+          dayTips:
+          - "Trời se lạnh (15–22°C), nên mang theo áo khoác nhẹ."
+          - Nên mang giày thể thao đế bám tốt.
+          activities:
+          - id: 1
+            startTime: 07:30
+            title: Ăn sáng tại chợ Đà Lạt
+            activityCategory: dining
+            durationMinutes: 60
+            location: Chợ Đà Lạt
+            googleMapsUrl: "https://www.google.com/maps?q=11.9427,108.4373"
+            description: Thưởng thức bánh căn và sữa đậu nành nóng.
+            notes: Nên đi sớm trước 8h00 để không phải chờ bàn.
+            imagePath: itineraries/activities/dalat-banh-can.jpg
+          - id: 1
+            startTime: 07:30
+            title: Ăn sáng tại chợ Đà Lạt
+            activityCategory: dining
+            durationMinutes: 60
+            location: Chợ Đà Lạt
+            googleMapsUrl: "https://www.google.com/maps?q=11.9427,108.4373"
+            description: Thưởng thức bánh căn và sữa đậu nành nóng.
+            notes: Nên đi sớm trước 8h00 để không phải chờ bàn.
+            imagePath: itineraries/activities/dalat-banh-can.jpg
+      properties:
+        id:
+          example: 1
+          format: int64
+          type: integer
+        itineraryName:
+          example: Khám phá Đà Lạt
+          type: string
+        locationId:
+          example: 1
+          format: int64
+          nullable: true
+          type: integer
+        locationName:
+          example: Lâm Đồng
+          nullable: true
+          type: string
+        durationDays:
+          example: 2
+          type: integer
+        durationNights:
+          example: 1
+          type: integer
+        duration:
+          example: 2 ngày 1 đêm
+          type: string
+        suitableFor:
+          example: "Cặp đôi, nhóm bạn, gia đình"
+          nullable: true
+          type: string
+        activityCount:
+          example: 11
+          type: integer
+        themes:
+          items:
+            $ref: "#/components/schemas/FetchItineraryByIDResponse_data_themes_inner"
+          type: array
+        description:
+          example: Một hành trình nhẹ nhàng để cảm nhận trọn vẹn vẻ đẹp của Đà Lạt.
+          nullable: true
+          type: string
+        coverImagePath:
+          example: itineraries/dalat-cover.jpg
+          nullable: true
+          type: string
+        travelTips:
+          example:
+          - "Thời tiết Đà Lạt se lạnh vào sáng sớm và ban đêm, nên chuẩn bị áo ấm."
+          - Thuê xe máy sẽ giúp chủ động di chuyển.
+          items:
+            type: string
+          type: array
+        featuredImages:
+          items:
+            $ref: "#/components/schemas/FetchItineraryByIDResponse_data_featuredImages_inner"
+          type: array
+        days:
+          items:
+            $ref: "#/components/schemas/FetchItineraryByIDResponse_data_days_inner"
+          type: array
+      required:
+      - activityCount
+      - days
+      - duration
+      - durationDays
+      - durationNights
+      - featuredImages
+      - id
+      - itineraryName
+      - themes
+      - travelTips
       type: object
     SelectionTravelLocationResponse_data_inner:
       example:

@@ -1,0 +1,24 @@
+get:
+  operationId: fetchItineraryByID
+  parameters:
+    - name: itineraryID
+      in: path
+      required: true
+      schema:
+        type: integer
+        format: int64
+        minimum: 1
+      example: 1
+  tags:
+    - itineraries
+  summary: Get itinerary detail
+  description: Retrieve a single itinerary with its themes, featured images, days, and activities.
+  security:
+    - AccessCookie: []
+  responses:
+    "200":
+      description: Itinerary retrieved successfully
+      content:
+        application/json:
+          schema:
+            $ref: "../../components/schemas/itineraries/:itineraryID.yml#/FetchItineraryByIDResponse"

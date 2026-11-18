@@ -1,0 +1,187 @@
+# ---------------------------------------------------------------------------
+# Fetch itinerary detail (GET /itineraries/{itineraryID})
+# ---------------------------------------------------------------------------
+FetchItineraryByIDResponse:
+  type: object
+  properties:
+    data:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1
+        itineraryName:
+          type: string
+          example: "Khám phá Đà Lạt"
+        locationId:
+          type: integer
+          format: int64
+          nullable: true
+          example: 1
+        locationName:
+          type: string
+          nullable: true
+          example: "Lâm Đồng"
+        durationDays:
+          type: integer
+          example: 2
+        durationNights:
+          type: integer
+          example: 1
+        duration:
+          type: string
+          example: "2 ngày 1 đêm"
+        suitableFor:
+          type: string
+          nullable: true
+          example: "Cặp đôi, nhóm bạn, gia đình"
+        activityCount:
+          type: integer
+          example: 11
+        themes:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: integer
+                format: int64
+                example: 1
+              name:
+                type: string
+                example: "Thiên nhiên"
+            required:
+              - id
+              - name
+        description:
+          type: string
+          nullable: true
+          example: "Một hành trình nhẹ nhàng để cảm nhận trọn vẹn vẻ đẹp của Đà Lạt."
+        coverImagePath:
+          type: string
+          nullable: true
+          example: "itineraries/dalat-cover.jpg"
+        travelTips:
+          type: array
+          items:
+            type: string
+          example:
+            - "Thời tiết Đà Lạt se lạnh vào sáng sớm và ban đêm, nên chuẩn bị áo ấm."
+            - "Thuê xe máy sẽ giúp chủ động di chuyển."
+        featuredImages:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: integer
+                format: int64
+                example: 1
+              imagePath:
+                type: string
+                example: "itineraries/featured/dalat-1.jpg"
+            required:
+              - id
+              - imagePath
+        days:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: integer
+                format: int64
+                example: 1
+              dayNumber:
+                type: integer
+                example: 1
+              title:
+                type: string
+                example: "Ngày 1 – Khám phá trung tâm Đà Lạt"
+              subtitle:
+                type: string
+                nullable: true
+                example: "Làm quen với thành phố ngàn hoa."
+              summary:
+                type: string
+                nullable: true
+                example: "Cảm nhận không khí mát lành của trung tâm thành phố."
+              imagePath:
+                type: string
+                nullable: true
+                example: "itineraries/days/dalat-day-1.jpg"
+              dayTips:
+                type: array
+                items:
+                  type: string
+                example:
+                  - "Trời se lạnh (15–22°C), nên mang theo áo khoác nhẹ."
+                  - "Nên mang giày thể thao đế bám tốt."
+              activities:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      format: int64
+                      example: 1
+                    startTime:
+                      type: string
+                      example: "07:30"
+                    title:
+                      type: string
+                      example: "Ăn sáng tại chợ Đà Lạt"
+                    activityCategory:
+                      allOf:
+                        - $ref: "../enum/itinerary_activity_category.yml#/ItineraryActivityCategory"
+                      nullable: true
+                      example: "dining"
+                    durationMinutes:
+                      type: integer
+                      nullable: true
+                      example: 60
+                    location:
+                      type: string
+                      nullable: true
+                      example: "Chợ Đà Lạt"
+                    googleMapsUrl:
+                      type: string
+                      nullable: true
+                      example: "https://www.google.com/maps?q=11.9427,108.4373"
+                    description:
+                      type: string
+                      nullable: true
+                      example: "Thưởng thức bánh căn và sữa đậu nành nóng."
+                    notes:
+                      type: string
+                      nullable: true
+                      example: "Nên đi sớm trước 8h00 để không phải chờ bàn."
+                    imagePath:
+                      type: string
+                      nullable: true
+                      example: "itineraries/activities/dalat-banh-can.jpg"
+                  required:
+                    - id
+                    - startTime
+                    - title
+            required:
+              - id
+              - dayNumber
+              - title
+              - dayTips
+              - activities
+      required:
+        - id
+        - itineraryName
+        - durationDays
+        - durationNights
+        - duration
+        - activityCount
+        - themes
+        - travelTips
+        - featuredImages
+        - days
+  required:
+    - data

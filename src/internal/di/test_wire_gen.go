@@ -62,7 +62,8 @@ func TestInitializeControllers(t *testing.T, db *gorm.DB) (*TestHandlerSet, erro
 	selectionController := controller.NewSelectionController(fetchSelectionTravelLocationsUseCase, fetchSelectionTravelThemesUseCase)
 	itineraryQueryService := queryservice.NewItineraryQueryService(db)
 	fetchItinerariesUseCase := usecase5.NewFetchItinerariesUseCase(itineraryQueryService)
-	itineraryController := controller.NewItineraryController(fetchItinerariesUseCase)
+	fetchItineraryByIDUseCase := usecase5.NewFetchItineraryByIDUseCase(itineraryQueryService)
+	itineraryController := controller.NewItineraryController(fetchItinerariesUseCase, fetchItineraryByIDUseCase)
 	testHandlerSet := &TestHandlerSet{
 		Handler:               userController,
 		HomestayHandler:       homestayController,

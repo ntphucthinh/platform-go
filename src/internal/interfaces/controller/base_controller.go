@@ -231,3 +231,9 @@ func (con *ServerController) FetchItineraries(c *gin.Context, params api.FetchIt
 	con.itineraryController.FetchItineraries(c, params)
 }
 
+// FetchItineraryByID retrieves details of a single itinerary by ID.
+// (GET /itineraries/{itineraryID})
+func (con *ServerController) FetchItineraryByID(c *gin.Context, itineraryID int64) {
+	con.itineraryController.FetchItineraryByID(c, itineraryID)
+}
+

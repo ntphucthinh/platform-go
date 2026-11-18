@@ -20,6 +20,17 @@ const (
 	Video DeleteUploadItemResourceType = "video"
 )
 
+// Defines values for ItineraryActivityCategory.
+const (
+	ItineraryActivityCategoryCafe        ItineraryActivityCategory = "cafe"
+	ItineraryActivityCategoryDining      ItineraryActivityCategory = "dining"
+	ItineraryActivityCategoryNature      ItineraryActivityCategory = "nature"
+	ItineraryActivityCategoryOther       ItineraryActivityCategory = "other"
+	ItineraryActivityCategoryRelax       ItineraryActivityCategory = "relax"
+	ItineraryActivityCategoryShopping    ItineraryActivityCategory = "shopping"
+	ItineraryActivityCategorySightseeing ItineraryActivityCategory = "sightseeing"
+)
+
 // Defines values for PriceUnit.
 const (
 	PriceUnitNightPerHouse PriceUnit = "night_per_house"
@@ -253,6 +264,68 @@ type FetchItinerariesResponseDataInner struct {
 	LocationName   *string `json:"locationName"`
 }
 
+// FetchItineraryByIDResponse defines model for FetchItineraryByIDResponse.
+type FetchItineraryByIDResponse struct {
+	Data FetchItineraryByIDResponseData `json:"data"`
+}
+
+// FetchItineraryByIDResponseData defines model for FetchItineraryByIDResponse_data.
+type FetchItineraryByIDResponseData struct {
+	ActivityCount  int                                                 `json:"activityCount"`
+	CoverImagePath *string                                             `json:"coverImagePath"`
+	Days           []FetchItineraryByIDResponseDataDaysInner           `json:"days"`
+	Description    *string                                             `json:"description"`
+	Duration       string                                              `json:"duration"`
+	DurationDays   int                                                 `json:"durationDays"`
+	DurationNights int                                                 `json:"durationNights"`
+	FeaturedImages []FetchItineraryByIDResponseDataFeaturedImagesInner `json:"featuredImages"`
+	Id             int64                                               `json:"id"`
+	ItineraryName  string                                              `json:"itineraryName"`
+	LocationId     *int64                                              `json:"locationId"`
+	LocationName   *string                                             `json:"locationName"`
+	SuitableFor    *string                                             `json:"suitableFor"`
+	Themes         []FetchItineraryByIDResponseDataThemesInner         `json:"themes"`
+	TravelTips     []string                                            `json:"travelTips"`
+}
+
+// FetchItineraryByIDResponseDataDaysInner defines model for FetchItineraryByIDResponse_data_days_inner.
+type FetchItineraryByIDResponseDataDaysInner struct {
+	Activities []FetchItineraryByIDResponseDataDaysInnerActivitiesInner `json:"activities"`
+	DayNumber  int                                                      `json:"dayNumber"`
+	DayTips    []string                                                 `json:"dayTips"`
+	Id         int64                                                    `json:"id"`
+	ImagePath  *string                                                  `json:"imagePath"`
+	Subtitle   *string                                                  `json:"subtitle"`
+	Summary    *string                                                  `json:"summary"`
+	Title      string                                                   `json:"title"`
+}
+
+// FetchItineraryByIDResponseDataDaysInnerActivitiesInner defines model for FetchItineraryByIDResponse_data_days_inner_activities_inner.
+type FetchItineraryByIDResponseDataDaysInnerActivitiesInner struct {
+	ActivityCategory *ItineraryActivityCategory `json:"activityCategory"`
+	Description      *string                    `json:"description"`
+	DurationMinutes  *int                       `json:"durationMinutes"`
+	GoogleMapsUrl    *string                    `json:"googleMapsUrl"`
+	Id               int64                      `json:"id"`
+	ImagePath        *string                    `json:"imagePath"`
+	Location         *string                    `json:"location"`
+	Notes            *string                    `json:"notes"`
+	StartTime        string                     `json:"startTime"`
+	Title            string                     `json:"title"`
+}
+
+// FetchItineraryByIDResponseDataFeaturedImagesInner defines model for FetchItineraryByIDResponse_data_featuredImages_inner.
+type FetchItineraryByIDResponseDataFeaturedImagesInner struct {
+	Id        int64  `json:"id"`
+	ImagePath string `json:"imagePath"`
+}
+
+// FetchItineraryByIDResponseDataThemesInner defines model for FetchItineraryByIDResponse_data_themes_inner.
+type FetchItineraryByIDResponseDataThemesInner struct {
+	Id   int64  `json:"id"`
+	Name string `json:"name"`
+}
+
 // FetchTravelLocationByIDResponse defines model for FetchTravelLocationByIDResponse.
 type FetchTravelLocationByIDResponse struct {
 	Data FetchTravelLocationsResponseDataInner `json:"data"`
@@ -357,6 +430,16 @@ type HomestayImageInput struct {
 	// IsCover Cover image flag
 	IsCover bool `binding:"required" json:"isCover"`
 }
+
+// ItineraryActivityCategory Loại hoạt động trong lịch trình:
+// - dining: Ăn uống
+// - sightseeing: Tham quan
+// - nature: Thiên nhiên
+// - cafe: Cà phê
+// - shopping: Mua sắm
+// - relax: Nghỉ ngơi
+// - other: Khác
+type ItineraryActivityCategory string
 
 // LoginRequest defines model for LoginRequest.
 type LoginRequest struct {

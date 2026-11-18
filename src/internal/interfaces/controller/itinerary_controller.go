@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -12,15 +13,21 @@ import (
 
 type ItineraryController interface {
 	FetchItineraries(c *gin.Context, params api.FetchItinerariesParams)
+	FetchItineraryByID(c *gin.Context, itineraryID int64)
 }
 
 type itineraryController struct {
-	fetchItinerariesUseCase *itineraryusecase.FetchItinerariesUseCase
+	fetchItinerariesUseCase   *itineraryusecase.FetchItinerariesUseCase
+	fetchItineraryByIDUseCase *itineraryusecase.FetchItineraryByIDUseCase
 }
 
-func NewItineraryController(fetchItinerariesUseCase *itineraryusecase.FetchItinerariesUseCase) ItineraryController {
+func NewItineraryController(
+	fetchItinerariesUseCase *itineraryusecase.FetchItinerariesUseCase,
+	fetchItineraryByIDUseCase *itineraryusecase.FetchItineraryByIDUseCase,
+) ItineraryController {
 	return &itineraryController{
-		fetchItinerariesUseCase: fetchItinerariesUseCase,
+		fetchItinerariesUseCase:   fetchItinerariesUseCase,
+		fetchItineraryByIDUseCase: fetchItineraryByIDUseCase,
 	}
 }
 
@@ -30,6 +37,22 @@ func (con *itineraryController) FetchItineraries(c *gin.Context, params api.Fetc
 	res, err := con.fetchItinerariesUseCase.Execute(c.Request.Context(), params.Page, params.PerPage, params.LocationId)
 	if err != nil {
 		common.IsErrorWithMessage(c, err, "Failed to fetch itineraries")
+		return
+	}
+
+	c.JSON(http.StatusOK, res)
+}
+
+// Get itinerary detail
+// (GET /itineraries/{itineraryID})
+func (con *itineraryController) FetchItineraryByID(c *gin.Context, itineraryID int64) {
+	res, err := con.fetchItineraryByIDUseCase.Execute(c.Request.Context(), itineraryID)
+	if err != nil {
+		if errors.Is(err, itineraryusecase.ErrItineraryNotFound) {
+			c.JSON(http.StatusNotFound, gin.H{"error": "Itinerary not found"})
+			return
+		}
+		common.IsErrorWithMessage(c, err, "Failed to fetch itinerary detail")
 		return
 	}
 

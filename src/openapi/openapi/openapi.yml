@@ -58,6 +58,8 @@ paths:
   # Itineraries
   /itineraries:
     $ref: "./paths/itineraries/index.yml"
+  /itineraries/{itineraryID}:
+    $ref: "./paths/itineraries/:itineraryID.yml"
 
   # Selection
   /selections/travel-locations:
@@ -118,8 +120,12 @@ components:
       $ref: "./components/schemas/travel_memories/:travelMemoryID.yml#/FetchTravelMemoryByIDResponse"
     CreateTravelMemoryRequest:
       $ref: "./components/schemas/travel_memories/index.yml#/CreateTravelMemoryRequest"
+    ItineraryActivityCategory:
+      $ref: "./components/schemas/enum/itinerary_activity_category.yml#/ItineraryActivityCategory"
     FetchItinerariesResponse:
       $ref: "./components/schemas/itineraries/index.yml#/FetchItinerariesResponse"
+    FetchItineraryByIDResponse:
+      $ref: "./components/schemas/itineraries/:itineraryID.yml#/FetchItineraryByIDResponse"
     SelectionTravelLocationResponse:
       $ref: "./components/schemas/selections/travel_locations.yml#/SelectionTravelLocationResponse"
     SelectionTravelThemeResponse:

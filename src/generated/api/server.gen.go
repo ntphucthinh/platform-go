@@ -43,6 +43,9 @@ type ServerInterface interface {
 	// Get itinerary list
 	// (GET /itineraries)
 	FetchItineraries(c *gin.Context, params FetchItinerariesParams)
+	// Get itinerary detail
+	// (GET /itineraries/{itineraryID})
+	FetchItineraryByID(c *gin.Context, itineraryID int64)
 	// Get travel locations for selection
 	// (GET /selections/travel-locations)
 	FetchSelectionTravelLocations(c *gin.Context, params FetchSelectionTravelLocationsParams)
@@ -355,6 +358,32 @@ func (siw *ServerInterfaceWrapper) FetchItineraries(c *gin.Context) {
 	}
 
 	siw.Handler.FetchItineraries(c, params)
+}
+
+// FetchItineraryByID operation middleware
+func (siw *ServerInterfaceWrapper) FetchItineraryByID(c *gin.Context) {
+
+	var err error
+
+	// ------------- Path parameter "itineraryID" -------------
+	var itineraryID int64
+
+	err = runtime.BindStyledParameterWithOptions("simple", "itineraryID", c.Param("itineraryID"), &itineraryID, runtime.BindStyledParameterOptions{Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter itineraryID: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	c.Set(AccessCookieScopes, []string{})
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.FetchItineraryByID(c, itineraryID)
 }
 
 // FetchSelectionTravelLocations operation middleware
@@ -774,6 +803,7 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.GET(options.BaseURL+"/homestays/:homestayID", wrapper.FetchHomestayByID)
 	router.PUT(options.BaseURL+"/homestays/:homestayID", wrapper.UpdateHomestay)
 	router.GET(options.BaseURL+"/itineraries", wrapper.FetchItineraries)
+	router.GET(options.BaseURL+"/itineraries/:itineraryID", wrapper.FetchItineraryByID)
 	router.GET(options.BaseURL+"/selections/travel-locations", wrapper.FetchSelectionTravelLocations)
 	router.GET(options.BaseURL+"/selections/travel-themes", wrapper.FetchSelectionTravelThemes)
 	router.GET(options.BaseURL+"/travel-locations", wrapper.FetchTravelLocations)

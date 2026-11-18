@@ -1,0 +1,27 @@
+ItineraryActivityCategory:
+  type: string
+  enum:
+    - dining
+    - sightseeing
+    - nature
+    - cafe
+    - shopping
+    - relax
+    - other
+  x-enum-varnames:
+    - ItineraryActivityCategoryDining
+    - ItineraryActivityCategorySightseeing
+    - ItineraryActivityCategoryNature
+    - ItineraryActivityCategoryCafe
+    - ItineraryActivityCategoryShopping
+    - ItineraryActivityCategoryRelax
+    - ItineraryActivityCategoryOther
+  description: |-
+    Loại hoạt động trong lịch trình:
+    - dining: Ăn uống
+    - sightseeing: Tham quan
+    - nature: Thiên nhiên
+    - cafe: Cà phê
+    - shopping: Mua sắm
+    - relax: Nghỉ ngơi
+    - other: Khác

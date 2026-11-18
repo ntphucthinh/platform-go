@@ -69,7 +69,8 @@ func InitializeApplication(db *gorm.DB, jwtService *security.JWTService, secureC
 	selectionController := controller.NewSelectionController(fetchSelectionTravelLocationsUseCase, fetchSelectionTravelThemesUseCase)
 	itineraryQueryService := queryservice.NewItineraryQueryService(db)
 	fetchItinerariesUseCase := usecase5.NewFetchItinerariesUseCase(itineraryQueryService)
-	itineraryController := controller.NewItineraryController(fetchItinerariesUseCase)
+	fetchItineraryByIDUseCase := usecase5.NewFetchItineraryByIDUseCase(itineraryQueryService)
+	itineraryController := controller.NewItineraryController(fetchItinerariesUseCase, fetchItineraryByIDUseCase)
 	serverController := controller.NewServerController(userController, authController, homestayController, travelLocationController, travelMemoryController, uploadController, selectionController, itineraryController)
 	application := &Application{
 		Controller:  serverController,

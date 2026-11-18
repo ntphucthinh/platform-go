@@ -79,6 +79,7 @@ func InitializeApplication(db *gorm.DB, jwtService *security.JWTService, secureC
 		selectionusecase.NewFetchSelectionTravelLocationsUseCase,
 		selectionusecase.NewFetchSelectionTravelThemesUseCase,
 		itineraryusecase.NewFetchItinerariesUseCase,
+		itineraryusecase.NewFetchItineraryByIDUseCase,
 		controller.NewUserController,
 		controller.NewAuthController,
 		controller.NewHomestayController,
