@@ -84,9 +84,15 @@ func SetupTestDB(t *testing.T) *gorm.DB {
 		&dbmodel.HomestayRoom{},
 		&dbmodel.HomestayImage{},
 		&dbmodel.TravelLocation{},
+		&dbmodel.TravelTheme{},
 		&dbmodel.TravelMemory{},
 		&dbmodel.TravelMemoryDay{},
 		&dbmodel.TravelMemoryPhoto{},
+		&dbmodel.Itinerary{},
+		&dbmodel.ItineraryTheme{},
+		&dbmodel.ItineraryDay{},
+		&dbmodel.ItineraryActivity{},
+		&dbmodel.ItineraryFeaturedImage{},
 	} {
 		if !migrator.HasTable(model) {
 			_ = db.AutoMigrate(model)

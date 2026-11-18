@@ -67,12 +67,19 @@ func main() {
 
 	//Travel map
 	locations := seeder.CreateTravelLocations(schemaDB)
-	seeder.CreateTravelThemes(schemaDB)
+	themes := seeder.CreateTravelThemes(schemaDB)
 
 	//Travel memories
 	memories := seeder.CreateTravelMemories(schemaDB, locations)
 	days := seeder.CreateTravelMemoryDays(schemaDB, memories)
 	seeder.CreateTravelMemoryPhotos(schemaDB, days)
+
+	//Itineraries
+	itineraries := seeder.CreateItineraries(schemaDB, locations)
+	seeder.CreateItineraryThemes(schemaDB, itineraries, themes)
+	seeder.CreateItineraryFeaturedImages(schemaDB, itineraries)
+	itineraryDays := seeder.CreateItineraryDays(schemaDB, itineraries)
+	seeder.CreateItineraryActivities(schemaDB, itineraryDays)
 
 	fmt.Println("Seeding completed successfully.")
 }

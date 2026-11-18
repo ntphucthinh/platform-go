@@ -1,0 +1,752 @@
+package seeder
+
+import (
+	"fmt"
+
+	"platform-go/internal/infrastructure/dbmodel"
+	"platform-go/internal/infrastructure/repository"
+)
+
+type activityTemplateDef struct {
+	startTime        string
+	title            string
+	activityCategory string
+	durationMinutes  uint16
+	location         string
+	googleMapsURL    string
+	description      string
+	notes            string
+	imagePath        string
+}
+
+// CreateItineraryActivities creates initial activities for each itinerary day.
+func CreateItineraryActivities(db repository.DBInterface, days []dbmodel.ItineraryDay) []dbmodel.ItineraryActivity {
+	var existingActivities []dbmodel.ItineraryActivity
+	db.GetDB().Find(&existingActivities)
+	if len(existingActivities) >= 58 {
+		fmt.Printf("Itinerary activity seed data already contains %d records. Skipping.\n", len(existingActivities))
+		return existingActivities
+	}
+
+	activitiesConfig := map[string][]activityTemplateDef{
+		// Đà Lạt
+		"Ngày 1: Check-in Đà Lạt & Dạo quanh Hồ Xuân Hương": {
+			{
+				startTime:        "08:00:00",
+				title:            "Thưởng thức Bánh căn Lệ nóng hổi",
+				activityCategory: "dining",
+				durationMinutes:  60,
+				location:         "Hẻm 44 Yersin, Phường 10, Đà Lạt",
+				googleMapsURL:    "https://maps.google.com/?q=Banh+Can+Le+Da+Lat",
+				description:      "Món bánh căn trứng cút xíu mại trứ danh với chén nước chấm mỡ hành thơm lừng, rất thích hợp cho buổi sáng se lạnh.",
+				notes:            "Quán thường đông vào khoảng 8h-9h, nên đến sớm để có chỗ ngồi",
+				imagePath:        "itineraries/activities/dalat-banh-can.jpg",
+			},
+			{
+				startTime:        "10:00:00",
+				title:            "Tham quan Ga Đà Lạt cổ kính",
+				activityCategory: "sightseeing",
+				durationMinutes:  90,
+				location:         "1 Quang Trung, Phường 9, Đà Lạt",
+				googleMapsURL:    "https://maps.google.com/?q=Ga+Da+Lat",
+				description:      "Công trình kiến trúc đường sắt răng cưa độc đáo thời Pháp thuộc, điểm check-in hoài niệm không thể bỏ lỡ.",
+				notes:            "Vé vào cổng 50.000 VNĐ/người",
+				imagePath:        "itineraries/activities/dalat-ga.jpg",
+			},
+			{
+				startTime:        "14:30:00",
+				title:            "Chill ngắm cảnh tại Tiệm Cà Phê Túi Mơ To",
+				activityCategory: "cafe",
+				durationMinutes:  120,
+				location:         "Hẻm 31 Sào Nam, Phường 11, Đà Lạt",
+				googleMapsURL:    "https://maps.google.com/?q=Tui+Mo+To+Coffee",
+				description:      "Khu vườn cúc họa mi trắng muốt và nhà lồng kính view nhìn bao quát cả thung lũng Trại Mát.",
+				notes:            "Nên thử món trà đào cam sả và sữa chua dẻo",
+				imagePath:        "itineraries/activities/dalat-tui-mo-to.jpg",
+			},
+			{
+				startTime:        "18:30:00",
+				title:            "Ăn tối Lẩu gà lá é Tao Ngộ",
+				activityCategory: "dining",
+				durationMinutes:  90,
+				location:         "Số 5 đường 3 Tháng 4, Phường 3, Đà Lạt",
+				googleMapsURL:    "https://maps.google.com/?q=Lau+Ga+La+E+Tao+Ngo",
+				description:      "Nồi lẩu bốc khói nghi ngút với thịt gà đồi dai ngọt, măng cay và vị the nồng đặc trưng của lá é.",
+				notes:            "Quán gốc số 5 đường 3/4 chỉ có ít bàn, nên đi sớm",
+				imagePath:        "itineraries/activities/dalat-lau-ga.jpg",
+			},
+			{
+				startTime:        "20:30:00",
+				title:            "Dạo Chợ đêm & Uống sữa đậu nành nóng",
+				activityCategory: "shopping",
+				durationMinutes:  90,
+				location:         "Khu Hòa Bình, Phường 1, Đà Lạt",
+				googleMapsURL:    "https://maps.google.com/?q=Cho+Dem+Da+Lat",
+				description:      "Hòa mình vào không khí nhộn nhịp, nhâm nhi ly sữa đậu nành béo ngậy kèm bánh tráng nướng Đà Lạt giòn rụm.",
+				notes:            "Hỏi giá trước khi mua sắm đặc sản len hoặc dâu tây",
+				imagePath:        "itineraries/activities/dalat-cho-dem.jpg",
+			},
+		},
+		"Ngày 2: Săn mây Cầu Đất & Đồi chè ngát xanh": {
+			{
+				startTime:        "05:00:00",
+				title:            "Săn mây tại Panorama Cầu Đất",
+				activityCategory: "nature",
+				durationMinutes:  120,
+				location:         "Thôn Cầu Đất, Xã Xuân Trường, Đà Lạt",
+				googleMapsURL:    "https://maps.google.com/?q=Cau+Dat+Panorama",
+				description:      "Đứng trên sàn gỗ ngắm nhìn biển mây trắng muốt cuồn cuộn dưới ánh nắng bình minh tuyệt mỹ.",
+				notes:            "Mang theo máy ảnh có pin đầy vì sẽ chụp rất nhiều ảnh đẹp",
+				imagePath:        "itineraries/activities/dalat-san-may.jpg",
+			},
+			{
+				startTime:        "08:30:00",
+				title:            "Bánh mì xíu mại Hoàng Diệu",
+				activityCategory: "dining",
+				durationMinutes:  60,
+				location:         "26 Hoàng Diệu, Phường 5, Đà Lạt",
+				googleMapsURL:    "https://maps.google.com/?q=Banh+Mi+Xiu+Mai+Hoang+Dieu",
+				description:      "Chén xíu mại ngọt thanh, chả lụa dai giòn chấm cùng bánh mì nướng giòn rụm xua tan cái lạnh sáng sớm.",
+				notes:            "Có thể gọi thêm sữa chua phô mai tráng miệng",
+				imagePath:        "itineraries/activities/dalat-banh-mi.jpg",
+			},
+			{
+				startTime:        "10:30:00",
+				title:            "Tham quan Dinh 1 Bảo Đại (King Palace)",
+				activityCategory: "sightseeing",
+				durationMinutes:  90,
+				location:         "01 Trần Quang Diệu, Phường 10, Đà Lạt",
+				googleMapsURL:    "https://maps.google.com/?q=Dinh+1+Bao+Dai",
+				description:      "Dinh thự mang đậm phong cách kiến trúc tân cổ điển châu Âu tọa lạc giữa rừng thông xanh ngát.",
+				notes:            "Con đường hàng cây tràm hoa vàng dẫn vào dinh là góc chụp ảnh nổi tiếng",
+				imagePath:        "itineraries/activities/dalat-dinh-1.jpg",
+			},
+			{
+				startTime:        "15:00:00",
+				title:            "Ngắm hoàng hôn tại Cafe Cheo Veooo",
+				activityCategory: "cafe",
+				durationMinutes:  120,
+				location:         "116 Hùng Vương, Hẻm Dã Chiến, Đà Lạt",
+				googleMapsURL:    "https://maps.google.com/?q=Cheo+Veooo+Coffee",
+				description:      "Tiệm cà phê gỗ mộc mạc nép mình bên sườn đồi, nơi bắt trọn khoảnh khắc hoàng hôn nhuộm tím bầu trời.",
+				notes:            "Đường vào dốc hơi hẹp, nếu đi xe ga nên vững tay lái",
+				imagePath:        "itineraries/activities/dalat-cheo-veooo.jpg",
+			},
+			{
+				startTime:        "19:00:00",
+				title:            "Ăn tối Nướng ngói Cu Đức",
+				activityCategory: "dining",
+				durationMinutes:  90,
+				location:         "6A Nguyễn Lương Bằng, Phường 2, Đà Lạt",
+				googleMapsURL:    "https://maps.google.com/?q=Nuong+Ngoi+Cu+Duc",
+				description:      "Trải nghiệm nướng thịt trên phiến ngói đất nung độc đáo, thịt nướng thơm lừng đậm đà gia vị.",
+				notes:            "Món bò nướng ngói và vú heo nướng là đặc sản của quán",
+				imagePath:        "itineraries/activities/dalat-nuong-ngoi.jpg",
+			},
+		},
+		"Ngày 3: Thác Datanla & Mua quà lưu niệm": {
+			{
+				startTime:        "08:30:00",
+				title:            "Trải nghiệm máng trượt Thác Datanla",
+				activityCategory: "nature",
+				durationMinutes:  120,
+				location:         "Đèo Prenn, Phường 3, Đà Lạt",
+				googleMapsURL:    "https://maps.google.com/?q=Thac+Datanla",
+				description:      "Chinh phục đường trượt Alpine Coaster dài nhất Đông Nam Á uốn lượn xuyên qua rừng thông nguyên sinh.",
+				notes:            "Giá vé máng trượt khứ hồi 200.000 VNĐ/người lớn",
+				imagePath:        "itineraries/activities/dalat-datanla.jpg",
+			},
+			{
+				startTime:        "11:30:00",
+				title:            "Ăn trưa Cơm niêu Như Ngọc",
+				activityCategory: "dining",
+				durationMinutes:  60,
+				location:         "19/8 Hồ Tùng Mậu, Phường 3, Đà Lạt",
+				googleMapsURL:    "https://maps.google.com/?q=Com+Nieu+Nhu+Ngoc",
+				description:      "Bữa cơm gia đình đậm đà với cơm cháy niêu giòn rụm, cá kho tộ và canh atiso hầm giò heo thanh mát.",
+				notes:            "Nên đặt bàn trước nếu đi đoàn đông",
+				imagePath:        "itineraries/activities/dalat-com-nieu.jpg",
+			},
+			{
+				startTime:        "14:00:00",
+				title:            "Mua đặc sản tại L'angfarm & Chuẩn bị về",
+				activityCategory: "shopping",
+				durationMinutes:  60,
+				location:         "06 Nguyễn Thị Minh Khai, Phường 1, Đà Lạt",
+				googleMapsURL:    "https://maps.google.com/?q=Langfarm+Da+Lat",
+				description:      "Lựa chọn các loại mứt trái cây, trà atiso, rượu vang và hoa quả sấy khô đóng gói đảm bảo chất lượng.",
+				notes:            "Có dịch vụ đóng thùng carton tiện lợi mang lên máy bay",
+				imagePath:        "itineraries/activities/dalat-langfarm.jpg",
+			},
+		},
+
+		// Đà Nẵng
+		"Ngày 1: Chào đón biển Mỹ Khê & Bán đảo Sơn Trà": {
+			{
+				startTime:        "09:00:00",
+				title:            "Ăn sáng Bún chả cá Bà Phiến",
+				activityCategory: "dining",
+				durationMinutes:  60,
+				location:         "63 Lê Hồng Phong, Hải Châu, Đà Nẵng",
+				googleMapsURL:    "https://maps.google.com/?q=Bun+Cha+Ca+Ba+Phien",
+				description:      "Tô bún chả cá đậm đà hương vị miền Trung với chả cá thu chiên và hấp dai giòn tự nhiên.",
+				notes:            "Nên cho thêm chút ớt rim và mắm ruốc để dậy mùi",
+				imagePath:        "itineraries/activities/danang-bun-cha-ca.jpg",
+			},
+			{
+				startTime:        "10:30:00",
+				title:            "Tắm biển & Dạo mát Bãi biển Mỹ Khê",
+				activityCategory: "relax",
+				durationMinutes:  120,
+				location:         "Đường Võ Nguyên Giáp, Ngũ Hành Sơn, Đà Nẵng",
+				googleMapsURL:    "https://maps.google.com/?q=My+Khe+Beach",
+				description:      "Bãi cát trắng mịn trải dài cùng làn nước biển xanh trong vắt, một trong những bãi biển quyến rũ nhất hành tinh.",
+				notes:            "Có khu vực gửi đồ và tắm tráng nước ngọt tiện lợi",
+				imagePath:        "itineraries/activities/danang-my-khe.jpg",
+			},
+			{
+				startTime:        "15:00:00",
+				title:            "Viếng Chùa Linh Ứng Bán đảo Sơn Trà",
+				activityCategory: "sightseeing",
+				durationMinutes:  90,
+				location:         "Hoàng Sa, Thọ Quang, Sơn Trà, Đà Nẵng",
+				googleMapsURL:    "https://maps.google.com/?q=Chua+Linh+Ung+Son+Tra",
+				description:      "Chiêm ngưỡng tượng Phật Quan Thế Âm cao 67m hướng ra biển cả bao la và ngắm toàn cảnh thành phố Đà Nẵng từ trên cao.",
+				notes:            "Vào chùa cần ăn mặc lịch sự, kín đáo",
+				imagePath:        "itineraries/activities/danang-chua-linh-ung.jpg",
+			},
+			{
+				startTime:        "18:30:00",
+				title:            "Ăn tối Hải sản tươi sống Năm Đảnh",
+				activityCategory: "dining",
+				durationMinutes:  90,
+				location:         "K139/H59/38 Trần Quang Khải, Thọ Quang, Sơn Trà",
+				googleMapsURL:    "https://maps.google.com/?q=Hai+San+Nam+Danh",
+				description:      "Thiên đường hải sản bình dân nổi tiếng với các món ốc hương xào bơ tỏi, ghẹ hấp, mực nướng sa tế đậm đà.",
+				notes:            "Đường vào hơi vòng vèo, nên đi taxi hoặc dùng Google Maps cẩn thận",
+				imagePath:        "itineraries/activities/danang-hai-san.jpg",
+			},
+			{
+				startTime:        "21:00:00",
+				title:            "Xem Cầu Rồng phun lửa và phun nước",
+				activityCategory: "sightseeing",
+				durationMinutes:  45,
+				location:         "Đường Nguyễn Văn Linh, Phước Ninh, Hải Châu",
+				googleMapsURL:    "https://maps.google.com/?q=Dragon+Bridge+Da+Nang",
+				description:      "Màn biểu diễn ánh sáng kết hợp phun lửa và nước hoành tráng kéo dài khoảng 15 phút bên bờ sông Hàn thơ mộng.",
+				notes:            "Các phương tiện sẽ bị cấm qua cầu từ 20:45",
+				imagePath:        "itineraries/activities/danang-cau-rong.jpg",
+			},
+		},
+		"Ngày 2: Thiên đường Sun World Bà Nà Hills": {
+			{
+				startTime:        "08:00:00",
+				title:            "Đi Cáp treo lên đỉnh Bà Nà Hills",
+				activityCategory: "nature",
+				durationMinutes:  60,
+				location:         "Thôn An Sơn, Hòa Ninh, Hòa Vang, Đà Nẵng",
+				googleMapsURL:    "https://maps.google.com/?q=Sun+World+Ba+Na+Hills",
+				description:      "Tuyến cáp treo một dây dài nhất thế giới băng qua những cánh rừng nguyên sinh và thác nước hùng vĩ.",
+				notes:            "Thời gian di chuyển trên cáp khoảng 20 phút",
+				imagePath:        "itineraries/activities/danang-cap-treo.jpg",
+			},
+			{
+				startTime:        "09:30:00",
+				title:            "Check-in Cầu Vàng (Golden Bridge)",
+				activityCategory: "sightseeing",
+				durationMinutes:  90,
+				location:         "Sun World Ba Na Hills, Hòa Vang, Đà Nẵng",
+				googleMapsURL:    "https://maps.google.com/?q=Golden+Bridge+Ba+Na",
+				description:      "Kiệt tác kiến trúc với đôi bàn tay khổng lồ rêu phong nâng đỡ dải lụa vàng giữa tầng mây lãng đãng.",
+				notes:            "Góc chụp toàn cảnh đẹp nhất là ở đầu và giữa cầu",
+				imagePath:        "itineraries/activities/danang-cau-vang.jpg",
+			},
+			{
+				startTime:        "12:00:00",
+				title:            "Thưởng thức Buffet quốc tế tại Làng Pháp",
+				activityCategory: "dining",
+				durationMinutes:  90,
+				location:         "Nhà hàng Arapang / Beer Plaza, Bà Nà Hills",
+				googleMapsURL:    "https://maps.google.com/?q=French+Village+Ba+Na",
+				description:      "Bữa tiệc buffet phong phú hơn 100 món ăn Á - Âu trong không gian kiến trúc lâu đài kiểu Gothic tráng lệ.",
+				notes:            "Nên mua combo vé vào cổng kèm buffet để tiết kiệm chi phí",
+				imagePath:        "itineraries/activities/danang-buffet.jpg",
+			},
+			{
+				startTime:        "14:00:00",
+				title:            "Vui chơi tại Fantasy Park & Hầm rượu Debay",
+				activityCategory: "relax",
+				durationMinutes:  150,
+				location:         "Sun World Ba Na Hills",
+				googleMapsURL:    "https://maps.google.com/?q=Fantasy+Park+Ba+Na",
+				description:      "Trải nghiệm tháp rơi tự do, xe trượt ống Alpine Coaster và khám phá hầm rượu cổ sâu trong lòng núi từ năm 1923.",
+				notes:            "Nhiều trò chơi cảm giác mạnh không dành cho người say xe hoặc có bệnh tim",
+				imagePath:        "itineraries/activities/danang-fantasy.jpg",
+			},
+			{
+				startTime:        "19:00:00",
+				title:            "Ăn tối Mì Quảng Ếch Bếp Trang",
+				activityCategory: "dining",
+				durationMinutes:  60,
+				location:         "441 Ông Ích Khiêm, Nam Dương, Hải Châu",
+				googleMapsURL:    "https://maps.google.com/?q=Mi+Quang+Ech+Bep+Trang",
+				description:      "Mì Quảng biến tấu độc đáo phục vụ trên mẹt tre cùng thố ếch om sả nghệ thơm nồng cay cay.",
+				notes:            "Rau sống đi kèm rất tươi sạch và đa dạng loại rau thơm",
+				imagePath:        "itineraries/activities/danang-mi-quang.jpg",
+			},
+		},
+		"Ngày 3: Danh thắng Ngũ Hành Sơn & Chợ Cồn": {
+			{
+				startTime:        "08:30:00",
+				title:            "Khám phá Danh thắng Ngũ Hành Sơn",
+				activityCategory: "nature",
+				durationMinutes:  120,
+				location:         "81 Huyền Trân Công Chúa, Hòa Hải, Ngũ Hành Sơn",
+				googleMapsURL:    "https://maps.google.com/?q=Ngu+Hanh+Son+Da+Nang",
+				description:      "Hệ thống 5 ngọn núi đá vôi mang tên ngũ hành với Động Huyền Không lung linh ánh sáng mặt trời chiếu qua vòm đá.",
+				notes:            "Có thể chọn đi thang máy lên đỉnh nếu không muốn leo dốc",
+				imagePath:        "itineraries/activities/danang-ngu-hanh-son.jpg",
+			},
+			{
+				startTime:        "11:30:00",
+				title:            "Bánh tráng cuốn thịt heo Đại Lộc",
+				activityCategory: "dining",
+				durationMinutes:  60,
+				location:         "97 Trưng Nữ Vương, Bình Hiên, Hải Châu",
+				googleMapsURL:    "https://maps.google.com/?q=Banh+Trang+Thit+Heo+Dai+Loc",
+				description:      "Thịt heo hai đầu da luộc mềm béo cuộn cùng bánh tráng phơi sương, rau rừng và chấm mắm nêm đậm đà.",
+				notes:            "Đĩa rau sống kèm theo có hơn 10 loại rau xanh",
+				imagePath:        "itineraries/activities/danang-banh-trang.jpg",
+			},
+			{
+				startTime:        "13:30:00",
+				title:            "Mua đặc sản tại Chợ Cồn & Tạm biệt",
+				activityCategory: "shopping",
+				durationMinutes:  60,
+				location:         "Góc đường Hùng Vương và Ông Ích Khiêm, Hải Châu",
+				googleMapsURL:    "https://maps.google.com/?q=Cho+Con+Da+Nang",
+				description:      "Khu chợ sầm uất với các đặc sản nổi tiếng như mực rim me, chả bò Đà Nẵng, tré và bánh khô mè Bà Liễu.",
+				notes:            "Nhớ nếm thử chè sầu Liên ngay góc chợ trước khi ra sân bay",
+				imagePath:        "itineraries/activities/danang-cho-con.jpg",
+			},
+		},
+
+		// Hà Nội
+		"Ngày 1: Dấu ấn lịch sử & Phố cổ nghìn năm": {
+			{
+				startTime:        "08:00:00",
+				title:            "Ăn sáng Phở gia truyền Bát Đàn",
+				activityCategory: "dining",
+				durationMinutes:  60,
+				location:         "49 Bát Đàn, Hàng Gai, Hoàn Kiếm, Hà Nội",
+				googleMapsURL:    "https://maps.google.com/?q=Pho+Bat+Dan",
+				description:      "Bát phở bò tái nạm nước dùng trong vắt, ngọt thanh từ xương ống ninh nhừ, hương gừng hành quyến rũ.",
+				notes:            "Văn hóa xếp hàng tự bưng bê đặc trưng của phố cổ",
+				imagePath:        "itineraries/activities/hanoi-pho.jpg",
+			},
+			{
+				startTime:        "09:30:00",
+				title:            "Viếng Lăng Bác & Chùa Một Cột",
+				activityCategory: "sightseeing",
+				durationMinutes:  120,
+				location:         "Số 2 Hùng Vương, Điện Bàn, Ba Đình, Hà Nội",
+				googleMapsURL:    "https://maps.google.com/?q=Lang+Chu+Tich+Ho+Chi+Minh",
+				description:      "Quảng trường Ba Đình lịch sử, Lăng Chủ tịch uy nghiêm, khu nhà sàn đơn sơ và bông sen nghìn tuổi Chùa Một Cột.",
+				notes:            "Giữ trật tự tuyệt đối và không mang theo máy quay phim chuyên nghiệp vào trong lăng",
+				imagePath:        "itineraries/activities/hanoi-lang-bac.jpg",
+			},
+			{
+				startTime:        "14:00:00",
+				title:            "Tham quan Văn Miếu - Quốc Tử Giám",
+				activityCategory: "sightseeing",
+				durationMinutes:  90,
+				location:         "58 Quốc Tử Giám, Đống Đa, Hà Nội",
+				googleMapsURL:    "https://maps.google.com/?q=Van+Mieu+Quoc+Tu+Giam",
+				description:      "Trường đại học đầu tiên của Việt Nam với Khuê Văn Các bằng gỗ lim và 82 bia tiến sĩ khắc trên lưng rùa đá.",
+				notes:            "Vé vào cổng 70.000 VNĐ/người lớn",
+				imagePath:        "itineraries/activities/hanoi-van-mieu.jpg",
+			},
+			{
+				startTime:        "16:30:00",
+				title:            "Thưởng thức Cà phê Trứng Giảng",
+				activityCategory: "cafe",
+				durationMinutes:  60,
+				location:         "39 Nguyễn Hữu Huân, Lý Thái Tổ, Hoàn Kiếm",
+				googleMapsURL:    "https://maps.google.com/?q=Cafe+Giang+Nguyen+Huu+Huan",
+				description:      "Cốc cà phê trứng nóng hổi với lớp kem trứng đánh bông mịn ngậy béo hòa quyện hoàn hảo cùng vị đắng của cà phê Robusta.",
+				notes:            "Cốc được đặt trong bát nước nóng giữ ấm suốt lúc uống",
+				imagePath:        "itineraries/activities/hanoi-cafe-giang.jpg",
+			},
+			{
+				startTime:        "19:00:00",
+				title:            "Ăn tối Chả cá Lã Vọng gia truyền",
+				activityCategory: "dining",
+				durationMinutes:  90,
+				location:         "14 Chả Cá, Hàng Bồ, Hoàn Kiếm, Hà Nội",
+				googleMapsURL:    "https://maps.google.com/?q=Cha+Ca+La+Vong",
+				description:      "Miếng cá lăng vàng ruộm xèo xèo trên chảo mỡ cùng thì là, hành hoa, ăn kèm bún, đậu phộng rang và mắm tôm đánh sủi bọt.",
+				notes:            "Quán gốc hơn 100 năm tuổi giữ trọn vẹn hương vị xưa",
+				imagePath:        "itineraries/activities/hanoi-cha-ca.jpg",
+			},
+		},
+		"Ngày 2: Bình yên Hồ Tây & Trải nghiệm Làng gốm Bát Tràng": {
+			{
+				startTime:        "08:30:00",
+				title:            "Dạo quanh Hồ Tây & Viếng Chùa Trấn Quốc",
+				activityCategory: "sightseeing",
+				durationMinutes:  90,
+				location:         "Đường Thanh Niên, Yên Phụ, Tây Hồ, Hà Nội",
+				googleMapsURL:    "https://maps.google.com/?q=Chua+Tran+Quoc",
+				description:      "Ngôi chùa cổ nhất Thăng Long với lịch sử gần 1.500 năm tọa lạc trên hòn đảo nhỏ phía đông Hồ Tây.",
+				notes:            "Cây bồ đề cổ thụ tại chùa là quà tặng của Tổng thống Ấn Độ năm 1959",
+				imagePath:        "itineraries/activities/hanoi-chua-tran-quoc.jpg",
+			},
+			{
+				startTime:        "10:30:00",
+				title:            "Tự tay làm gốm tại Làng gốm cổ Bát Tràng",
+				activityCategory: "relax",
+				durationMinutes:  150,
+				location:         "Xã Bát Tràng, Huyện Gia Lâm, Hà Nội",
+				googleMapsURL:    "https://maps.google.com/?q=Lang+Gom+Bat+Trang",
+				description:      "Trải nghiệm cảm giác xoay đất sét trên bàn xoay thủ công và tự tay vẽ hoa văn cho chiếc bình gốm kỷ niệm.",
+				notes:            "Phí vuốt nặn gốm khoảng 50.000 VNĐ - 80.000 VNĐ/sản phẩm",
+				imagePath:        "itineraries/activities/hanoi-bat-trang.jpg",
+			},
+			{
+				startTime:        "13:30:00",
+				title:            "Ăn trưa Bún chả Hương Liên (Bún chả Obama)",
+				activityCategory: "dining",
+				durationMinutes:  60,
+				location:         "24 Lê Văn Hưu, Phan Chu Trinh, Hai Bà Trưng",
+				googleMapsURL:    "https://maps.google.com/?q=Bun+Cha+Huong+Lien",
+				description:      "Đĩa chả nướng than hoa thơm nức mũi, chả giò hải sản giòn rụm chấm nước mắm chua ngọt ấm nóng trứ danh.",
+				notes:            "Bàn ăn Tổng thống Obama từng ngồi được giữ nguyên trong lồng kính ở tầng 2",
+				imagePath:        "itineraries/activities/hanoi-bun-cha.jpg",
+			},
+			{
+				startTime:        "15:30:00",
+				title:            "Ngắm hoàng hôn bên Cầu Long Biên lịch sử",
+				activityCategory: "sightseeing",
+				durationMinutes:  90,
+				location:         "Cầu Long Biên, Hoàn Kiếm, Hà Nội",
+				googleMapsURL:    "https://maps.google.com/?q=Cau+Long+Bien",
+				description:      "Cây cầu thép lịch sử bắc qua sông Hồng do kiến trúc sư Gustave Eiffel thiết kế, chứng nhân lịch sử hào hùng.",
+				notes:            "Có thể ghé quán cà phê đường tàu gần đầu cầu để ngắm toàn cảnh",
+				imagePath:        "itineraries/activities/hanoi-cau-long-bien.jpg",
+			},
+		},
+
+		// Hạ Long
+		"Ngày 1: Check-in Du thuyền & Chèo kayak Hang Luồn": {
+			{
+				startTime:        "11:30:00",
+				title:            "Làm thủ tục lên Du thuyền tại Cảng Tuần Châu",
+				activityCategory: "sightseeing",
+				durationMinutes:  60,
+				location:         "Cảng tàu khách quốc tế Tuần Châu, Hạ Long",
+				googleMapsURL:    "https://maps.google.com/?q=Tuan+Chau+Port",
+				description:      "Được thủy thủ đoàn chào đón bằng thức uống mát lạnh, nhận phòng ngủ tiện nghi với ban công hướng biển riêng.",
+				notes:            "Thủy thủ đoàn sẽ hướng dẫn các quy định an toàn hàng hải",
+				imagePath:        "itineraries/activities/halong-checkin-tau.jpg",
+			},
+			{
+				startTime:        "12:30:00",
+				title:            "Thưởng thức Buffet trưa hải sản tươi sống",
+				activityCategory: "dining",
+				durationMinutes:  90,
+				location:         "Nhà hàng trên du thuyền vịnh Hạ Long",
+				googleMapsURL:    "https://maps.google.com/?q=Ha+Long+Bay",
+				description:      "Thực đơn hải sản cao cấp gồm hàu nướng mỡ hành, tôm sú hấp, mực xào cay trong khi tàu lướt qua hàng ngàn đảo đá vôi.",
+				notes:            "Cửa sổ kính tràn panorama cho tầm nhìn ngắm cảnh 360 độ",
+				imagePath:        "itineraries/activities/halong-buffet-trua.jpg",
+			},
+			{
+				startTime:        "15:00:00",
+				title:            "Thám hiểm Hang Sửng Sốt kỳ vĩ",
+				activityCategory: "nature",
+				durationMinutes:  90,
+				location:         "Đảo Bồ Hòn, Vịnh Hạ Long, Quảng Ninh",
+				googleMapsURL:    "https://maps.google.com/?q=Hang+Sung+Sot",
+				description:      "Hang động rộng lớn và tráng lệ nhất vịnh với hàng triệu nhũ đá muôn hình vạn trạng lấp lánh sắc màu.",
+				notes:            "Nhiệt độ trong hang rất mát mẻ quanh năm",
+				imagePath:        "itineraries/activities/halong-hang-sung-sot.jpg",
+			},
+			{
+				startTime:        "16:45:00",
+				title:            "Chèo thuyền Kayak khám phá Hang Luồn",
+				activityCategory: "nature",
+				durationMinutes:  75,
+				location:         "Hang Luồn, Vịnh Hạ Long",
+				googleMapsURL:    "https://maps.google.com/?q=Hang+Luon",
+				description:      "Tự tay chèo thuyền kayak luồn qua vòm hang đá dẫn vào một hồ nước tĩnh lặng bao bọc bởi vách núi dựng đứng.",
+				notes:            "Có thể bắt gặp đàn khỉ vàng leo trèo trên vách đá",
+				imagePath:        "itineraries/activities/halong-kayak.jpg",
+			},
+			{
+				startTime:        "18:30:00",
+				title:            "Sunset Party & Bữa tối Fine Dining",
+				activityCategory: "dining",
+				durationMinutes:  120,
+				location:         "Sundeck & Nhà hàng du thuyền",
+				googleMapsURL:    "https://maps.google.com/?q=Ha+Long+Bay",
+				description:      "Nhâm nhi cocktail ngắm mặt trời đỏ rực lặn sau những rặng núi đá, sau đó dùng bữa tối nến lãng mạn phong cách hoàng gia.",
+				notes:            "Sau bữa tối có thể tham gia câu mực đêm cùng các thủy thủ trên boong",
+				imagePath:        "itineraries/activities/halong-sunset-dinner.jpg",
+			},
+		},
+		"Ngày 2: Bình minh đảo Ti Tốp & Tạm biệt Vịnh": {
+			{
+				startTime:        "06:15:00",
+				title:            "Tập Thái Cực Quyền (Taichi) đón bình minh",
+				activityCategory: "relax",
+				durationMinutes:  45,
+				location:         "Sundeck tầng thượng du thuyền",
+				googleMapsURL:    "https://maps.google.com/?q=Ha+Long+Bay",
+				description:      "Khởi động cơ thể với những động tác dưỡng sinh mềm mại giữa làn gió biển sớm mai trong lành và sảng khoái.",
+				notes:            "Có phục vụ trà thảo mộc và cà phê sáng nhẹ",
+				imagePath:        "itineraries/activities/halong-taichi.jpg",
+			},
+			{
+				startTime:        "07:30:00",
+				title:            "Chinh phục đỉnh núi Đảo Ti Tốp",
+				activityCategory: "sightseeing",
+				durationMinutes:  90,
+				location:         "Đảo Ti Tốp, Vịnh Hạ Long",
+				googleMapsURL:    "https://maps.google.com/?q=Dao+Ti+Top",
+				description:      "Leo lên đài quan sát trên đỉnh ngắm nhìn toàn cảnh 360 độ vịnh Hạ Long với hàng trăm cánh buồm nâu lướt nhẹ.",
+				notes:            "Bãi cát hình vành trăng lưỡi liềm dưới chân đảo rất đẹp để dạo chân trần",
+				imagePath:        "itineraries/activities/halong-ti-top.jpg",
+			},
+			{
+				startTime:        "09:30:00",
+				title:            "Thưởng thức tiệc Brunch & Về cảng",
+				activityCategory: "dining",
+				durationMinutes:  60,
+				location:         "Nhà hàng du thuyền",
+				googleMapsURL:    "https://maps.google.com/?q=Ha+Long+Bay",
+				description:      "Bữa ăn nửa buổi phong phú trong khi con tàu rẽ sóng êm đềm quay trở về bến Tuần Châu.",
+				notes:            "Nhân viên sẽ mang hành lý gửi xuống sảnh chờ cho khách",
+				imagePath:        "itineraries/activities/halong-brunch.jpg",
+			},
+			{
+				startTime:        "11:30:00",
+				title:            "Mua đặc sản Chả mực giã tay Hạ Long",
+				activityCategory: "shopping",
+				durationMinutes:  45,
+				location:         "Cảng Tuần Châu / Chợ Hạ Long 1",
+				googleMapsURL:    "https://maps.google.com/?q=Cho+Ha+Long+1",
+				description:      "Món chả mực giã tay truyền thống chiên vàng giòn sần sật nức tiếng của vùng biển Quảng Ninh.",
+				notes:            "Chả mực được đóng gói hút chân không kèm đá gel bảo quản đi xa",
+				imagePath:        "itineraries/activities/halong-cha-muc.jpg",
+			},
+		},
+
+		// Tokyo
+		"Ngày 1: Nét cổ kính Asakusa & Biểu tượng Tokyo Skytree": {
+			{
+				startTime:        "09:00:00",
+				title:            "Viếng Đền Sensoji (Asakusa Kannon)",
+				activityCategory: "sightseeing",
+				durationMinutes:  90,
+				location:         "2 Chome-3-1 Asakusa, Taito City, Tokyo",
+				googleMapsURL:    "https://maps.google.com/?q=Senso-ji+Tokyo",
+				description:      "Ngôi chùa Phật giáo cổ kính nhất Tokyo với cổng Sấm Kaminarimon cùng lư hương xua đi bệnh tật nổi tiếng.",
+				notes:            "Có thể rút quẻ xăm Omikuji với giá 100 Yên",
+				imagePath:        "itineraries/activities/tokyo-sensoji.jpg",
+			},
+			{
+				startTime:        "11:00:00",
+				title:            "Dạo phố mua sắm truyền thống Nakamise",
+				activityCategory: "shopping",
+				durationMinutes:  60,
+				location:         "1 Chome-36-3 Asakusa, Taito City, Tokyo",
+				googleMapsURL:    "https://maps.google.com/?q=Nakamise-dori+Tokyo",
+				description:      "Con phố dẫn vào đền với hàng chục quầy hàng bán bánh dưa gang kem tươi, bánh nướng Ningyoyaki và quạt giấy thủ công.",
+				notes:            "Theo quy định tại Nhật, bạn nên đứng ăn tại quầy thay vì vừa đi vừa ăn",
+				imagePath:        "itineraries/activities/tokyo-nakamise.jpg",
+			},
+			{
+				startTime:        "12:30:00",
+				title:            "Ăn trưa Mì Ramen Ichiran Asakusa",
+				activityCategory: "dining",
+				durationMinutes:  60,
+				location:         "1 Chome-1-16 Asakusa, Taito City, Tokyo",
+				googleMapsURL:    "https://maps.google.com/?q=Ichiran+Ramen+Asakusa",
+				description:      "Tô mì ramen Tonkotsu nước dùng xương heo béo ngậy với sợi mì dai ngon tại buồng ăn cá nhân riêng tư độc đáo.",
+				notes:            "Tự do chọn độ cay, độ đậm của nước dùng trên phiếu order",
+				imagePath:        "itineraries/activities/tokyo-ichiran.jpg",
+			},
+			{
+				startTime:        "15:00:00",
+				title:            "Ngắm thành phố từ Tháp Tokyo Skytree",
+				activityCategory: "sightseeing",
+				durationMinutes:  120,
+				location:         "1 Chome-1-2 Oshiage, Sumida City, Tokyo",
+				googleMapsURL:    "https://maps.google.com/?q=Tokyo+Skytree",
+				description:      "Tòa tháp truyền hình cao 634m với đài quan sát Tembo Deck nhìn thấy cả núi Phú Sĩ vào những ngày trời trong.",
+				notes:            "Có khu mua sắm Solamachi rộng lớn ngay dưới chân tháp",
+				imagePath:        "itineraries/activities/tokyo-skytree.jpg",
+			},
+			{
+				startTime:        "18:30:00",
+				title:            "Ăn tối Thịt nướng Yakiniku tại Ueno",
+				activityCategory: "dining",
+				durationMinutes:  90,
+				location:         "Ueno, Taito City, Tokyo",
+				googleMapsURL:    "https://maps.google.com/?q=Ueno+Tokyo",
+				description:      "Thưởng thức các phần thịt bò Wagyu A5 mềm tan trong miệng nướng trên than hồng thơm lừng cùng bia tươi Nhật Bản.",
+				notes:            "Nên đặt bàn trước qua ứng dụng Tabelog",
+				imagePath:        "itineraries/activities/tokyo-yakiniku.jpg",
+			},
+		},
+		"Ngày 2: Thiên đường Akihabara & Hoàng hôn Shibuya Sky": {
+			{
+				startTime:        "10:00:00",
+				title:            "Khám phá Phố điện tử Akihabara Electric Town",
+				activityCategory: "shopping",
+				durationMinutes:  150,
+				location:         "Sotokanda, Chiyoda City, Tokyo",
+				googleMapsURL:    "https://maps.google.com/?q=Akihabara+Tokyo",
+				description:      "Thánh địa văn hóa Otaku với hàng trăm cửa hàng đồ chơi mô hình figure, máy game arcade retro và quán cafe hầu gái.",
+				notes:            "Các tòa nhà Yodobashi Camera và Mandarake là điểm đến tiêu biểu",
+				imagePath:        "itineraries/activities/tokyo-akihabara.jpg",
+			},
+			{
+				startTime:        "13:00:00",
+				title:            "Ăn trưa Bò Wagyu Teppanyaki tại Ginza",
+				activityCategory: "dining",
+				durationMinutes:  90,
+				location:         "Ginza, Chuo City, Tokyo",
+				googleMapsURL:    "https://maps.google.com/?q=Ginza+Tokyo",
+				description:      "Màn biểu diễn nấu nướng điêu luyện của đầu bếp trên bàn sắt nhiệt độ cao với từng thớ thịt bò mềm ngọt tuyệt hảo.",
+				notes:            "Các set ăn trưa tại Ginza có giá hợp lý hơn bữa tối rất nhiều",
+				imagePath:        "itineraries/activities/tokyo-wagyu.jpg",
+			},
+			{
+				startTime:        "15:30:00",
+				title:            "Dạo bước Ngã tư Shibuya Scramble huyền thoại",
+				activityCategory: "sightseeing",
+				durationMinutes:  60,
+				location:         "Dogenzaka, Shibuya City, Tokyo",
+				googleMapsURL:    "https://maps.google.com/?q=Shibuya+Crossing",
+				description:      "Ngã tư dành cho người đi bộ đông đúc nhất thế giới và check-in bức tượng chú chó trung thành Hachiko.",
+				notes:            "Góc ngắm dòng người đẹp nhất từ quán Starbucks Tsutaya nhìn xuống",
+				imagePath:        "itineraries/activities/tokyo-shibuya-crossing.jpg",
+			},
+			{
+				startTime:        "17:00:00",
+				title:            "Ngắm hoàng hôn ngoạn mục tại Shibuya Sky",
+				activityCategory: "relax",
+				durationMinutes:  90,
+				location:         "2 Chome-24-12 Shibuya, Shibuya City, Tokyo",
+				googleMapsURL:    "https://maps.google.com/?q=Shibuya+Sky",
+				description:      "Đài quan sát ngoài trời ở độ cao 229m mang đến tầm nhìn toàn cảnh 360 độ đường chân trời rực rỡ ánh hoàng hôn của Tokyo.",
+				notes:            "Tất cả túi xách và phụ kiện lỏng lẻo phải gửi trong tủ khóa trước khi lên sàn",
+				imagePath:        "itineraries/activities/tokyo-shibuya-sky.jpg",
+			},
+			{
+				startTime:        "19:30:00",
+				title:            "Trải nghiệm nhậu kiểu Nhật tại Omoide Yokocho",
+				activityCategory: "dining",
+				durationMinutes:  90,
+				location:         "1 Chome-2 Nishishinjuku, Shinjuku City, Tokyo",
+				googleMapsURL:    "https://maps.google.com/?q=Omoide+Yokocho",
+				description:      "Con hẻm nhỏ hoài niệm thời kỳ Showa ngập tràn khói nướng thơm lừng từ những xiên gà nướng Yakitori và rượu sake ấm nóng.",
+				notes:            "Mỗi quán thường có một khoản phí chỗ ngồi nhỏ (Otoshi) kèm món khai vị",
+				imagePath:        "itineraries/activities/tokyo-omoide.jpg",
+			},
+		},
+		"Ngày 3: Đền Meiji Jingu & Phố thời trang Harajuku": {
+			{
+				startTime:        "09:00:00",
+				title:            "Tản bộ Đền Thần đạo Meiji Jingu",
+				activityCategory: "nature",
+				durationMinutes:  90,
+				location:         "1-1 Yoyogikamizonocho, Shibuya City, Tokyo",
+				googleMapsURL:    "https://maps.google.com/?q=Meiji+Jingu",
+				description:      "Ốc đảo xanh yên bình với hơn 100.000 cây xanh bao bọc ngôi đền thờ Thiên hoàng Minh Trị và Hoàng thái hậu Shoken.",
+				notes:            "Chiếc cổng Torii bằng gỗ bách khổng lồ là điểm check-in uy nghi",
+				imagePath:        "itineraries/activities/tokyo-meiji.jpg",
+			},
+			{
+				startTime:        "11:00:00",
+				title:            "Dạo phố thời trang Takeshita Dori Harajuku",
+				activityCategory: "shopping",
+				durationMinutes:  90,
+				location:         "1 Chome Jingumae, Shibuya City, Tokyo",
+				googleMapsURL:    "https://maps.google.com/?q=Takeshita+Street",
+				description:      "Trung tâm của văn hóa Kawaii Nhật Bản với các cửa hàng thời trang cosplay độc lạ và tiệm bánh crepe cuộn kem tươi hấp dẫn.",
+				notes:            "Thử bánh crepe Marion Crepes nổi tiếng nhất khu phố",
+				imagePath:        "itineraries/activities/tokyo-harajuku.jpg",
+			},
+			{
+				startTime:        "13:00:00",
+				title:            "Ăn trưa Sushi băng chuyền Kura Sushi",
+				activityCategory: "dining",
+				durationMinutes:  60,
+				location:         "Shibuya / Harajuku, Tokyo",
+				googleMapsURL:    "https://maps.google.com/?q=Kura+Sushi+Tokyo",
+				description:      "Trải nghiệm ăn sushi trên đĩa trượt tự động với đa dạng các món cá hồi, cá ngừ, sò điệp tươi ngon và trò chơi gắp thú vui nhộn.",
+				notes:            "Cứ mỗi 5 chiếc đĩa thả vào khe thu hồi sẽ được quay thưởng 1 lần",
+				imagePath:        "itineraries/activities/tokyo-kura-sushi.jpg",
+			},
+			{
+				startTime:        "15:00:00",
+				title:            "Mua quà lưu niệm & Chuẩn bị ra sân bay",
+				activityCategory: "shopping",
+				durationMinutes:  60,
+				location:         "Don Quijote Shinjuku / Tokyo Station",
+				googleMapsURL:    "https://maps.google.com/?q=Don+Quijote+Shinjuku",
+				description:      "Mua sắm mỹ phẩm nội địa Nhật, bánh KitKat các vị độc lạ và bánh chuối Tokyo Banana làm quà cho người thân.",
+				notes:            "Giữ lại hóa đơn và túi niêm phong miễn thuế cho đến khi qua cửa an ninh sân bay",
+				imagePath:        "itineraries/activities/tokyo-don-quijote.jpg",
+			},
+		},
+	}
+
+	existingMap := make(map[string]bool)
+	for _, a := range existingActivities {
+		existingMap[fmt.Sprintf("%d_%s", a.ItineraryDayID, a.Title)] = true
+	}
+
+	for _, day := range days {
+		defs, ok := activitiesConfig[day.Title]
+		if !ok {
+			continue
+		}
+		for _, a := range defs {
+			key := fmt.Sprintf("%d_%s", day.ID, a.title)
+			if existingMap[key] {
+				continue
+			}
+
+			cat := a.activityCategory
+			dur := a.durationMinutes
+			loc := a.location
+			gmaps := a.googleMapsURL
+			desc := a.description
+			notes := a.notes
+			img := a.imagePath
+
+			act := dbmodel.ItineraryActivity{
+				ItineraryDayID:   day.ID,
+				StartTime:        a.startTime,
+				Title:            a.title,
+				ActivityCategory: &cat,
+				DurationMinutes:  &dur,
+				Location:         &loc,
+				GoogleMapsURL:    &gmaps,
+				Description:      &desc,
+				Notes:            &notes,
+				ImagePath:        &img,
+			}
+			if err := db.GetDB().Create(&act).Error; err != nil {
+				fmt.Printf("failed to seed itinerary activity %s: %v\n", a.title, err)
+			}
+		}
+	}
+
+	var allActivities []dbmodel.ItineraryActivity
+	db.GetDB().Find(&allActivities)
+	return allActivities
+}
