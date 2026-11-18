@@ -1,0 +1,25 @@
+get:
+  operationId: fetchItineraries
+  tags:
+    - itineraries
+  summary: Get itinerary list
+  description: Retrieve a paginated list of travel itineraries.
+  security:
+    - AccessCookie: []
+  parameters:
+    - $ref: "../../components/schemas/common/query_pagination.yml#/Page"
+    - $ref: "../../components/schemas/common/query_pagination.yml#/PerPage"
+    - name: locationId
+      in: query
+      required: false
+      description: Filter itineraries by location ID
+      schema:
+        type: integer
+        format: int64
+  responses:
+    "200":
+      description: Itineraries retrieved successfully
+      content:
+        application/json:
+          schema:
+            $ref: "../../components/schemas/itineraries/index.yml#/FetchItinerariesResponse"

@@ -19,6 +19,8 @@ tags:
     description: Travel location management
   - name: travelMemories
     description: Travel memory management
+  - name: itineraries
+    description: Itinerary management
   - name: uploads
     description: Generic media upload management
   - name: selection
@@ -52,6 +54,10 @@ paths:
     $ref: "./paths/travel_memories/index.yml"
   /travel-memories/{travelMemoryID}:
     $ref: "./paths/travel_memories/:travelMemoryID.yml"
+
+  # Itineraries
+  /itineraries:
+    $ref: "./paths/itineraries/index.yml"
 
   # Selection
   /selections/travel-locations:
@@ -112,6 +118,8 @@ components:
       $ref: "./components/schemas/travel_memories/:travelMemoryID.yml#/FetchTravelMemoryByIDResponse"
     CreateTravelMemoryRequest:
       $ref: "./components/schemas/travel_memories/index.yml#/CreateTravelMemoryRequest"
+    FetchItinerariesResponse:
+      $ref: "./components/schemas/itineraries/index.yml#/FetchItinerariesResponse"
     SelectionTravelLocationResponse:
       $ref: "./components/schemas/selections/travel_locations.yml#/SelectionTravelLocationResponse"
     SelectionTravelThemeResponse:

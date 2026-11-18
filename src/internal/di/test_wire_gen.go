@@ -13,6 +13,7 @@ import (
 	"platform-go/internal/interfaces/controller"
 	"platform-go/internal/usecases"
 	"platform-go/internal/usecases/homestays/usecase"
+	usecase5 "platform-go/internal/usecases/itineraries/usecase"
 	usecase4 "platform-go/internal/usecases/selections/usecase"
 	usecase2 "platform-go/internal/usecases/travel_locations/usecase"
 	usecase3 "platform-go/internal/usecases/travel_memories/usecase"
@@ -59,12 +60,16 @@ func TestInitializeControllers(t *testing.T, db *gorm.DB) (*TestHandlerSet, erro
 	fetchSelectionTravelLocationsUseCase := usecase4.NewFetchSelectionTravelLocationsUseCase(selectionQueryService)
 	fetchSelectionTravelThemesUseCase := usecase4.NewFetchSelectionTravelThemesUseCase(selectionQueryService)
 	selectionController := controller.NewSelectionController(fetchSelectionTravelLocationsUseCase, fetchSelectionTravelThemesUseCase)
+	itineraryQueryService := queryservice.NewItineraryQueryService(db)
+	fetchItinerariesUseCase := usecase5.NewFetchItinerariesUseCase(itineraryQueryService)
+	itineraryController := controller.NewItineraryController(fetchItinerariesUseCase)
 	testHandlerSet := &TestHandlerSet{
 		Handler:               userController,
 		HomestayHandler:       homestayController,
 		TravelLocationHandler: travelLocationController,
 		TravelMemoryHandler:   travelMemoryController,
 		SelectionHandler:      selectionController,
+		ItineraryHandler:      itineraryController,
 		DB:                    db,
 	}
 	return testHandlerSet, nil
@@ -78,5 +83,6 @@ type TestHandlerSet struct {
 	TravelLocationHandler controller.TravelLocationController
 	TravelMemoryHandler   controller.TravelMemoryController
 	SelectionHandler      controller.SelectionController
+	ItineraryHandler      controller.ItineraryController
 	DB                    *gorm.DB
 }

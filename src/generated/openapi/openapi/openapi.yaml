@@ -19,6 +19,8 @@ tags:
   name: travelLocations
 - description: Travel memory management
   name: travelMemories
+- description: Itinerary management
+  name: itineraries
 - description: Generic media upload management
   name: uploads
 - description: Related to pull-down data
@@ -559,6 +561,55 @@ paths:
       summary: Update a travel memory
       tags:
       - travelMemories
+  /itineraries:
+    get:
+      description: Retrieve a paginated list of travel itineraries.
+      operationId: fetchItineraries
+      parameters:
+      - description: Number of pages
+        example: 1
+        in: query
+        name: page
+        required: true
+        schema:
+          default: 1
+          minimum: 1
+          type: integer
+        x-oapi-codegen-extra-tags:
+          binding: "required,number,min=1"
+          label: Number of pages
+      - description: Number of records per page
+        example: 20
+        in: query
+        name: perPage
+        required: true
+        schema:
+          default: 20
+          maximum: 20
+          minimum: 2
+          type: integer
+        x-oapi-codegen-extra-tags:
+          binding: "required,number,min=2,max=20"
+          label: Number of records per page
+      - description: Filter itineraries by location ID
+        in: query
+        name: locationId
+        required: false
+        schema:
+          format: int64
+          type: integer
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FetchItinerariesResponse"
+          description: Itineraries retrieved successfully
+      security:
+      - AccessCookie: []
+      summary: Get itinerary list
+      tags:
+      - itineraries
   /selections/travel-locations:
     get:
       description: "Retrieve a lightweight list of travel locations (id and name)\
@@ -1664,6 +1715,49 @@ components:
       - locationId
       - startDate
       - title
+      type: object
+    FetchItinerariesResponse:
+      example:
+        data:
+        - id: 1
+          locationId: 1
+          locationName: Lâm Đồng
+          itineraryName: Khám phá Đà Lạt
+          durationDays: 3
+          durationNights: 2
+          duration: 3 ngày 2 đêm
+          activityCount: 11
+          description: "Một hành trình nhẹ nhàng để cảm nhận trọn vẹn vẻ đẹp của Đ\
+            à Lạt, từ thiên nhiên, ẩm thực đến những góc cà phê thơ mộng."
+          coverImagePath: itineraries/dalat-cover.jpg
+        - id: 1
+          locationId: 1
+          locationName: Lâm Đồng
+          itineraryName: Khám phá Đà Lạt
+          durationDays: 3
+          durationNights: 2
+          duration: 3 ngày 2 đêm
+          activityCount: 11
+          description: "Một hành trình nhẹ nhàng để cảm nhận trọn vẹn vẻ đẹp của Đ\
+            à Lạt, từ thiên nhiên, ẩm thực đến những góc cà phê thơ mộng."
+          coverImagePath: itineraries/dalat-cover.jpg
+        paginatorInfo:
+          count: 1
+          currentPage: 1
+          hasMorePages: false
+          lastPage: 1
+          perPage: 1
+          total: 1
+      properties:
+        data:
+          items:
+            $ref: "#/components/schemas/FetchItinerariesResponse_data_inner"
+          type: array
+        paginatorInfo:
+          $ref: "#/components/schemas/paginator_info"
+      required:
+      - data
+      - paginatorInfo
       type: object
     SelectionTravelLocationResponse:
       example:
@@ -2908,6 +3002,65 @@ components:
       - locationId
       - startDate
       - title
+      type: object
+    FetchItinerariesResponse_data_inner:
+      example:
+        id: 1
+        locationId: 1
+        locationName: Lâm Đồng
+        itineraryName: Khám phá Đà Lạt
+        durationDays: 3
+        durationNights: 2
+        duration: 3 ngày 2 đêm
+        activityCount: 11
+        description: "Một hành trình nhẹ nhàng để cảm nhận trọn vẹn vẻ đẹp của Đà\
+          \ Lạt, từ thiên nhiên, ẩm thực đến những góc cà phê thơ mộng."
+        coverImagePath: itineraries/dalat-cover.jpg
+      properties:
+        id:
+          example: 1
+          format: int64
+          type: integer
+        locationId:
+          example: 1
+          format: int64
+          nullable: true
+          type: integer
+        locationName:
+          example: Lâm Đồng
+          nullable: true
+          type: string
+        itineraryName:
+          example: Khám phá Đà Lạt
+          type: string
+        durationDays:
+          example: 3
+          type: integer
+        durationNights:
+          example: 2
+          type: integer
+        duration:
+          example: 3 ngày 2 đêm
+          type: string
+        activityCount:
+          example: 11
+          type: integer
+        description:
+          example: "Một hành trình nhẹ nhàng để cảm nhận trọn vẹn vẻ đẹp của Đà Lạ\
+            t, từ thiên nhiên, ẩm thực đến những góc cà phê thơ mộng."
+          nullable: true
+          type: string
+        coverImagePath:
+          example: itineraries/dalat-cover.jpg
+          nullable: true
+          type: string
+      required:
+      - activityCount
+      - duration
+      - durationDays
+      - durationNights
+      - id
+      - itineraryName
       type: object
     SelectionTravelLocationResponse_data_inner:
       example:

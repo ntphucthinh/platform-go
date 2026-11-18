@@ -18,6 +18,7 @@ type ServerController struct {
 	travelMemoryController   TravelMemoryController
 	uploadController         *UploadController
 	selectionController      SelectionController
+	itineraryController      ItineraryController
 }
 
 func NewServerController(
@@ -28,6 +29,7 @@ func NewServerController(
 	travelMemoryController TravelMemoryController,
 	uploadController *UploadController,
 	selectionController SelectionController,
+	itineraryController ItineraryController,
 ) *ServerController {
 	return &ServerController{
 		userController:           userController,
@@ -37,6 +39,7 @@ func NewServerController(
 		travelMemoryController:   travelMemoryController,
 		uploadController:         uploadController,
 		selectionController:      selectionController,
+		itineraryController:      itineraryController,
 	}
 }
 
@@ -217,3 +220,14 @@ func (con *ServerController) GetUsers(c *gin.Context) {
 func (con *ServerController) CreateUser(c *gin.Context) {
 	con.userController.CreateUser(c)
 }
+
+// -----------------------------------------------------------------------------
+// Itineraries APIs (ItineraryController)
+// -----------------------------------------------------------------------------
+
+// FetchItineraries retrieves a paginated list of itineraries.
+// (GET /itineraries)
+func (con *ServerController) FetchItineraries(c *gin.Context, params api.FetchItinerariesParams) {
+	con.itineraryController.FetchItineraries(c, params)
+}
+

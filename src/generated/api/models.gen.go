@@ -231,6 +231,28 @@ type FetchHomestayResponseDataInnerHomestayRoomsInnerHomestayImagesInner struct 
 	SortOrder int32  `json:"sortOrder"`
 }
 
+// FetchItinerariesResponse defines model for FetchItinerariesResponse.
+type FetchItinerariesResponse struct {
+	Data []FetchItinerariesResponseDataInner `json:"data"`
+
+	// PaginatorInfo Pagination information used in the response
+	PaginatorInfo PaginatorInfo `json:"paginatorInfo"`
+}
+
+// FetchItinerariesResponseDataInner defines model for FetchItinerariesResponse_data_inner.
+type FetchItinerariesResponseDataInner struct {
+	ActivityCount  int     `json:"activityCount"`
+	CoverImagePath *string `json:"coverImagePath"`
+	Description    *string `json:"description"`
+	Duration       string  `json:"duration"`
+	DurationDays   int     `json:"durationDays"`
+	DurationNights int     `json:"durationNights"`
+	Id             int64   `json:"id"`
+	ItineraryName  string  `json:"itineraryName"`
+	LocationId     *int64  `json:"locationId"`
+	LocationName   *string `json:"locationName"`
+}
+
 // FetchTravelLocationByIDResponse defines model for FetchTravelLocationByIDResponse.
 type FetchTravelLocationByIDResponse struct {
 	Data FetchTravelLocationsResponseDataInner `json:"data"`
@@ -638,6 +660,18 @@ type FetchHomestaysParams struct {
 
 	// PerPage Number of records per page
 	PerPage int `binding:"required,number,min=2,max=20" form:"perPage" json:"perPage" label:"Number of records per page"`
+}
+
+// FetchItinerariesParams defines parameters for FetchItineraries.
+type FetchItinerariesParams struct {
+	// Page Number of pages
+	Page int `binding:"required,number,min=1" form:"page" json:"page" label:"Number of pages"`
+
+	// PerPage Number of records per page
+	PerPage int `binding:"required,number,min=2,max=20" form:"perPage" json:"perPage" label:"Number of records per page"`
+
+	// LocationId Filter itineraries by location ID
+	LocationId *int64 `form:"locationId,omitempty" json:"locationId,omitempty"`
 }
 
 // FetchSelectionTravelLocationsParams defines parameters for FetchSelectionTravelLocations.

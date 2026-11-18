@@ -15,6 +15,8 @@ import (
 	"platform-go/internal/usecases"
 	homestayqueryservice "platform-go/internal/usecases/homestays/queryservice"
 	homestayusecase "platform-go/internal/usecases/homestays/usecase"
+	itineraryqueryservice "platform-go/internal/usecases/itineraries/queryservice"
+	itineraryusecase "platform-go/internal/usecases/itineraries/usecase"
 	selectionqueryservice "platform-go/internal/usecases/selections/queryservice"
 	selectionusecase "platform-go/internal/usecases/selections/usecase"
 	travellocationqueryservice "platform-go/internal/usecases/travel_locations/queryservice"
@@ -48,12 +50,14 @@ func InitializeApplication(db *gorm.DB, jwtService *security.JWTService, secureC
 		queryservice.NewTravelLocationQueryService,
 		queryservice.NewTravelMemoryQueryService,
 		queryservice.NewSelectionQueryService,
+		queryservice.NewItineraryQueryService,
 		cloudinary.NewClient,
 		wire.Bind(new(uploads.AssetClient), new(*cloudinary.Client)),
 		wire.Bind(new(homestayqueryservice.HomestayQueryService), new(*queryservice.HomestayQueryService)),
 		wire.Bind(new(travellocationqueryservice.TravelLocationQueryService), new(*queryservice.TravelLocationQueryService)),
 		wire.Bind(new(travelmemoryqueryservice.TravelMemoryQueryService), new(*queryservice.TravelMemoryQueryService)),
 		wire.Bind(new(selectionqueryservice.SelectionQueryService), new(*queryservice.SelectionQueryService)),
+		wire.Bind(new(itineraryqueryservice.ItineraryQueryService), new(*queryservice.ItineraryQueryService)),
 		usecases.NewUserUsecase,
 		usecases.NewAuthUsecase,
 		uploads.NewUseCase,
@@ -74,12 +78,14 @@ func InitializeApplication(db *gorm.DB, jwtService *security.JWTService, secureC
 		travelmemoryusecase.NewDeleteTravelMemoryUseCase,
 		selectionusecase.NewFetchSelectionTravelLocationsUseCase,
 		selectionusecase.NewFetchSelectionTravelThemesUseCase,
+		itineraryusecase.NewFetchItinerariesUseCase,
 		controller.NewUserController,
 		controller.NewAuthController,
 		controller.NewHomestayController,
 		controller.NewTravelLocationController,
 		controller.NewTravelMemoryController,
 		controller.NewSelectionController,
+		controller.NewItineraryController,
 		controller.NewUploadController,
 		controller.NewServerController,
 		wire.Struct(new(Application), "*"),

@@ -40,6 +40,9 @@ type ServerInterface interface {
 	// Update a homestay
 	// (PUT /homestays/{homestayID})
 	UpdateHomestay(c *gin.Context, homestayID int64)
+	// Get itinerary list
+	// (GET /itineraries)
+	FetchItineraries(c *gin.Context, params FetchItinerariesParams)
 	// Get travel locations for selection
 	// (GET /selections/travel-locations)
 	FetchSelectionTravelLocations(c *gin.Context, params FetchSelectionTravelLocationsParams)
@@ -294,6 +297,64 @@ func (siw *ServerInterfaceWrapper) UpdateHomestay(c *gin.Context) {
 	}
 
 	siw.Handler.UpdateHomestay(c, homestayID)
+}
+
+// FetchItineraries operation middleware
+func (siw *ServerInterfaceWrapper) FetchItineraries(c *gin.Context) {
+
+	var err error
+
+	c.Set(AccessCookieScopes, []string{})
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params FetchItinerariesParams
+
+	// ------------- Required query parameter "page" -------------
+
+	if paramValue := c.Query("page"); paramValue != "" {
+
+	} else {
+		siw.ErrorHandler(c, fmt.Errorf("Query argument page is required, but not found"), http.StatusBadRequest)
+		return
+	}
+
+	err = runtime.BindQueryParameter("form", true, true, "page", c.Request.URL.Query(), &params.Page)
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter page: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	// ------------- Required query parameter "perPage" -------------
+
+	if paramValue := c.Query("perPage"); paramValue != "" {
+
+	} else {
+		siw.ErrorHandler(c, fmt.Errorf("Query argument perPage is required, but not found"), http.StatusBadRequest)
+		return
+	}
+
+	err = runtime.BindQueryParameter("form", true, true, "perPage", c.Request.URL.Query(), &params.PerPage)
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter perPage: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	// ------------- Optional query parameter "locationId" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "locationId", c.Request.URL.Query(), &params.LocationId)
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter locationId: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.FetchItineraries(c, params)
 }
 
 // FetchSelectionTravelLocations operation middleware
@@ -712,6 +773,7 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.DELETE(options.BaseURL+"/homestays/:homestayID", wrapper.DeleteHomestay)
 	router.GET(options.BaseURL+"/homestays/:homestayID", wrapper.FetchHomestayByID)
 	router.PUT(options.BaseURL+"/homestays/:homestayID", wrapper.UpdateHomestay)
+	router.GET(options.BaseURL+"/itineraries", wrapper.FetchItineraries)
 	router.GET(options.BaseURL+"/selections/travel-locations", wrapper.FetchSelectionTravelLocations)
 	router.GET(options.BaseURL+"/selections/travel-themes", wrapper.FetchSelectionTravelThemes)
 	router.GET(options.BaseURL+"/travel-locations", wrapper.FetchTravelLocations)

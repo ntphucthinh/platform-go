@@ -1,0 +1,56 @@
+FetchItinerariesResponse:
+  type: object
+  properties:
+    data:
+      type: array
+      items:
+        type: object
+        properties:
+          id:
+            type: integer
+            format: int64
+            example: 1
+          locationId:
+            type: integer
+            format: int64
+            nullable: true
+            example: 1
+          locationName:
+            type: string
+            nullable: true
+            example: "Lâm Đồng"
+          itineraryName:
+            type: string
+            example: "Khám phá Đà Lạt"
+          durationDays:
+            type: integer
+            example: 3
+          durationNights:
+            type: integer
+            example: 2
+          duration:
+            type: string
+            example: "3 ngày 2 đêm"
+          activityCount:
+            type: integer
+            example: 11
+          description:
+            type: string
+            nullable: true
+            example: "Một hành trình nhẹ nhàng để cảm nhận trọn vẹn vẻ đẹp của Đà Lạt, từ thiên nhiên, ẩm thực đến những góc cà phê thơ mộng."
+          coverImagePath:
+            type: string
+            nullable: true
+            example: "itineraries/dalat-cover.jpg"
+        required:
+          - id
+          - itineraryName
+          - durationDays
+          - durationNights
+          - duration
+          - activityCount
+    paginatorInfo:
+      $ref: "../common/paginator_info.yml"
+  required:
+    - data
+    - paginatorInfo

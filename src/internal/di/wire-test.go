@@ -15,6 +15,8 @@ import (
 	"platform-go/internal/usecases"
 	homestayqueryservice "platform-go/internal/usecases/homestays/queryservice"
 	homestayusecase "platform-go/internal/usecases/homestays/usecase"
+	itineraryqueryservice "platform-go/internal/usecases/itineraries/queryservice"
+	itineraryusecase "platform-go/internal/usecases/itineraries/usecase"
 	selectionqueryservice "platform-go/internal/usecases/selections/queryservice"
 	selectionusecase "platform-go/internal/usecases/selections/usecase"
 	travellocationqueryservice "platform-go/internal/usecases/travel_locations/queryservice"
@@ -29,6 +31,7 @@ type TestHandlerSet struct {
 	TravelLocationHandler controller.TravelLocationController
 	TravelMemoryHandler   controller.TravelMemoryController
 	SelectionHandler      controller.SelectionController
+	ItineraryHandler      controller.ItineraryController
 	DB                    *gorm.DB
 }
 
@@ -48,10 +51,12 @@ func TestInitializeControllers(t *testing.T, db *gorm.DB) (*TestHandlerSet, erro
 		queryservice.NewTravelLocationQueryService,
 		queryservice.NewTravelMemoryQueryService,
 		queryservice.NewSelectionQueryService,
+		queryservice.NewItineraryQueryService,
 		wire.Bind(new(homestayqueryservice.HomestayQueryService), new(*queryservice.HomestayQueryService)),
 		wire.Bind(new(travellocationqueryservice.TravelLocationQueryService), new(*queryservice.TravelLocationQueryService)),
 		wire.Bind(new(travelmemoryqueryservice.TravelMemoryQueryService), new(*queryservice.TravelMemoryQueryService)),
 		wire.Bind(new(selectionqueryservice.SelectionQueryService), new(*queryservice.SelectionQueryService)),
+		wire.Bind(new(itineraryqueryservice.ItineraryQueryService), new(*queryservice.ItineraryQueryService)),
 		usecases.NewUserUsecase,
 		homestayusecase.NewFetchHomestaysUseCase,
 		homestayusecase.NewCreateHomestayUsecase,
@@ -70,11 +75,13 @@ func TestInitializeControllers(t *testing.T, db *gorm.DB) (*TestHandlerSet, erro
 		travelmemoryusecase.NewDeleteTravelMemoryUseCase,
 		selectionusecase.NewFetchSelectionTravelLocationsUseCase,
 		selectionusecase.NewFetchSelectionTravelThemesUseCase,
+		itineraryusecase.NewFetchItinerariesUseCase,
 		controller.NewUserController,
 		controller.NewHomestayController,
 		controller.NewTravelLocationController,
 		controller.NewTravelMemoryController,
 		controller.NewSelectionController,
+		controller.NewItineraryController,
 		wire.Struct(new(TestHandlerSet), "*"),
 	)
 	return nil, nil

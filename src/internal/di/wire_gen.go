@@ -15,6 +15,7 @@ import (
 	"platform-go/internal/interfaces/controller"
 	"platform-go/internal/usecases"
 	"platform-go/internal/usecases/homestays/usecase"
+	usecase5 "platform-go/internal/usecases/itineraries/usecase"
 	usecase4 "platform-go/internal/usecases/selections/usecase"
 	usecase2 "platform-go/internal/usecases/travel_locations/usecase"
 	usecase3 "platform-go/internal/usecases/travel_memories/usecase"
@@ -66,7 +67,10 @@ func InitializeApplication(db *gorm.DB, jwtService *security.JWTService, secureC
 	fetchSelectionTravelLocationsUseCase := usecase4.NewFetchSelectionTravelLocationsUseCase(selectionQueryService)
 	fetchSelectionTravelThemesUseCase := usecase4.NewFetchSelectionTravelThemesUseCase(selectionQueryService)
 	selectionController := controller.NewSelectionController(fetchSelectionTravelLocationsUseCase, fetchSelectionTravelThemesUseCase)
-	serverController := controller.NewServerController(userController, authController, homestayController, travelLocationController, travelMemoryController, uploadController, selectionController)
+	itineraryQueryService := queryservice.NewItineraryQueryService(db)
+	fetchItinerariesUseCase := usecase5.NewFetchItinerariesUseCase(itineraryQueryService)
+	itineraryController := controller.NewItineraryController(fetchItinerariesUseCase)
+	serverController := controller.NewServerController(userController, authController, homestayController, travelLocationController, travelMemoryController, uploadController, selectionController, itineraryController)
 	application := &Application{
 		Controller:  serverController,
 		AuthUsecase: authUsecase,
