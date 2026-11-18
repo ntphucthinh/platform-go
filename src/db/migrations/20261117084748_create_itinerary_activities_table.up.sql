@@ -3,7 +3,7 @@ CREATE TABLE IF NOT EXISTS itinerary_activities (
     itinerary_day_id BIGINT NOT NULL,
     start_time TIME NOT NULL, -- Giờ bắt đầu định dạng HH:mm (VD: "07:30", "14:00")
     title VARCHAR(255) NOT NULL, -- Tên hoạt động
-    activity_category ENUM('dining', 'sightseeing', 'nature', 'cafe', 'shopping', 'relax') NULL DEFAULT NULL, -- 'Ăn uống' | 'Tham quan' | 'Thiên nhiên' | 'Cà phê' | 'Mua sắm' | 'Nghỉ ngơi'
+    activity_category ENUM('dining', 'sightseeing', 'nature', 'cafe', 'shopping', 'relax', 'other') NULL DEFAULT NULL, -- 'Ăn uống' | 'Tham quan' | 'Thiên nhiên' | 'Cà phê' | 'Mua sắm' | 'Nghỉ ngơi'
     duration_minutes SMALLINT UNSIGNED NULL,  -- Thời lượng tính bằng phút
     location VARCHAR(500) NULL, -- Địa điểm cụ thể 
     google_maps_url VARCHAR(500) NULL, -- Link Google Maps
