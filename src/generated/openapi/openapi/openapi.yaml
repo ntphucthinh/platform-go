@@ -1750,7 +1750,7 @@ components:
         - nature: Thiên nhiên
         - cafe: Cà phê
         - shopping: Mua sắm
-        - relax: Nghỉ ngơi
+        - rest: Nghỉ ngơi
         - other: Khác
       enum:
       - dining
@@ -1758,7 +1758,7 @@ components:
       - nature
       - cafe
       - shopping
-      - relax
+      - rest
       - other
       type: string
       x-enum-varnames:
@@ -1767,7 +1767,7 @@ components:
       - ItineraryActivityCategoryNature
       - ItineraryActivityCategoryCafe
       - ItineraryActivityCategoryShopping
-      - ItineraryActivityCategoryRelax
+      - ItineraryActivityCategoryRest
       - ItineraryActivityCategoryOther
     FetchItinerariesResponse:
       example:

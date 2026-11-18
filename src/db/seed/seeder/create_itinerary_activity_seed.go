@@ -196,7 +196,7 @@ func CreateItineraryActivities(db repository.DBInterface, days []dbmodel.Itinera
 			{
 				startTime:        "10:30:00",
 				title:            "Tắm biển & Dạo mát Bãi biển Mỹ Khê",
-				activityCategory: "relax",
+				activityCategory: "rest",
 				durationMinutes:  120,
 				location:         "Đường Võ Nguyên Giáp, Ngũ Hành Sơn, Đà Nẵng",
 				googleMapsURL:    "https://maps.google.com/?q=My+Khe+Beach",
@@ -275,7 +275,7 @@ func CreateItineraryActivities(db repository.DBInterface, days []dbmodel.Itinera
 			{
 				startTime:        "14:00:00",
 				title:            "Vui chơi tại Fantasy Park & Hầm rượu Debay",
-				activityCategory: "relax",
+				activityCategory: "rest",
 				durationMinutes:  150,
 				location:         "Sun World Ba Na Hills",
 				googleMapsURL:    "https://maps.google.com/?q=Fantasy+Park+Ba+Na",
@@ -404,7 +404,7 @@ func CreateItineraryActivities(db repository.DBInterface, days []dbmodel.Itinera
 			{
 				startTime:        "10:30:00",
 				title:            "Tự tay làm gốm tại Làng gốm cổ Bát Tràng",
-				activityCategory: "relax",
+				activityCategory: "rest",
 				durationMinutes:  150,
 				location:         "Xã Bát Tràng, Huyện Gia Lâm, Hà Nội",
 				googleMapsURL:    "https://maps.google.com/?q=Lang+Gom+Bat+Trang",
@@ -498,7 +498,7 @@ func CreateItineraryActivities(db repository.DBInterface, days []dbmodel.Itinera
 			{
 				startTime:        "06:15:00",
 				title:            "Tập Thái Cực Quyền (Taichi) đón bình minh",
-				activityCategory: "relax",
+				activityCategory: "rest",
 				durationMinutes:  45,
 				location:         "Sundeck tầng thượng du thuyền",
 				googleMapsURL:    "https://maps.google.com/?q=Ha+Long+Bay",
@@ -636,7 +636,7 @@ func CreateItineraryActivities(db repository.DBInterface, days []dbmodel.Itinera
 			{
 				startTime:        "17:00:00",
 				title:            "Ngắm hoàng hôn ngoạn mục tại Shibuya Sky",
-				activityCategory: "relax",
+				activityCategory: "rest",
 				durationMinutes:  90,
 				location:         "2 Chome-24-12 Shibuya, Shibuya City, Tokyo",
 				googleMapsURL:    "https://maps.google.com/?q=Shibuya+Sky",

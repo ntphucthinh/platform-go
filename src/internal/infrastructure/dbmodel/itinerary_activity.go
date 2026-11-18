@@ -10,7 +10,7 @@ type ItineraryActivity struct {
 	ItineraryDayID   int64     `gorm:"column:itinerary_day_id;not null;index"`
 	StartTime        string    `gorm:"column:start_time;type:time;not null"`
 	Title            string    `gorm:"column:title;size:255;not null"`
-	ActivityCategory *string   `gorm:"column:activity_category;type:enum('dining','sightseeing','nature','cafe','shopping','relax','other')"`
+	ActivityCategory *string   `gorm:"column:activity_category;type:enum('dining','sightseeing','nature','cafe','shopping','rest','other')"`
 	DurationMinutes  *uint16   `gorm:"column:duration_minutes"`
 	Location         *string   `gorm:"column:location;size:500"`
 	GoogleMapsURL    *string   `gorm:"column:google_maps_url;size:500"`

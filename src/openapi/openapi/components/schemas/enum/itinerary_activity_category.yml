@@ -6,7 +6,7 @@ ItineraryActivityCategory:
     - nature
     - cafe
     - shopping
-    - relax
+    - rest
     - other
   x-enum-varnames:
     - ItineraryActivityCategoryDining
@@ -14,7 +14,7 @@ ItineraryActivityCategory:
     - ItineraryActivityCategoryNature
     - ItineraryActivityCategoryCafe
     - ItineraryActivityCategoryShopping
-    - ItineraryActivityCategoryRelax
+    - ItineraryActivityCategoryRest
     - ItineraryActivityCategoryOther
   description: |-
     Loại hoạt động trong lịch trình:
@@ -23,5 +23,5 @@ ItineraryActivityCategory:
     - nature: Thiên nhiên
     - cafe: Cà phê
     - shopping: Mua sắm
-    - relax: Nghỉ ngơi
+    - rest: Nghỉ ngơi
     - other: Khác

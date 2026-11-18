@@ -26,7 +26,7 @@ const (
 	ItineraryActivityCategoryDining      ItineraryActivityCategory = "dining"
 	ItineraryActivityCategoryNature      ItineraryActivityCategory = "nature"
 	ItineraryActivityCategoryOther       ItineraryActivityCategory = "other"
-	ItineraryActivityCategoryRelax       ItineraryActivityCategory = "relax"
+	ItineraryActivityCategoryRest        ItineraryActivityCategory = "rest"
 	ItineraryActivityCategoryShopping    ItineraryActivityCategory = "shopping"
 	ItineraryActivityCategorySightseeing ItineraryActivityCategory = "sightseeing"
 )
@@ -437,7 +437,7 @@ type HomestayImageInput struct {
 // - nature: Thiên nhiên
 // - cafe: Cà phê
 // - shopping: Mua sắm
-// - relax: Nghỉ ngơi
+// - rest: Nghỉ ngơi
 // - other: Khác
 type ItineraryActivityCategory string
 
