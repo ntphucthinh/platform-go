@@ -23,3 +23,24 @@ get:
         application/json:
           schema:
             $ref: "../../components/schemas/itineraries/index.yml#/FetchItinerariesResponse"
+post:
+  operationId: createItinerary
+  tags:
+    - itineraries
+  summary: Create a new itinerary
+  description: Create a new itinerary along with its themes, days, and activities.
+  security:
+    - AccessCookie: []
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: "../../components/schemas/itineraries/index.yml#/CreateItineraryRequest"
+  responses:
+    "200":
+      description: Itinerary created successfully
+      content:
+        application/json:
+          schema:
+            $ref: "../../components/schemas/common/message.yml#/MessageOnlyResponse"

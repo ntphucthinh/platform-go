@@ -18,6 +18,9 @@ var (
 
 func ValidatorTranslate(v *validator.Validate) {
 	registerCustomTranslation(v, "validateTravelLocationID", validateTravelLocationIDTranslation)
+	registerCustomTranslation(v, "validateTravelLocationIDs", validateTravelLocationIDTranslation)
+	registerCustomTranslation(v, "validateTravelThemeID", validateTravelThemeIDTranslation)
+	registerCustomTranslation(v, "validateTravelThemeIDs", validateTravelThemeIDTranslation)
 }
 
 func TranslateError(err error) map[string]string {

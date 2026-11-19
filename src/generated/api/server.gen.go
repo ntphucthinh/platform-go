@@ -43,6 +43,9 @@ type ServerInterface interface {
 	// Get itinerary list
 	// (GET /itineraries)
 	FetchItineraries(c *gin.Context, params FetchItinerariesParams)
+	// Create a new itinerary
+	// (POST /itineraries)
+	CreateItinerary(c *gin.Context)
 	// Get itinerary detail
 	// (GET /itineraries/{itineraryID})
 	FetchItineraryByID(c *gin.Context, itineraryID int64)
@@ -358,6 +361,21 @@ func (siw *ServerInterfaceWrapper) FetchItineraries(c *gin.Context) {
 	}
 
 	siw.Handler.FetchItineraries(c, params)
+}
+
+// CreateItinerary operation middleware
+func (siw *ServerInterfaceWrapper) CreateItinerary(c *gin.Context) {
+
+	c.Set(AccessCookieScopes, []string{})
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.CreateItinerary(c)
 }
 
 // FetchItineraryByID operation middleware
@@ -803,6 +821,7 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.GET(options.BaseURL+"/homestays/:homestayID", wrapper.FetchHomestayByID)
 	router.PUT(options.BaseURL+"/homestays/:homestayID", wrapper.UpdateHomestay)
 	router.GET(options.BaseURL+"/itineraries", wrapper.FetchItineraries)
+	router.POST(options.BaseURL+"/itineraries", wrapper.CreateItinerary)
 	router.GET(options.BaseURL+"/itineraries/:itineraryID", wrapper.FetchItineraryByID)
 	router.GET(options.BaseURL+"/selections/travel-locations", wrapper.FetchSelectionTravelLocations)
 	router.GET(options.BaseURL+"/selections/travel-themes", wrapper.FetchSelectionTravelThemes)

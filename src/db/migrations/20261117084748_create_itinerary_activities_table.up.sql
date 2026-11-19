@@ -5,7 +5,7 @@ CREATE TABLE IF NOT EXISTS itinerary_activities (
     title VARCHAR(255) NOT NULL, -- Tên hoạt động
     activity_category ENUM('dining', 'sightseeing', 'nature', 'cafe', 'shopping', 'rest', 'other') NULL DEFAULT NULL, -- 'Ăn uống' | 'Tham quan' | 'Thiên nhiên' | 'Cà phê' | 'Mua sắm' | 'Nghỉ ngơi'
     duration_minutes SMALLINT UNSIGNED NULL,  -- Thời lượng tính bằng phút
-    location VARCHAR(500) NULL, -- Địa điểm cụ thể 
+    location VARCHAR(255) NULL, -- Địa điểm cụ thể 
     google_maps_url VARCHAR(500) NULL, -- Link Google Maps
     description VARCHAR(500) NULL, -- Mô tả hoạt động
     notes VARCHAR(255) NULL, -- Ghi chú thêm

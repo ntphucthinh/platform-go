@@ -14,6 +14,7 @@ import (
 type ItineraryController interface {
 	FetchItineraries(c *gin.Context, params api.FetchItinerariesParams)
 	FetchItineraryByID(c *gin.Context, itineraryID int64)
+	CreateItinerary(c *gin.Context)
 }
 
 type itineraryController struct {
@@ -57,4 +58,15 @@ func (con *itineraryController) FetchItineraryByID(c *gin.Context, itineraryID i
 	}
 
 	c.JSON(http.StatusOK, res)
+}
+
+// Create itinerary
+// (POST /itineraries)
+func (con *itineraryController) CreateItinerary(c *gin.Context) {
+	var request api.CreateItineraryRequest
+	if err := common.BindJSON(c, &request); err != nil {
+		return
+	}
+
+	c.JSON(http.StatusOK, api.MessageOnlyResponse{Message: "Success"})
 }

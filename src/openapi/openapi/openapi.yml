@@ -126,6 +126,8 @@ components:
       $ref: "./components/schemas/itineraries/index.yml#/FetchItinerariesResponse"
     FetchItineraryByIDResponse:
       $ref: "./components/schemas/itineraries/:itineraryID.yml#/FetchItineraryByIDResponse"
+    CreateItineraryRequest:
+      $ref: "./components/schemas/itineraries/index.yml#/CreateItineraryRequest"
     SelectionTravelLocationResponse:
       $ref: "./components/schemas/selections/travel_locations.yml#/SelectionTravelLocationResponse"
     SelectionTravelThemeResponse:

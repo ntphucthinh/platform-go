@@ -231,6 +231,12 @@ func (con *ServerController) FetchItineraries(c *gin.Context, params api.FetchIt
 	con.itineraryController.FetchItineraries(c, params)
 }
 
+// CreateItinerary creates a new itinerary along with its themes, days, and activities.
+// (POST /itineraries)
+func (con *ServerController) CreateItinerary(c *gin.Context) {
+	con.itineraryController.CreateItinerary(c)
+}
+
 // FetchItineraryByID retrieves details of a single itinerary by ID.
 // (GET /itineraries/{itineraryID})
 func (con *ServerController) FetchItineraryByID(c *gin.Context, itineraryID int64) {

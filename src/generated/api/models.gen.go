@@ -100,6 +100,87 @@ type CreateHomestayRoomInput struct {
 	Images *[]HomestayImageInput `binding:"omitempty" json:"images,omitempty"`
 }
 
+// CreateItineraryActivityInput defines model for CreateItineraryActivityInput.
+type CreateItineraryActivityInput struct {
+	// StartTime Activity start time (HH:mm)
+	StartTime string `binding:"required" json:"startTime"`
+
+	// Title Activity title
+	Title string `binding:"required,min=1,max=255" json:"title"`
+
+	// ActivityCategory Activity category
+	ActivityCategory *ItineraryActivityCategory `binding:"omitempty,oneof=dining sightseeing nature cafe shopping rest other" json:"activityCategory"`
+
+	// DurationMinutes Duration in minutes
+	DurationMinutes *int `binding:"omitempty,min=1" json:"durationMinutes"`
+
+	// Location Specific location or address
+	Location *string `binding:"omitempty,max=255" json:"location"`
+
+	// GoogleMapsUrl Google Maps URL
+	GoogleMapsUrl *string `binding:"omitempty,max=500" json:"googleMapsUrl"`
+
+	// Description Activity description
+	Description *string `binding:"omitempty,max=500" json:"description"`
+
+	// Notes Additional notes
+	Notes *string `binding:"omitempty,max=255" json:"notes"`
+
+	// ImagePath Activity image path returned by POST /uploads
+	ImagePath *string `binding:"omitempty,max=255" json:"imagePath"`
+}
+
+// CreateItineraryDayInput defines model for CreateItineraryDayInput.
+type CreateItineraryDayInput struct {
+	// DayNumber Sequential day number starting from 1
+	DayNumber int `binding:"required,min=1" json:"dayNumber"`
+
+	// Title Main title for the day
+	Title string `binding:"required,min=1,max=255" json:"title"`
+
+	// Subtitle Short subtitle for the day
+	Subtitle *string `binding:"omitempty,max=255" json:"subtitle"`
+
+	// Summary Summary of the day's experiences
+	Summary *string `binding:"omitempty,max=500" json:"summary"`
+
+	// ImagePath Representative image path for the day
+	ImagePath *string `binding:"omitempty,max=255" json:"imagePath"`
+
+	// DayTips Daily notes and tips
+	DayTips *[]string `binding:"omitempty" json:"dayTips,omitempty"`
+
+	// Activities List of activities for this day
+	Activities *[]CreateItineraryActivityInput `binding:"omitempty,dive" json:"activities,omitempty"`
+}
+
+// CreateItineraryRequest defines model for CreateItineraryRequest.
+type CreateItineraryRequest struct {
+	// ItineraryName Itinerary name
+	ItineraryName string `binding:"required,min=1,max=255" json:"itineraryName"`
+
+	// LocationId Travel location ID
+	LocationId *int64 `binding:"omitempty,validateTravelLocationID" json:"locationId"`
+
+	// SuitableFor Target audience for the itinerary
+	SuitableFor *string `binding:"omitempty,max=255" json:"suitableFor"`
+
+	// Description General itinerary description
+	Description *string `binding:"omitempty,max=500" json:"description"`
+
+	// CoverImagePath Cover image path returned by POST /uploads
+	CoverImagePath *string `binding:"omitempty,max=255" json:"coverImagePath"`
+
+	// TravelTips General travel tips for the itinerary
+	TravelTips *[]string `binding:"omitempty" json:"travelTips,omitempty"`
+
+	// ThemeIds List of travel theme IDs
+	ThemeIds *[]int64 `binding:"omitempty,validateTravelThemeID" json:"themeIds,omitempty"`
+
+	// Days List of daily itinerary entries
+	Days *[]CreateItineraryDayInput `binding:"omitempty,dive" json:"days,omitempty"`
+}
+
 // CreateTravelLocationRequest defines model for CreateTravelLocationRequest.
 type CreateTravelLocationRequest struct {
 	// CountryCode ISO 3166-1 alpha-2 country code
@@ -795,6 +876,9 @@ type CreateHomestayJSONRequestBody = CreateHomestayRequest
 
 // UpdateHomestayJSONRequestBody defines body for UpdateHomestay for application/json ContentType.
 type UpdateHomestayJSONRequestBody = UpdateHomestayRequest
+
+// CreateItineraryJSONRequestBody defines body for CreateItinerary for application/json ContentType.
+type CreateItineraryJSONRequestBody = CreateItineraryRequest
 
 // CreateTravelLocationJSONRequestBody defines body for CreateTravelLocation for application/json ContentType.
 type CreateTravelLocationJSONRequestBody = CreateTravelLocationRequest
