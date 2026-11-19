@@ -45,9 +45,12 @@ const (
 
 // Defines values for UploadFilesRequestFolder.
 const (
-	Homestays      UploadFilesRequestFolder = "homestays"
-	TravelLocation UploadFilesRequestFolder = "travel_location"
-	TravelMemories UploadFilesRequestFolder = "travel_memories"
+	Homestays             UploadFilesRequestFolder = "homestays"
+	Itineraries           UploadFilesRequestFolder = "itineraries"
+	Itinerariesactivities UploadFilesRequestFolder = "itineraries/activities"
+	Itinerariesdays       UploadFilesRequestFolder = "itineraries/days"
+	TravelLocation        UploadFilesRequestFolder = "travel_location"
+	TravelMemories        UploadFilesRequestFolder = "travel_memories"
 )
 
 // AuthResponse defines model for AuthResponse.

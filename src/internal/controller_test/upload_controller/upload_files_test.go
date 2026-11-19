@@ -95,6 +95,45 @@ func TestUploadFilesValidation(t *testing.T) {
 		require.Equal(t, http.StatusOK, response.Code, response.Body.String())
 	})
 
+	t.Run("accepts itineraries folder", func(t *testing.T) {
+		client := &fakeAssetClient{}
+		response := performUpload(t, newUploadRouter(t, client), "itineraries", "photo.png", pngContent())
+		require.Equal(t, http.StatusOK, response.Code, response.Body.String())
+
+		var body api.UploadResponse
+		require.NoError(t, json.Unmarshal(response.Body.Bytes(), &body))
+		require.Len(t, body.Data, 1)
+		assert.True(t, strings.HasPrefix(body.Data[0].Path, "itineraries/"))
+		require.Len(t, client.uploads, 1)
+		assert.Equal(t, "itineraries", client.uploads[0].Folder)
+	})
+
+	t.Run("accepts itineraries/days folder", func(t *testing.T) {
+		client := &fakeAssetClient{}
+		response := performUpload(t, newUploadRouter(t, client), "itineraries/days", "photo.png", pngContent())
+		require.Equal(t, http.StatusOK, response.Code, response.Body.String())
+
+		var body api.UploadResponse
+		require.NoError(t, json.Unmarshal(response.Body.Bytes(), &body))
+		require.Len(t, body.Data, 1)
+		assert.True(t, strings.HasPrefix(body.Data[0].Path, "itineraries/days/"))
+		require.Len(t, client.uploads, 1)
+		assert.Equal(t, "itineraries/days", client.uploads[0].Folder)
+	})
+
+	t.Run("accepts itineraries/activities folder", func(t *testing.T) {
+		client := &fakeAssetClient{}
+		response := performUpload(t, newUploadRouter(t, client), "itineraries/activities", "photo.png", pngContent())
+		require.Equal(t, http.StatusOK, response.Code, response.Body.String())
+
+		var body api.UploadResponse
+		require.NoError(t, json.Unmarshal(response.Body.Bytes(), &body))
+		require.Len(t, body.Data, 1)
+		assert.True(t, strings.HasPrefix(body.Data[0].Path, "itineraries/activities/"))
+		require.Len(t, client.uploads, 1)
+		assert.Equal(t, "itineraries/activities", client.uploads[0].Folder)
+	})
+
 	cases := []struct {
 		name, folder, fileName string
 		content                []byte

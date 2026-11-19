@@ -8,6 +8,10 @@ import (
 
 	api "platform-go/generated/api"
 	"platform-go/internal/common"
+	"platform-go/internal/domain/itinerary"
+	itineraryactivity "platform-go/internal/domain/itinerary_activity"
+	itineraryday "platform-go/internal/domain/itinerary_day"
+	itinerarytheme "platform-go/internal/domain/itinerary_theme"
 	itineraryusecase "platform-go/internal/usecases/itineraries/usecase"
 )
 
@@ -20,15 +24,18 @@ type ItineraryController interface {
 type itineraryController struct {
 	fetchItinerariesUseCase   *itineraryusecase.FetchItinerariesUseCase
 	fetchItineraryByIDUseCase *itineraryusecase.FetchItineraryByIDUseCase
+	createItineraryUseCase    *itineraryusecase.CreateItineraryUseCase
 }
 
 func NewItineraryController(
 	fetchItinerariesUseCase *itineraryusecase.FetchItinerariesUseCase,
 	fetchItineraryByIDUseCase *itineraryusecase.FetchItineraryByIDUseCase,
+	createItineraryUseCase *itineraryusecase.CreateItineraryUseCase,
 ) ItineraryController {
 	return &itineraryController{
 		fetchItinerariesUseCase:   fetchItinerariesUseCase,
 		fetchItineraryByIDUseCase: fetchItineraryByIDUseCase,
+		createItineraryUseCase:    createItineraryUseCase,
 	}
 }
 
@@ -68,5 +75,24 @@ func (con *itineraryController) CreateItinerary(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, api.MessageOnlyResponse{Message: "Success"})
+	res, err := con.createItineraryUseCase.Execute(c.Request.Context(), request)
+	if err != nil {
+		if errors.Is(err, itinerary.ErrInvalidImagePath) ||
+			errors.Is(err, itinerarytheme.ErrDuplicateThemeID) ||
+			errors.Is(err, itinerarytheme.ErrInvalidThemeID) ||
+			errors.Is(err, itineraryday.ErrDayNotFound) ||
+			errors.Is(err, itineraryday.ErrInvalidDayNumber) ||
+			errors.Is(err, itineraryday.ErrDuplicateDayNumber) ||
+			errors.Is(err, itineraryday.ErrInvalidImagePath) ||
+			errors.Is(err, itineraryactivity.ErrInvalidStartTime) ||
+			errors.Is(err, itineraryactivity.ErrInvalidDurationMinutes) ||
+			errors.Is(err, itineraryactivity.ErrInvalidImagePath) {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+		common.IsErrorWithMessage(c, err, "Failed to create itinerary")
+		return
+	}
+
+	c.JSON(http.StatusOK, res)
 }

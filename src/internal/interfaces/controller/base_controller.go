@@ -242,4 +242,3 @@ func (con *ServerController) CreateItinerary(c *gin.Context) {
 func (con *ServerController) FetchItineraryByID(c *gin.Context, itineraryID int64) {
 	con.itineraryController.FetchItineraryByID(c, itineraryID)
 }
-

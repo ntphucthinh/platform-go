@@ -36,6 +36,33 @@ func TestDeleteUploads(t *testing.T) {
 		assert.Equal(t, "travel_memories/550e8400-e29b-41d4-a716-446655440000", memClient.deletes[0].PublicID)
 		assert.Equal(t, uploads.ResourceImage, memClient.deletes[0].ResourceType)
 	})
+
+	t.Run("deletes itineraries path", func(t *testing.T) {
+		itClient := &fakeAssetClient{}
+		itResp := performDelete(t, newUploadRouter(t, itClient), `[{"path":"itineraries/550e8400-e29b-41d4-a716-446655440000.jpg","resourceType":"image"}]`)
+		require.Equal(t, http.StatusOK, itResp.Code, itResp.Body.String())
+		require.Len(t, itClient.deletes, 1)
+		assert.Equal(t, "itineraries/550e8400-e29b-41d4-a716-446655440000", itClient.deletes[0].PublicID)
+		assert.Equal(t, uploads.ResourceImage, itClient.deletes[0].ResourceType)
+	})
+
+	t.Run("deletes itineraries/days path", func(t *testing.T) {
+		dayClient := &fakeAssetClient{}
+		resp := performDelete(t, newUploadRouter(t, dayClient), `[{"path":"itineraries/days/550e8400-e29b-41d4-a716-446655440000.jpg","resourceType":"image"}]`)
+		require.Equal(t, http.StatusOK, resp.Code, resp.Body.String())
+		require.Len(t, dayClient.deletes, 1)
+		assert.Equal(t, "itineraries/days/550e8400-e29b-41d4-a716-446655440000", dayClient.deletes[0].PublicID)
+		assert.Equal(t, uploads.ResourceImage, dayClient.deletes[0].ResourceType)
+	})
+
+	t.Run("deletes itineraries/activities path", func(t *testing.T) {
+		actClient := &fakeAssetClient{}
+		resp := performDelete(t, newUploadRouter(t, actClient), `[{"path":"itineraries/activities/550e8400-e29b-41d4-a716-446655440000.jpg","resourceType":"image"}]`)
+		require.Equal(t, http.StatusOK, resp.Code, resp.Body.String())
+		require.Len(t, actClient.deletes, 1)
+		assert.Equal(t, "itineraries/activities/550e8400-e29b-41d4-a716-446655440000", actClient.deletes[0].PublicID)
+		assert.Equal(t, uploads.ResourceImage, actClient.deletes[0].ResourceType)
+	})
 }
 
 func TestDeleteUploadsDoesNotDeleteInvalidPath(t *testing.T) {

@@ -70,7 +70,12 @@ func InitializeApplication(db *gorm.DB, jwtService *security.JWTService, secureC
 	itineraryQueryService := queryservice.NewItineraryQueryService(db)
 	fetchItinerariesUseCase := usecase5.NewFetchItinerariesUseCase(itineraryQueryService)
 	fetchItineraryByIDUseCase := usecase5.NewFetchItineraryByIDUseCase(itineraryQueryService)
-	itineraryController := controller.NewItineraryController(fetchItinerariesUseCase, fetchItineraryByIDUseCase)
+	itineraryRepository := repository.NewItineraryRepository(dbInterface)
+	itineraryThemeRepository := repository.NewItineraryThemeRepository(dbInterface)
+	itineraryDayRepository := repository.NewItineraryDayRepository(dbInterface)
+	itineraryActivityRepository := repository.NewItineraryActivityRepository(dbInterface)
+	createItineraryUseCase := usecase5.NewCreateItineraryUseCase(dbInterface, itineraryRepository, itineraryThemeRepository, itineraryDayRepository, itineraryActivityRepository)
+	itineraryController := controller.NewItineraryController(fetchItinerariesUseCase, fetchItineraryByIDUseCase, createItineraryUseCase)
 	serverController := controller.NewServerController(userController, authController, homestayController, travelLocationController, travelMemoryController, uploadController, selectionController, itineraryController)
 	application := &Application{
 		Controller:  serverController,
