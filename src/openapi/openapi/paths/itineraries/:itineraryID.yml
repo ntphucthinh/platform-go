@@ -22,3 +22,61 @@ get:
         application/json:
           schema:
             $ref: "../../components/schemas/itineraries/:itineraryID.yml#/FetchItineraryByIDResponse"
+put:
+  operationId: updateItinerary
+  parameters:
+    - name: itineraryID
+      in: path
+      required: true
+      schema:
+        type: integer
+        format: int64
+        minimum: 1
+      example: 1
+  tags:
+    - itineraries
+  summary: Update an itinerary
+  description: |
+    Replace an itinerary together with its themes, days, and activities (full-state sync).
+    - Day / activity with `id` → updated.
+    - Day / activity without `id` → created.
+    - Existing day / activity not present in the request → deleted.
+  security:
+    - AccessCookie: []
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: "../../components/schemas/itineraries/:itineraryID.yml#/UpdateItineraryRequest"
+  responses:
+    "200":
+      description: Itinerary updated successfully
+      content:
+        application/json:
+          schema:
+            $ref: "../../components/schemas/common/message.yml#/MessageOnlyResponse"
+delete:
+  operationId: deleteItinerary
+  parameters:
+    - name: itineraryID
+      in: path
+      required: true
+      schema:
+        type: integer
+        format: int64
+        minimum: 1
+      example: 1
+  tags:
+    - itineraries
+  summary: Delete an itinerary
+  description: Delete an itinerary together with all its associated themes, days, and activities.
+  security:
+    - AccessCookie: []
+  responses:
+    "200":
+      description: Itinerary deleted successfully
+      content:
+        application/json:
+          schema:
+            $ref: "../../components/schemas/common/message.yml#/MessageOnlyResponse"

@@ -185,3 +185,311 @@ FetchItineraryByIDResponse:
         - days
   required:
     - data
+
+# ---------------------------------------------------------------------------
+# Update itinerary (PUT /itineraries/{itineraryID})
+# ---------------------------------------------------------------------------
+UpdateItineraryRequest:
+  type: object
+  properties:
+    itineraryName:
+      type: string
+      minLength: 1
+      maxLength: 255
+      x-order: 1
+      x-go-name: ItineraryName
+      description: "Itinerary name"
+      example: "Khám phá Đà Lạt"
+      x-oapi-codegen-extra-tags:
+        binding: "required,min=1,max=255"
+
+    locationId:
+      type: integer
+      format: int64
+      nullable: true
+      x-order: 2
+      x-go-name: LocationId
+      description: "Travel location ID"
+      example: 1
+      x-oapi-codegen-extra-tags:
+        binding: "omitempty,validateTravelLocationID"
+
+    suitableFor:
+      type: string
+      maxLength: 255
+      nullable: true
+      x-order: 3
+      x-go-name: SuitableFor
+      description: "Target audience for the itinerary"
+      example: "Cặp đôi, nhóm bạn, gia đình"
+      x-oapi-codegen-extra-tags:
+        binding: "omitempty,max=255"
+
+    description:
+      type: string
+      maxLength: 500
+      nullable: true
+      x-order: 4
+      x-go-name: Description
+      description: "General itinerary description"
+      example: "Một hành trình nhẹ nhàng để cảm nhận trọn vẹn vẻ đẹp của Đà Lạt."
+      x-oapi-codegen-extra-tags:
+        binding: "omitempty,max=500"
+
+    coverImagePath:
+      type: string
+      maxLength: 255
+      nullable: true
+      x-order: 5
+      x-go-name: CoverImagePath
+      description: "Cover image path returned by POST /uploads"
+      example: "itineraries/dalat-cover.jpg"
+      x-oapi-codegen-extra-tags:
+        binding: "omitempty,max=255"
+
+    travelTips:
+      type: array
+      x-order: 6
+      x-go-name: TravelTips
+      description: "General travel tips for the itinerary"
+      items:
+        type: string
+      example:
+        - "Thời tiết Đà Lạt se lạnh vào sáng sớm và ban đêm, nên chuẩn bị áo ấm."
+        - "Thuê xe máy sẽ giúp chủ động di chuyển."
+      x-oapi-codegen-extra-tags:
+        binding: "omitempty"
+
+    themeIds:
+      type: array
+      x-order: 7
+      x-go-name: ThemeIds
+      description: "List of travel theme IDs. A nil themeIds field means themes remain unchanged."
+      items:
+        type: integer
+        format: int64
+      example:
+        - 1
+        - 2
+        - 3
+      x-oapi-codegen-extra-tags:
+        binding: "omitempty,validateTravelThemeID"
+
+    days:
+      type: array
+      x-order: 8
+      x-go-name: Days
+      description: "List of daily itinerary entries. A nil days field means days remain unchanged."
+      items:
+        $ref: "#/UpdateItineraryDayInput"
+      x-oapi-codegen-extra-tags:
+        binding: "omitempty,dive"
+
+  required:
+    - itineraryName
+
+UpdateItineraryDayInput:
+  type: object
+  properties:
+    id:
+      type: integer
+      format: int64
+      nullable: true
+      x-order: 1
+      x-go-name: Id
+      description: "Existing day ID. Omit or set to null to create a new day."
+      example: 1
+
+    dayNumber:
+      type: integer
+      minimum: 1
+      x-order: 2
+      x-go-name: DayNumber
+      description: "Sequential day number starting from 1"
+      example: 1
+      x-oapi-codegen-extra-tags:
+        binding: "required,min=1"
+
+    title:
+      type: string
+      minLength: 1
+      maxLength: 255
+      x-order: 3
+      x-go-name: Title
+      description: "Main title for the day"
+      example: "Ngày 1 – Khám phá trung tâm Đà Lạt"
+      x-oapi-codegen-extra-tags:
+        binding: "required,min=1,max=255"
+
+    subtitle:
+      type: string
+      maxLength: 255
+      nullable: true
+      x-order: 4
+      x-go-name: Subtitle
+      description: "Short subtitle for the day"
+      example: "Làm quen với thành phố ngàn hoa."
+      x-oapi-codegen-extra-tags:
+        binding: "omitempty,max=255"
+
+    summary:
+      type: string
+      maxLength: 500
+      nullable: true
+      x-order: 5
+      x-go-name: Summary
+      description: "Summary of the day's experiences"
+      example: "Cảm nhận không khí mát lành của trung tâm thành phố."
+      x-oapi-codegen-extra-tags:
+        binding: "omitempty,max=500"
+
+    imagePath:
+      type: string
+      maxLength: 255
+      nullable: true
+      x-order: 6
+      x-go-name: ImagePath
+      description: "Representative image path for the day"
+      example: "itineraries/days/dalat-day-1.jpg"
+      x-oapi-codegen-extra-tags:
+        binding: "omitempty,max=255"
+
+    dayTips:
+      type: array
+      x-order: 7
+      x-go-name: DayTips
+      description: "Daily notes and tips"
+      items:
+        type: string
+      example:
+        - "Trời se lạnh (15–22°C), nên mang theo áo khoác nhẹ."
+        - "Nên mang giày thể thao đế bám tốt."
+      x-oapi-codegen-extra-tags:
+        binding: "omitempty"
+
+    activities:
+      type: array
+      x-order: 8
+      x-go-name: Activities
+      description: "List of activities for this day. A nil activities field means activities remain unchanged."
+      items:
+        $ref: "#/UpdateItineraryActivityInput"
+      x-oapi-codegen-extra-tags:
+        binding: "omitempty,dive"
+
+  required:
+    - dayNumber
+    - title
+
+UpdateItineraryActivityInput:
+  type: object
+  properties:
+    id:
+      type: integer
+      format: int64
+      nullable: true
+      x-order: 1
+      x-go-name: Id
+      description: "Existing activity ID. Omit or set to null to create a new activity."
+      example: 1
+
+    startTime:
+      type: string
+      x-order: 2
+      x-go-name: StartTime
+      description: "Activity start time (HH:mm)"
+      example: "07:30"
+      x-oapi-codegen-extra-tags:
+        binding: "required"
+
+    title:
+      type: string
+      minLength: 1
+      maxLength: 255
+      x-order: 3
+      x-go-name: Title
+      description: "Activity title"
+      example: "Ăn sáng tại chợ Đà Lạt"
+      x-oapi-codegen-extra-tags:
+        binding: "required,min=1,max=255"
+
+    activityCategory:
+      allOf:
+        - $ref: "../enum/itinerary_activity_category.yml#/ItineraryActivityCategory"
+      nullable: true
+      x-order: 4
+      x-go-name: ActivityCategory
+      description: "Activity category"
+      example: "dining"
+      x-oapi-codegen-extra-tags:
+        binding: "omitempty,oneof=dining sightseeing nature cafe shopping rest other"
+
+    durationMinutes:
+      type: integer
+      minimum: 1
+      nullable: true
+      x-order: 5
+      x-go-name: DurationMinutes
+      description: "Duration in minutes"
+      example: 60
+      x-oapi-codegen-extra-tags:
+        binding: "omitempty,min=1"
+
+    location:
+      type: string
+      maxLength: 255
+      nullable: true
+      x-order: 6
+      x-go-name: Location
+      description: "Specific location or address"
+      example: "Chợ Đà Lạt"
+      x-oapi-codegen-extra-tags:
+        binding: "omitempty,max=255"
+
+    googleMapsUrl:
+      type: string
+      maxLength: 500
+      nullable: true
+      x-order: 7
+      x-go-name: GoogleMapsUrl
+      description: "Google Maps URL"
+      example: "https://www.google.com/maps?q=11.9427,108.4373"
+      x-oapi-codegen-extra-tags:
+        binding: "omitempty,max=500"
+
+    description:
+      type: string
+      maxLength: 500
+      nullable: true
+      x-order: 8
+      x-go-name: Description
+      description: "Activity description"
+      example: "Thưởng thức bánh căn và sữa đậu nành nóng."
+      x-oapi-codegen-extra-tags:
+        binding: "omitempty,max=500"
+
+    notes:
+      type: string
+      maxLength: 255
+      nullable: true
+      x-order: 9
+      x-go-name: Notes
+      description: "Additional notes"
+      example: "Nên đi sớm trước 8h00 để không phải chờ bàn."
+      x-oapi-codegen-extra-tags:
+        binding: "omitempty,max=255"
+
+    imagePath:
+      type: string
+      maxLength: 255
+      nullable: true
+      x-order: 10
+      x-go-name: ImagePath
+      description: "Activity image path returned by POST /uploads"
+      example: "itineraries/activities/dalat-banh-can.jpg"
+      x-oapi-codegen-extra-tags:
+        binding: "omitempty,max=255"
+
+  required:
+    - startTime
+    - title

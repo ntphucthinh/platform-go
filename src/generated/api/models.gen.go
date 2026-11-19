@@ -654,6 +654,93 @@ type UpdateHomestayRoomInput struct {
 	Images *[]UpdateHomestayImageInput `binding:"omitempty" json:"images,omitempty"`
 }
 
+// UpdateItineraryActivityInput defines model for UpdateItineraryActivityInput.
+type UpdateItineraryActivityInput struct {
+	// Id Existing activity ID. Omit or set to null to create a new activity.
+	Id *int64 `json:"id"`
+
+	// StartTime Activity start time (HH:mm)
+	StartTime string `binding:"required" json:"startTime"`
+
+	// Title Activity title
+	Title string `binding:"required,min=1,max=255" json:"title"`
+
+	// ActivityCategory Activity category
+	ActivityCategory *ItineraryActivityCategory `binding:"omitempty,oneof=dining sightseeing nature cafe shopping rest other" json:"activityCategory"`
+
+	// DurationMinutes Duration in minutes
+	DurationMinutes *int `binding:"omitempty,min=1" json:"durationMinutes"`
+
+	// Location Specific location or address
+	Location *string `binding:"omitempty,max=255" json:"location"`
+
+	// GoogleMapsUrl Google Maps URL
+	GoogleMapsUrl *string `binding:"omitempty,max=500" json:"googleMapsUrl"`
+
+	// Description Activity description
+	Description *string `binding:"omitempty,max=500" json:"description"`
+
+	// Notes Additional notes
+	Notes *string `binding:"omitempty,max=255" json:"notes"`
+
+	// ImagePath Activity image path returned by POST /uploads
+	ImagePath *string `binding:"omitempty,max=255" json:"imagePath"`
+}
+
+// UpdateItineraryDayInput defines model for UpdateItineraryDayInput.
+type UpdateItineraryDayInput struct {
+	// Id Existing day ID. Omit or set to null to create a new day.
+	Id *int64 `json:"id"`
+
+	// DayNumber Sequential day number starting from 1
+	DayNumber int `binding:"required,min=1" json:"dayNumber"`
+
+	// Title Main title for the day
+	Title string `binding:"required,min=1,max=255" json:"title"`
+
+	// Subtitle Short subtitle for the day
+	Subtitle *string `binding:"omitempty,max=255" json:"subtitle"`
+
+	// Summary Summary of the day's experiences
+	Summary *string `binding:"omitempty,max=500" json:"summary"`
+
+	// ImagePath Representative image path for the day
+	ImagePath *string `binding:"omitempty,max=255" json:"imagePath"`
+
+	// DayTips Daily notes and tips
+	DayTips *[]string `binding:"omitempty" json:"dayTips,omitempty"`
+
+	// Activities List of activities for this day. A nil activities field means activities remain unchanged.
+	Activities *[]UpdateItineraryActivityInput `binding:"omitempty,dive" json:"activities,omitempty"`
+}
+
+// UpdateItineraryRequest defines model for UpdateItineraryRequest.
+type UpdateItineraryRequest struct {
+	// ItineraryName Itinerary name
+	ItineraryName string `binding:"required,min=1,max=255" json:"itineraryName"`
+
+	// LocationId Travel location ID
+	LocationId *int64 `binding:"omitempty,validateTravelLocationID" json:"locationId"`
+
+	// SuitableFor Target audience for the itinerary
+	SuitableFor *string `binding:"omitempty,max=255" json:"suitableFor"`
+
+	// Description General itinerary description
+	Description *string `binding:"omitempty,max=500" json:"description"`
+
+	// CoverImagePath Cover image path returned by POST /uploads
+	CoverImagePath *string `binding:"omitempty,max=255" json:"coverImagePath"`
+
+	// TravelTips General travel tips for the itinerary
+	TravelTips *[]string `binding:"omitempty" json:"travelTips,omitempty"`
+
+	// ThemeIds List of travel theme IDs. A nil themeIds field means themes remain unchanged.
+	ThemeIds *[]int64 `binding:"omitempty,validateTravelThemeID" json:"themeIds,omitempty"`
+
+	// Days List of daily itinerary entries. A nil days field means days remain unchanged.
+	Days *[]UpdateItineraryDayInput `binding:"omitempty,dive" json:"days,omitempty"`
+}
+
 // UpdateTravelLocationRequest defines model for UpdateTravelLocationRequest.
 type UpdateTravelLocationRequest struct {
 	// CountryCode ISO 3166-1 alpha-2 country code
@@ -882,6 +969,9 @@ type UpdateHomestayJSONRequestBody = UpdateHomestayRequest
 
 // CreateItineraryJSONRequestBody defines body for CreateItinerary for application/json ContentType.
 type CreateItineraryJSONRequestBody = CreateItineraryRequest
+
+// UpdateItineraryJSONRequestBody defines body for UpdateItinerary for application/json ContentType.
+type UpdateItineraryJSONRequestBody = UpdateItineraryRequest
 
 // CreateTravelLocationJSONRequestBody defines body for CreateTravelLocation for application/json ContentType.
 type CreateTravelLocationJSONRequestBody = CreateTravelLocationRequest

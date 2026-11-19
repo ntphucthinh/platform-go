@@ -242,3 +242,15 @@ func (con *ServerController) CreateItinerary(c *gin.Context) {
 func (con *ServerController) FetchItineraryByID(c *gin.Context, itineraryID int64) {
 	con.itineraryController.FetchItineraryByID(c, itineraryID)
 }
+
+// UpdateItinerary replaces an itinerary along with its themes, days, and activities.
+// (PUT /itineraries/{itineraryID})
+func (con *ServerController) UpdateItinerary(c *gin.Context, itineraryID int64) {
+	con.itineraryController.UpdateItinerary(c, itineraryID)
+}
+
+// DeleteItinerary deletes an itinerary along with its themes, days, and activities.
+// (DELETE /itineraries/{itineraryID})
+func (con *ServerController) DeleteItinerary(c *gin.Context, itineraryID int64) {
+	con.itineraryController.DeleteItinerary(c, itineraryID)
+}

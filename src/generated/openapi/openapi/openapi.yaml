@@ -632,6 +632,31 @@ paths:
       tags:
       - itineraries
   /itineraries/{itineraryID}:
+    delete:
+      description: "Delete an itinerary together with all its associated themes, days,\
+        \ and activities."
+      operationId: deleteItinerary
+      parameters:
+      - example: 1
+        in: path
+        name: itineraryID
+        required: true
+        schema:
+          format: int64
+          minimum: 1
+          type: integer
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageOnlyResponse"
+          description: Itinerary deleted successfully
+      security:
+      - AccessCookie: []
+      summary: Delete an itinerary
+      tags:
+      - itineraries
     get:
       description: "Retrieve a single itinerary with its themes, featured images,\
         \ days, and activities."
@@ -655,6 +680,40 @@ paths:
       security:
       - AccessCookie: []
       summary: Get itinerary detail
+      tags:
+      - itineraries
+    put:
+      description: |
+        Replace an itinerary together with its themes, days, and activities (full-state sync).
+        - Day / activity with `id` → updated.
+        - Day / activity without `id` → created.
+        - Existing day / activity not present in the request → deleted.
+      operationId: updateItinerary
+      parameters:
+      - example: 1
+        in: path
+        name: itineraryID
+        required: true
+        schema:
+          format: int64
+          minimum: 1
+          type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateItineraryRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageOnlyResponse"
+          description: Itinerary updated successfully
+      security:
+      - AccessCookie: []
+      summary: Update an itinerary
       tags:
       - itineraries
   /selections/travel-locations:
@@ -2884,6 +2943,402 @@ components:
           nullable: true
           type: string
           x-order: 9
+          x-go-name: ImagePath
+          x-oapi-codegen-extra-tags:
+            binding: "omitempty,max=255"
+      required:
+      - startTime
+      - title
+      type: object
+    UpdateItineraryRequest:
+      example:
+        itineraryName: Khám phá Đà Lạt
+        locationId: 1
+        suitableFor: "Cặp đôi, nhóm bạn, gia đình"
+        description: Một hành trình nhẹ nhàng để cảm nhận trọn vẹn vẻ đẹp của Đà Lạt.
+        coverImagePath: itineraries/dalat-cover.jpg
+        travelTips:
+        - "Thời tiết Đà Lạt se lạnh vào sáng sớm và ban đêm, nên chuẩn bị áo ấm."
+        - Thuê xe máy sẽ giúp chủ động di chuyển.
+        themeIds:
+        - 1
+        - 2
+        - 3
+        days:
+        - id: 1
+          dayNumber: 1
+          title: Ngày 1 – Khám phá trung tâm Đà Lạt
+          subtitle: Làm quen với thành phố ngàn hoa.
+          summary: Cảm nhận không khí mát lành của trung tâm thành phố.
+          imagePath: itineraries/days/dalat-day-1.jpg
+          dayTips:
+          - "Trời se lạnh (15–22°C), nên mang theo áo khoác nhẹ."
+          - Nên mang giày thể thao đế bám tốt.
+          activities:
+          - id: 1
+            startTime: 07:30
+            title: Ăn sáng tại chợ Đà Lạt
+            activityCategory: dining
+            durationMinutes: 60
+            location: Chợ Đà Lạt
+            googleMapsUrl: "https://www.google.com/maps?q=11.9427,108.4373"
+            description: Thưởng thức bánh căn và sữa đậu nành nóng.
+            notes: Nên đi sớm trước 8h00 để không phải chờ bàn.
+            imagePath: itineraries/activities/dalat-banh-can.jpg
+          - id: 1
+            startTime: 07:30
+            title: Ăn sáng tại chợ Đà Lạt
+            activityCategory: dining
+            durationMinutes: 60
+            location: Chợ Đà Lạt
+            googleMapsUrl: "https://www.google.com/maps?q=11.9427,108.4373"
+            description: Thưởng thức bánh căn và sữa đậu nành nóng.
+            notes: Nên đi sớm trước 8h00 để không phải chờ bàn.
+            imagePath: itineraries/activities/dalat-banh-can.jpg
+        - id: 1
+          dayNumber: 1
+          title: Ngày 1 – Khám phá trung tâm Đà Lạt
+          subtitle: Làm quen với thành phố ngàn hoa.
+          summary: Cảm nhận không khí mát lành của trung tâm thành phố.
+          imagePath: itineraries/days/dalat-day-1.jpg
+          dayTips:
+          - "Trời se lạnh (15–22°C), nên mang theo áo khoác nhẹ."
+          - Nên mang giày thể thao đế bám tốt.
+          activities:
+          - id: 1
+            startTime: 07:30
+            title: Ăn sáng tại chợ Đà Lạt
+            activityCategory: dining
+            durationMinutes: 60
+            location: Chợ Đà Lạt
+            googleMapsUrl: "https://www.google.com/maps?q=11.9427,108.4373"
+            description: Thưởng thức bánh căn và sữa đậu nành nóng.
+            notes: Nên đi sớm trước 8h00 để không phải chờ bàn.
+            imagePath: itineraries/activities/dalat-banh-can.jpg
+          - id: 1
+            startTime: 07:30
+            title: Ăn sáng tại chợ Đà Lạt
+            activityCategory: dining
+            durationMinutes: 60
+            location: Chợ Đà Lạt
+            googleMapsUrl: "https://www.google.com/maps?q=11.9427,108.4373"
+            description: Thưởng thức bánh căn và sữa đậu nành nóng.
+            notes: Nên đi sớm trước 8h00 để không phải chờ bàn.
+            imagePath: itineraries/activities/dalat-banh-can.jpg
+      properties:
+        itineraryName:
+          description: Itinerary name
+          example: Khám phá Đà Lạt
+          maxLength: 255
+          minLength: 1
+          type: string
+          x-order: 1
+          x-go-name: ItineraryName
+          x-oapi-codegen-extra-tags:
+            binding: "required,min=1,max=255"
+        locationId:
+          description: Travel location ID
+          example: 1
+          format: int64
+          nullable: true
+          type: integer
+          x-order: 2
+          x-go-name: LocationId
+          x-oapi-codegen-extra-tags:
+            binding: "omitempty,validateTravelLocationID"
+        suitableFor:
+          description: Target audience for the itinerary
+          example: "Cặp đôi, nhóm bạn, gia đình"
+          maxLength: 255
+          nullable: true
+          type: string
+          x-order: 3
+          x-go-name: SuitableFor
+          x-oapi-codegen-extra-tags:
+            binding: "omitempty,max=255"
+        description:
+          description: General itinerary description
+          example: Một hành trình nhẹ nhàng để cảm nhận trọn vẹn vẻ đẹp của Đà Lạt.
+          maxLength: 500
+          nullable: true
+          type: string
+          x-order: 4
+          x-go-name: Description
+          x-oapi-codegen-extra-tags:
+            binding: "omitempty,max=500"
+        coverImagePath:
+          description: Cover image path returned by POST /uploads
+          example: itineraries/dalat-cover.jpg
+          maxLength: 255
+          nullable: true
+          type: string
+          x-order: 5
+          x-go-name: CoverImagePath
+          x-oapi-codegen-extra-tags:
+            binding: "omitempty,max=255"
+        travelTips:
+          description: General travel tips for the itinerary
+          example:
+          - "Thời tiết Đà Lạt se lạnh vào sáng sớm và ban đêm, nên chuẩn bị áo ấm."
+          - Thuê xe máy sẽ giúp chủ động di chuyển.
+          items:
+            type: string
+          type: array
+          x-order: 6
+          x-go-name: TravelTips
+          x-oapi-codegen-extra-tags:
+            binding: omitempty
+        themeIds:
+          description: List of travel theme IDs. A nil themeIds field means themes
+            remain unchanged.
+          example:
+          - 1
+          - 2
+          - 3
+          items:
+            format: int64
+            type: integer
+          type: array
+          x-order: 7
+          x-go-name: ThemeIds
+          x-oapi-codegen-extra-tags:
+            binding: "omitempty,validateTravelThemeID"
+        days:
+          description: List of daily itinerary entries. A nil days field means days
+            remain unchanged.
+          items:
+            $ref: "#/components/schemas/UpdateItineraryDayInput"
+          type: array
+          x-order: 8
+          x-go-name: Days
+          x-oapi-codegen-extra-tags:
+            binding: "omitempty,dive"
+      required:
+      - itineraryName
+      type: object
+    UpdateItineraryDayInput:
+      example:
+        id: 1
+        dayNumber: 1
+        title: Ngày 1 – Khám phá trung tâm Đà Lạt
+        subtitle: Làm quen với thành phố ngàn hoa.
+        summary: Cảm nhận không khí mát lành của trung tâm thành phố.
+        imagePath: itineraries/days/dalat-day-1.jpg
+        dayTips:
+        - "Trời se lạnh (15–22°C), nên mang theo áo khoác nhẹ."
+        - Nên mang giày thể thao đế bám tốt.
+        activities:
+        - id: 1
+          startTime: 07:30
+          title: Ăn sáng tại chợ Đà Lạt
+          activityCategory: dining
+          durationMinutes: 60
+          location: Chợ Đà Lạt
+          googleMapsUrl: "https://www.google.com/maps?q=11.9427,108.4373"
+          description: Thưởng thức bánh căn và sữa đậu nành nóng.
+          notes: Nên đi sớm trước 8h00 để không phải chờ bàn.
+          imagePath: itineraries/activities/dalat-banh-can.jpg
+        - id: 1
+          startTime: 07:30
+          title: Ăn sáng tại chợ Đà Lạt
+          activityCategory: dining
+          durationMinutes: 60
+          location: Chợ Đà Lạt
+          googleMapsUrl: "https://www.google.com/maps?q=11.9427,108.4373"
+          description: Thưởng thức bánh căn và sữa đậu nành nóng.
+          notes: Nên đi sớm trước 8h00 để không phải chờ bàn.
+          imagePath: itineraries/activities/dalat-banh-can.jpg
+      properties:
+        id:
+          description: Existing day ID. Omit or set to null to create a new day.
+          example: 1
+          format: int64
+          nullable: true
+          type: integer
+          x-order: 1
+          x-go-name: Id
+        dayNumber:
+          description: Sequential day number starting from 1
+          example: 1
+          minimum: 1
+          type: integer
+          x-order: 2
+          x-go-name: DayNumber
+          x-oapi-codegen-extra-tags:
+            binding: "required,min=1"
+        title:
+          description: Main title for the day
+          example: Ngày 1 – Khám phá trung tâm Đà Lạt
+          maxLength: 255
+          minLength: 1
+          type: string
+          x-order: 3
+          x-go-name: Title
+          x-oapi-codegen-extra-tags:
+            binding: "required,min=1,max=255"
+        subtitle:
+          description: Short subtitle for the day
+          example: Làm quen với thành phố ngàn hoa.
+          maxLength: 255
+          nullable: true
+          type: string
+          x-order: 4
+          x-go-name: Subtitle
+          x-oapi-codegen-extra-tags:
+            binding: "omitempty,max=255"
+        summary:
+          description: Summary of the day's experiences
+          example: Cảm nhận không khí mát lành của trung tâm thành phố.
+          maxLength: 500
+          nullable: true
+          type: string
+          x-order: 5
+          x-go-name: Summary
+          x-oapi-codegen-extra-tags:
+            binding: "omitempty,max=500"
+        imagePath:
+          description: Representative image path for the day
+          example: itineraries/days/dalat-day-1.jpg
+          maxLength: 255
+          nullable: true
+          type: string
+          x-order: 6
+          x-go-name: ImagePath
+          x-oapi-codegen-extra-tags:
+            binding: "omitempty,max=255"
+        dayTips:
+          description: Daily notes and tips
+          example:
+          - "Trời se lạnh (15–22°C), nên mang theo áo khoác nhẹ."
+          - Nên mang giày thể thao đế bám tốt.
+          items:
+            type: string
+          type: array
+          x-order: 7
+          x-go-name: DayTips
+          x-oapi-codegen-extra-tags:
+            binding: omitempty
+        activities:
+          description: List of activities for this day. A nil activities field means
+            activities remain unchanged.
+          items:
+            $ref: "#/components/schemas/UpdateItineraryActivityInput"
+          type: array
+          x-order: 8
+          x-go-name: Activities
+          x-oapi-codegen-extra-tags:
+            binding: "omitempty,dive"
+      required:
+      - dayNumber
+      - title
+      type: object
+    UpdateItineraryActivityInput:
+      example:
+        id: 1
+        startTime: 07:30
+        title: Ăn sáng tại chợ Đà Lạt
+        activityCategory: dining
+        durationMinutes: 60
+        location: Chợ Đà Lạt
+        googleMapsUrl: "https://www.google.com/maps?q=11.9427,108.4373"
+        description: Thưởng thức bánh căn và sữa đậu nành nóng.
+        notes: Nên đi sớm trước 8h00 để không phải chờ bàn.
+        imagePath: itineraries/activities/dalat-banh-can.jpg
+      properties:
+        id:
+          description: Existing activity ID. Omit or set to null to create a new activity.
+          example: 1
+          format: int64
+          nullable: true
+          type: integer
+          x-order: 1
+          x-go-name: Id
+        startTime:
+          description: Activity start time (HH:mm)
+          example: 07:30
+          type: string
+          x-order: 2
+          x-go-name: StartTime
+          x-oapi-codegen-extra-tags:
+            binding: required
+        title:
+          description: Activity title
+          example: Ăn sáng tại chợ Đà Lạt
+          maxLength: 255
+          minLength: 1
+          type: string
+          x-order: 3
+          x-go-name: Title
+          x-oapi-codegen-extra-tags:
+            binding: "required,min=1,max=255"
+        activityCategory:
+          allOf:
+          - $ref: "#/components/schemas/ItineraryActivityCategory"
+          description: Activity category
+          example: dining
+          nullable: true
+          x-order: 4
+          x-go-name: ActivityCategory
+          x-oapi-codegen-extra-tags:
+            binding: "omitempty,oneof=dining sightseeing nature cafe shopping rest\
+              \ other"
+        durationMinutes:
+          description: Duration in minutes
+          example: 60
+          minimum: 1
+          nullable: true
+          type: integer
+          x-order: 5
+          x-go-name: DurationMinutes
+          x-oapi-codegen-extra-tags:
+            binding: "omitempty,min=1"
+        location:
+          description: Specific location or address
+          example: Chợ Đà Lạt
+          maxLength: 255
+          nullable: true
+          type: string
+          x-order: 6
+          x-go-name: Location
+          x-oapi-codegen-extra-tags:
+            binding: "omitempty,max=255"
+        googleMapsUrl:
+          description: Google Maps URL
+          example: "https://www.google.com/maps?q=11.9427,108.4373"
+          maxLength: 500
+          nullable: true
+          type: string
+          x-order: 7
+          x-go-name: GoogleMapsUrl
+          x-oapi-codegen-extra-tags:
+            binding: "omitempty,max=500"
+        description:
+          description: Activity description
+          example: Thưởng thức bánh căn và sữa đậu nành nóng.
+          maxLength: 500
+          nullable: true
+          type: string
+          x-order: 8
+          x-go-name: Description
+          x-oapi-codegen-extra-tags:
+            binding: "omitempty,max=500"
+        notes:
+          description: Additional notes
+          example: Nên đi sớm trước 8h00 để không phải chờ bàn.
+          maxLength: 255
+          nullable: true
+          type: string
+          x-order: 9
+          x-go-name: Notes
+          x-oapi-codegen-extra-tags:
+            binding: "omitempty,max=255"
+        imagePath:
+          description: Activity image path returned by POST /uploads
+          example: itineraries/activities/dalat-banh-can.jpg
+          maxLength: 255
+          nullable: true
+          type: string
+          x-order: 10
           x-go-name: ImagePath
           x-oapi-codegen-extra-tags:
             binding: "omitempty,max=255"

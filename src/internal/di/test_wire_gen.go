@@ -68,7 +68,9 @@ func TestInitializeControllers(t *testing.T, db *gorm.DB) (*TestHandlerSet, erro
 	itineraryDayRepository := repository.NewItineraryDayRepository(dbInterface)
 	itineraryActivityRepository := repository.NewItineraryActivityRepository(dbInterface)
 	createItineraryUseCase := usecase5.NewCreateItineraryUseCase(dbInterface, itineraryRepository, itineraryThemeRepository, itineraryDayRepository, itineraryActivityRepository)
-	itineraryController := controller.NewItineraryController(fetchItinerariesUseCase, fetchItineraryByIDUseCase, createItineraryUseCase)
+	updateItineraryUseCase := usecase5.NewUpdateItineraryUseCase(dbInterface, itineraryRepository, itineraryThemeRepository, itineraryDayRepository, itineraryActivityRepository)
+	deleteItineraryUseCase := usecase5.NewDeleteItineraryUseCase(dbInterface, itineraryRepository, itineraryThemeRepository, itineraryDayRepository, itineraryActivityRepository)
+	itineraryController := controller.NewItineraryController(fetchItinerariesUseCase, fetchItineraryByIDUseCase, createItineraryUseCase, updateItineraryUseCase, deleteItineraryUseCase)
 	testHandlerSet := &TestHandlerSet{
 		Handler:               userController,
 		HomestayHandler:       homestayController,

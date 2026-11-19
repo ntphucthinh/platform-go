@@ -46,9 +46,15 @@ type ServerInterface interface {
 	// Create a new itinerary
 	// (POST /itineraries)
 	CreateItinerary(c *gin.Context)
+	// Delete an itinerary
+	// (DELETE /itineraries/{itineraryID})
+	DeleteItinerary(c *gin.Context, itineraryID int64)
 	// Get itinerary detail
 	// (GET /itineraries/{itineraryID})
 	FetchItineraryByID(c *gin.Context, itineraryID int64)
+	// Update an itinerary
+	// (PUT /itineraries/{itineraryID})
+	UpdateItinerary(c *gin.Context, itineraryID int64)
 	// Get travel locations for selection
 	// (GET /selections/travel-locations)
 	FetchSelectionTravelLocations(c *gin.Context, params FetchSelectionTravelLocationsParams)
@@ -378,6 +384,32 @@ func (siw *ServerInterfaceWrapper) CreateItinerary(c *gin.Context) {
 	siw.Handler.CreateItinerary(c)
 }
 
+// DeleteItinerary operation middleware
+func (siw *ServerInterfaceWrapper) DeleteItinerary(c *gin.Context) {
+
+	var err error
+
+	// ------------- Path parameter "itineraryID" -------------
+	var itineraryID int64
+
+	err = runtime.BindStyledParameterWithOptions("simple", "itineraryID", c.Param("itineraryID"), &itineraryID, runtime.BindStyledParameterOptions{Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter itineraryID: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	c.Set(AccessCookieScopes, []string{})
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.DeleteItinerary(c, itineraryID)
+}
+
 // FetchItineraryByID operation middleware
 func (siw *ServerInterfaceWrapper) FetchItineraryByID(c *gin.Context) {
 
@@ -402,6 +434,32 @@ func (siw *ServerInterfaceWrapper) FetchItineraryByID(c *gin.Context) {
 	}
 
 	siw.Handler.FetchItineraryByID(c, itineraryID)
+}
+
+// UpdateItinerary operation middleware
+func (siw *ServerInterfaceWrapper) UpdateItinerary(c *gin.Context) {
+
+	var err error
+
+	// ------------- Path parameter "itineraryID" -------------
+	var itineraryID int64
+
+	err = runtime.BindStyledParameterWithOptions("simple", "itineraryID", c.Param("itineraryID"), &itineraryID, runtime.BindStyledParameterOptions{Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter itineraryID: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	c.Set(AccessCookieScopes, []string{})
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.UpdateItinerary(c, itineraryID)
 }
 
 // FetchSelectionTravelLocations operation middleware
@@ -822,7 +880,9 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.PUT(options.BaseURL+"/homestays/:homestayID", wrapper.UpdateHomestay)
 	router.GET(options.BaseURL+"/itineraries", wrapper.FetchItineraries)
 	router.POST(options.BaseURL+"/itineraries", wrapper.CreateItinerary)
+	router.DELETE(options.BaseURL+"/itineraries/:itineraryID", wrapper.DeleteItinerary)
 	router.GET(options.BaseURL+"/itineraries/:itineraryID", wrapper.FetchItineraryByID)
+	router.PUT(options.BaseURL+"/itineraries/:itineraryID", wrapper.UpdateItinerary)
 	router.GET(options.BaseURL+"/selections/travel-locations", wrapper.FetchSelectionTravelLocations)
 	router.GET(options.BaseURL+"/selections/travel-themes", wrapper.FetchSelectionTravelThemes)
 	router.GET(options.BaseURL+"/travel-locations", wrapper.FetchTravelLocations)
