@@ -142,6 +142,12 @@ func (con *travelLocationController) DeleteTravelLocation(c *gin.Context, travel
 			c.JSON(http.StatusNotFound, gin.H{"error": "Travel location not found"})
 			return
 		}
+		if errors.Is(err, travellocationusecase.ErrTravelLocationHasMemories) ||
+			errors.Is(err, travellocationusecase.ErrTravelLocationHasItineraries) ||
+			errors.Is(err, travellocationusecase.ErrTravelLocationInUse) {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
 		common.IsErrorWithMessage(c, err, "Failed to delete travel location")
 		return
 	}

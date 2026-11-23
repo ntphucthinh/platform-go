@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"context"
+	"errors"
 
 	"gorm.io/gorm"
 
@@ -11,6 +12,12 @@ import (
 )
 
 const DeleteTravelLocationUseCaseSuccessMessage = "Delete travel location successfully"
+
+var (
+	ErrTravelLocationHasMemories    = errors.New("cannot delete travel location because it has associated travel memories")
+	ErrTravelLocationHasItineraries = errors.New("cannot delete travel location because it has associated itineraries")
+	ErrTravelLocationInUse          = errors.New("cannot delete travel location because it has associated travel memories or itineraries")
+)
 
 type DeleteTravelLocationUsecase struct {
 	db                 repository.DBInterface
@@ -37,6 +44,22 @@ func (uc *DeleteTravelLocationUsecase) Execute(ctx context.Context, travelLocati
 		}
 		if existing == nil {
 			return ErrTravelLocationNotFound
+		}
+
+		hasMemories, err := uc.travelLocationRepo.HasAssociatedTravelMemories(txCtx, travelLocationID)
+		if err != nil {
+			return err
+		}
+		if hasMemories {
+			return ErrTravelLocationHasMemories
+		}
+
+		hasItineraries, err := uc.travelLocationRepo.HasAssociatedItineraries(txCtx, travelLocationID)
+		if err != nil {
+			return err
+		}
+		if hasItineraries {
+			return ErrTravelLocationHasItineraries
 		}
 
 		return uc.travelLocationRepo.DeleteTravelLocationByID(txCtx, travelLocationID)

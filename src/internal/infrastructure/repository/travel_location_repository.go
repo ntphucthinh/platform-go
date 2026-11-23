@@ -90,3 +90,25 @@ func (r *travelLocationRepository) DeleteTravelLocationByID(ctx context.Context,
 		Where("id = ?", id).
 		Delete(&dbmodel.TravelLocation{}).Error
 }
+
+func (r *travelLocationRepository) HasAssociatedTravelMemories(ctx context.Context, locationID int64) (bool, error) {
+	var count int64
+	if err := r.db.GetDBByCtx(ctx).
+		Model(&dbmodel.TravelMemory{}).
+		Where("location_id = ?", locationID).
+		Count(&count).Error; err != nil {
+		return false, err
+	}
+	return count > 0, nil
+}
+
+func (r *travelLocationRepository) HasAssociatedItineraries(ctx context.Context, locationID int64) (bool, error) {
+	var count int64
+	if err := r.db.GetDBByCtx(ctx).
+		Model(&dbmodel.Itinerary{}).
+		Where("location_id = ?", locationID).
+		Count(&count).Error; err != nil {
+		return false, err
+	}
+	return count > 0, nil
+}

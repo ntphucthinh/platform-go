@@ -43,6 +43,93 @@ func TestTravelLocationController_DeleteTravelLocation(t *testing.T) {
 		assert.Error(t, err, "record should be deleted")
 	})
 
+	t.Run("Error_CannotDeleteWithAssociatedMemories", func(t *testing.T) {
+		shared.SetupTestEnvironment(t)
+		admin := shared.CreateLoginUser()
+
+		loc := factory.NewTravelLocationFactory().
+			WithCountryCode("VN").
+			WithCountryName("Vietnam").
+			WithLocationName("Hà Nội").
+			MustInsert(shared.TestDB)
+
+		factory.NewTravelMemoryFactory().
+			WithLocationID(loc.ID).
+			WithTitle("Hanoi trip").
+			MustInsert(shared.TestDB)
+
+		req := shared.NewRequest(t, admin, http.MethodDelete, fmt.Sprintf("/travel-locations/%d", loc.ID), nil)
+		w := httptest.NewRecorder()
+		shared.TestRouter.ServeHTTP(w, req)
+
+		require.Equal(t, http.StatusBadRequest, w.Code, w.Body.String())
+		assert.Contains(t, w.Body.String(), travellocationusecase.ErrTravelLocationHasMemories.Error())
+
+		var locCheck dbmodel.TravelLocation
+		err := shared.TestDB.First(&locCheck, loc.ID).Error
+		assert.NoError(t, err, "record should not be deleted")
+	})
+
+	t.Run("Error_CannotDeleteWithAssociatedItineraries", func(t *testing.T) {
+		shared.SetupTestEnvironment(t)
+		admin := shared.CreateLoginUser()
+
+		loc := factory.NewTravelLocationFactory().
+			WithCountryCode("VN").
+			WithCountryName("Vietnam").
+			WithLocationName("Đà Nẵng").
+			MustInsert(shared.TestDB)
+
+		factory.NewItineraryFactory().
+			WithName("Da Nang 3D2N").
+			WithLocationID(&loc.ID).
+			MustInsert(shared.TestDB)
+
+		req := shared.NewRequest(t, admin, http.MethodDelete, fmt.Sprintf("/travel-locations/%d", loc.ID), nil)
+		w := httptest.NewRecorder()
+		shared.TestRouter.ServeHTTP(w, req)
+
+		require.Equal(t, http.StatusBadRequest, w.Code, w.Body.String())
+		assert.Contains(t, w.Body.String(), travellocationusecase.ErrTravelLocationHasItineraries.Error())
+
+		var locCheck dbmodel.TravelLocation
+		err := shared.TestDB.First(&locCheck, loc.ID).Error
+		assert.NoError(t, err, "record should not be deleted")
+	})
+
+	t.Run("Normal_DeleteWithSoftDeletedAssociationsSuccess", func(t *testing.T) {
+		shared.SetupTestEnvironment(t)
+		admin := shared.CreateLoginUser()
+
+		loc := factory.NewTravelLocationFactory().
+			WithCountryCode("VN").
+			WithCountryName("Vietnam").
+			WithLocationName("Huế").
+			MustInsert(shared.TestDB)
+
+		mem := factory.NewTravelMemoryFactory().
+			WithLocationID(loc.ID).
+			WithTitle("Hue trip").
+			MustInsert(shared.TestDB)
+		require.NoError(t, shared.TestDB.Delete(&mem).Error)
+
+		itin := factory.NewItineraryFactory().
+			WithName("Hue Tour").
+			WithLocationID(&loc.ID).
+			MustInsert(shared.TestDB)
+		require.NoError(t, shared.TestDB.Delete(&itin).Error)
+
+		req := shared.NewRequest(t, admin, http.MethodDelete, fmt.Sprintf("/travel-locations/%d", loc.ID), nil)
+		w := httptest.NewRecorder()
+		shared.TestRouter.ServeHTTP(w, req)
+
+		require.Equal(t, http.StatusOK, w.Code, w.Body.String())
+
+		var deleted dbmodel.TravelLocation
+		err := shared.TestDB.First(&deleted, loc.ID).Error
+		assert.Error(t, err, "record should be deleted because associated items were soft-deleted")
+	})
+
 	t.Run("Error_NotFound", func(t *testing.T) {
 		shared.SetupTestEnvironment(t)
 		admin := shared.CreateLoginUser()
