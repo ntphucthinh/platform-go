@@ -75,9 +75,24 @@ FetchTravelLocationsResponse:
       type: integer
       format: int64
       example: 100
+    statusCounts:
+      type: object
+      properties:
+        visited:
+          type: integer
+          format: int64
+          example: 8
+        wishlist:
+          type: integer
+          format: int64
+          example: 4
+      required:
+        - visited
+        - wishlist
   required:
     - data
     - total
+    - statusCounts
 
 # ---------------------------------------------------------------------------
 # Create travel location (POST /travel-locations)

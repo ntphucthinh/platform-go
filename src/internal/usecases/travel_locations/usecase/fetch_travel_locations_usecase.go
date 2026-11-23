@@ -28,7 +28,7 @@ func (uc *FetchTravelLocationsUsecase) Execute(ctx context.Context, params api.F
 		CountryCode: params.CountryCode,
 	}
 
-	locations, total, err := uc.queryService.FetchTravelLocations(ctx, filter)
+	locations, total, statusCounts, err := uc.queryService.FetchTravelLocations(ctx, filter)
 	if err != nil {
 		return nil, err
 	}
@@ -55,5 +55,9 @@ func (uc *FetchTravelLocationsUsecase) Execute(ctx context.Context, params api.F
 	return &api.FetchTravelLocationsResponse{
 		Data:  items,
 		Total: total,
+		StatusCounts: api.FetchTravelLocationsResponseStatusCounts{
+			Visited:  statusCounts.Visited,
+			Wishlist: statusCounts.Wishlist,
+		},
 	}, nil
 }

@@ -50,6 +50,8 @@ func TestTravelLocationController_FetchTravelLocations(t *testing.T) {
 
 		require.Len(t, body.Data, 1)
 		assert.Equal(t, int64(1), body.Total)
+		assert.Equal(t, int64(1), body.StatusCounts.Visited)
+		assert.Equal(t, int64(0), body.StatusCounts.Wishlist)
 		assert.Equal(t, loc.LocationName, body.Data[0].LocationName)
 		assert.Equal(t, loc.CountryCode, body.Data[0].CountryCode)
 		assert.Equal(t, int64(0), body.Data[0].VisitCount)
@@ -65,6 +67,9 @@ func TestTravelLocationController_FetchTravelLocations(t *testing.T) {
 			`"visitCount"`,
 			`"itineraryCount"`,
 			`"total"`,
+			`"statusCounts"`,
+			`"visited"`,
+			`"wishlist"`,
 		} {
 			assert.Contains(t, rawJSON, camelField)
 		}
@@ -92,16 +97,19 @@ func TestTravelLocationController_FetchTravelLocations(t *testing.T) {
 			WithVisited().
 			MustInsert(shared.TestDB)
 
-		// Filter by status=visited: should return VN (Hà Nội) and JP (Tokyo)
+		// Filter by status=visited: total should ignore status and return 3; statusCounts gives visited=2, wishlist=1
 		reqVisited := shared.NewRequest(t, admin, http.MethodGet, "/travel-locations?status=visited", nil)
 		wVisited := httptest.NewRecorder()
 		shared.TestRouter.ServeHTTP(wVisited, reqVisited)
 		require.Equal(t, http.StatusOK, wVisited.Code)
 		var bodyVisited api.FetchTravelLocationsResponse
 		require.NoError(t, json.Unmarshal(wVisited.Body.Bytes(), &bodyVisited))
-		assert.Equal(t, int64(2), bodyVisited.Total)
+		assert.Equal(t, int64(3), bodyVisited.Total)
+		assert.Equal(t, int64(2), bodyVisited.StatusCounts.Visited)
+		assert.Equal(t, int64(1), bodyVisited.StatusCounts.Wishlist)
+		require.Len(t, bodyVisited.Data, 2)
 
-		// Filter by countryCode=VN: should return Hà Nội and Đà Nẵng
+		// Filter by countryCode=VN: total is 2; statusCounts gives visited=1, wishlist=1
 		reqVN := shared.NewRequest(t, admin, http.MethodGet, "/travel-locations?countryCode=VN", nil)
 		wVN := httptest.NewRecorder()
 		shared.TestRouter.ServeHTTP(wVN, reqVN)
@@ -109,14 +117,20 @@ func TestTravelLocationController_FetchTravelLocations(t *testing.T) {
 		var bodyVN api.FetchTravelLocationsResponse
 		require.NoError(t, json.Unmarshal(wVN.Body.Bytes(), &bodyVN))
 		assert.Equal(t, int64(2), bodyVN.Total)
+		assert.Equal(t, int64(1), bodyVN.StatusCounts.Visited)
+		assert.Equal(t, int64(1), bodyVN.StatusCounts.Wishlist)
+		require.Len(t, bodyVN.Data, 2)
 
-		// Filter by both countryCode=VN and status=wishlist: should return only Đà Nẵng
+		// Filter by both countryCode=VN and status=wishlist: total is 2 (country total); statusCounts gives visited=1, wishlist=1; data is only Đà Nẵng
 		reqVNWishlist := shared.NewRequest(t, admin, http.MethodGet, "/travel-locations?countryCode=VN&status=wishlist", nil)
 		wVNWishlist := httptest.NewRecorder()
 		shared.TestRouter.ServeHTTP(wVNWishlist, reqVNWishlist)
 		require.Equal(t, http.StatusOK, wVNWishlist.Code)
 		var bodyVNWishlist api.FetchTravelLocationsResponse
 		require.NoError(t, json.Unmarshal(wVNWishlist.Body.Bytes(), &bodyVNWishlist))
+		assert.Equal(t, int64(2), bodyVNWishlist.Total)
+		assert.Equal(t, int64(1), bodyVNWishlist.StatusCounts.Visited)
+		assert.Equal(t, int64(1), bodyVNWishlist.StatusCounts.Wishlist)
 		require.Len(t, bodyVNWishlist.Data, 1)
 		assert.Equal(t, "Đà Nẵng", bodyVNWishlist.Data[0].LocationName)
 
@@ -127,6 +141,9 @@ func TestTravelLocationController_FetchTravelLocations(t *testing.T) {
 		require.Equal(t, http.StatusOK, wWithIgnoredParam.Code)
 		var bodyIgnored api.FetchTravelLocationsResponse
 		require.NoError(t, json.Unmarshal(wWithIgnoredParam.Body.Bytes(), &bodyIgnored))
+		assert.Equal(t, int64(2), bodyIgnored.Total)
+		assert.Equal(t, int64(1), bodyIgnored.StatusCounts.Visited)
+		assert.Equal(t, int64(1), bodyIgnored.StatusCounts.Wishlist)
 		require.Len(t, bodyIgnored.Data, 1)
 		assert.Equal(t, "Hà Nội", bodyIgnored.Data[0].LocationName)
 	})

@@ -58,6 +58,58 @@ FetchTravelLocationByIDResponse:
           type: integer
           format: int64
           example: 2
+        memories:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: integer
+                format: int64
+                example: 1
+              title:
+                type: string
+                example: "Chuyến đi mùa hoa dã quỳ Đà Lạt"
+              coverImagePath:
+                type: string
+                example: "travel_memories/550e8400-e29b-41d4-a716-446655440000.jpg"
+              startDate:
+                type: string
+                format: date
+                example: "2024-11-10"
+              endDate:
+                type: string
+                format: date
+                example: "2024-11-12"
+              photoCount:
+                type: integer
+                example: 10
+            required:
+              - id
+              - title
+              - coverImagePath
+              - startDate
+              - endDate
+              - photoCount
+        itineraries:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: integer
+                format: int64
+                example: 1
+              title:
+                type: string
+                example: "Khám phá Đà Lạt"
+              duration:
+                type: string
+                example: "3 ngày 2 đêm"
+            required:
+              - id
+              - title
+              - duration
       required:
         - id
         - countryCode
@@ -72,6 +124,8 @@ FetchTravelLocationByIDResponse:
         - googleMapsUrl
         - visitCount
         - itineraryCount
+        - memories
+        - itineraries
   required:
     - data
 

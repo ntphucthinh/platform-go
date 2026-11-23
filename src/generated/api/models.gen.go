@@ -412,13 +412,50 @@ type FetchItineraryByIDResponseDataThemesInner struct {
 
 // FetchTravelLocationByIDResponse defines model for FetchTravelLocationByIDResponse.
 type FetchTravelLocationByIDResponse struct {
-	Data FetchTravelLocationsResponseDataInner `json:"data"`
+	Data FetchTravelLocationByIDResponseData `json:"data"`
+}
+
+// FetchTravelLocationByIDResponseData defines model for FetchTravelLocationByIDResponse_data.
+type FetchTravelLocationByIDResponseData struct {
+	CountryCode    string                                                `json:"countryCode"`
+	CountryName    string                                                `json:"countryName"`
+	Description    *string                                               `json:"description"`
+	GoogleMapsUrl  *string                                               `json:"googleMapsUrl"`
+	Id             int64                                                 `json:"id"`
+	ImagePath      *string                                               `json:"imagePath"`
+	Itineraries    []FetchTravelLocationByIDResponseDataItinerariesInner `json:"itineraries"`
+	ItineraryCount int64                                                 `json:"itineraryCount"`
+	Latitude       *float64                                              `json:"latitude"`
+	LocationName   string                                                `json:"locationName"`
+	Longitude      *float64                                              `json:"longitude"`
+	Memories       []FetchTravelLocationByIDResponseDataMemoriesInner    `json:"memories"`
+	Notes          *string                                               `json:"notes"`
+	Status         TravelLocationStatus                                  `json:"status"`
+	VisitCount     int64                                                 `json:"visitCount"`
+}
+
+// FetchTravelLocationByIDResponseDataItinerariesInner defines model for FetchTravelLocationByIDResponse_data_itineraries_inner.
+type FetchTravelLocationByIDResponseDataItinerariesInner struct {
+	Duration string `json:"duration"`
+	Id       int64  `json:"id"`
+	Title    string `json:"title"`
+}
+
+// FetchTravelLocationByIDResponseDataMemoriesInner defines model for FetchTravelLocationByIDResponse_data_memories_inner.
+type FetchTravelLocationByIDResponseDataMemoriesInner struct {
+	CoverImagePath string             `json:"coverImagePath"`
+	EndDate        openapi_types.Date `json:"endDate"`
+	Id             int64              `json:"id"`
+	PhotoCount     int                `json:"photoCount"`
+	StartDate      openapi_types.Date `json:"startDate"`
+	Title          string             `json:"title"`
 }
 
 // FetchTravelLocationsResponse defines model for FetchTravelLocationsResponse.
 type FetchTravelLocationsResponse struct {
-	Data  []FetchTravelLocationsResponseDataInner `json:"data"`
-	Total int64                                   `json:"total"`
+	Data         []FetchTravelLocationsResponseDataInner  `json:"data"`
+	StatusCounts FetchTravelLocationsResponseStatusCounts `json:"statusCounts"`
+	Total        int64                                    `json:"total"`
 }
 
 // FetchTravelLocationsResponseDataInner defines model for FetchTravelLocationsResponse_data_inner.
@@ -436,6 +473,12 @@ type FetchTravelLocationsResponseDataInner struct {
 	Notes          *string              `json:"notes"`
 	Status         TravelLocationStatus `json:"status"`
 	VisitCount     int64                `json:"visitCount"`
+}
+
+// FetchTravelLocationsResponseStatusCounts defines model for FetchTravelLocationsResponse_statusCounts.
+type FetchTravelLocationsResponseStatusCounts struct {
+	Visited  int64 `json:"visited"`
+	Wishlist int64 `json:"wishlist"`
 }
 
 // FetchTravelMemoriesResponse defines model for FetchTravelMemoriesResponse.

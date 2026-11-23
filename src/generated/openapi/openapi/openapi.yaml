@@ -1323,6 +1323,9 @@ components:
           visitCount: 3
           itineraryCount: 2
         total: 100
+        statusCounts:
+          visited: 8
+          wishlist: 4
       properties:
         data:
           items:
@@ -1332,8 +1335,11 @@ components:
           example: 100
           format: int64
           type: integer
+        statusCounts:
+          $ref: "#/components/schemas/FetchTravelLocationsResponse_statusCounts"
       required:
       - data
+      - statusCounts
       - total
       type: object
     FetchTravelLocationByIDResponse:
@@ -1352,9 +1358,29 @@ components:
           googleMapsUrl: https://maps.app.goo.gl/example
           visitCount: 3
           itineraryCount: 2
+          memories:
+          - id: 1
+            title: Chuyến đi mùa hoa dã quỳ Đà Lạt
+            coverImagePath: travel_memories/550e8400-e29b-41d4-a716-446655440000.jpg
+            startDate: 2024-11-10
+            endDate: 2024-11-12
+            photoCount: 10
+          - id: 1
+            title: Chuyến đi mùa hoa dã quỳ Đà Lạt
+            coverImagePath: travel_memories/550e8400-e29b-41d4-a716-446655440000.jpg
+            startDate: 2024-11-10
+            endDate: 2024-11-12
+            photoCount: 10
+          itineraries:
+          - id: 1
+            title: Khám phá Đà Lạt
+            duration: 3 ngày 2 đêm
+          - id: 1
+            title: Khám phá Đà Lạt
+            duration: 3 ngày 2 đêm
       properties:
         data:
-          $ref: "#/components/schemas/FetchTravelLocationsResponse_data_inner"
+          $ref: "#/components/schemas/FetchTravelLocationByIDResponse_data"
       required:
       - data
       type: object
@@ -3727,6 +3753,194 @@ components:
       - latitude
       - locationName
       - longitude
+      - notes
+      - status
+      - visitCount
+      type: object
+    FetchTravelLocationsResponse_statusCounts:
+      example:
+        visited: 8
+        wishlist: 4
+      properties:
+        visited:
+          example: 8
+          format: int64
+          type: integer
+        wishlist:
+          example: 4
+          format: int64
+          type: integer
+      required:
+      - visited
+      - wishlist
+      type: object
+    FetchTravelLocationByIDResponse_data_memories_inner:
+      example:
+        id: 1
+        title: Chuyến đi mùa hoa dã quỳ Đà Lạt
+        coverImagePath: travel_memories/550e8400-e29b-41d4-a716-446655440000.jpg
+        startDate: 2024-11-10
+        endDate: 2024-11-12
+        photoCount: 10
+      properties:
+        id:
+          example: 1
+          format: int64
+          type: integer
+        title:
+          example: Chuyến đi mùa hoa dã quỳ Đà Lạt
+          type: string
+        coverImagePath:
+          example: travel_memories/550e8400-e29b-41d4-a716-446655440000.jpg
+          type: string
+        startDate:
+          example: 2024-11-10
+          format: date
+          type: string
+        endDate:
+          example: 2024-11-12
+          format: date
+          type: string
+        photoCount:
+          example: 10
+          type: integer
+      required:
+      - coverImagePath
+      - endDate
+      - id
+      - photoCount
+      - startDate
+      - title
+      type: object
+    FetchTravelLocationByIDResponse_data_itineraries_inner:
+      example:
+        id: 1
+        title: Khám phá Đà Lạt
+        duration: 3 ngày 2 đêm
+      properties:
+        id:
+          example: 1
+          format: int64
+          type: integer
+        title:
+          example: Khám phá Đà Lạt
+          type: string
+        duration:
+          example: 3 ngày 2 đêm
+          type: string
+      required:
+      - duration
+      - id
+      - title
+      type: object
+    FetchTravelLocationByIDResponse_data:
+      example:
+        id: 1
+        countryCode: VN
+        countryName: Vietnam
+        locationName: TP. Hồ Chí Minh
+        latitude: 10.8230989
+        longitude: 106.6296638
+        imagePath: travel_location/550e8400-e29b-41d4-a716-446655440000.png
+        status: visited
+        description: TP. Hồ Chí Minh is the largest city in Vietnam by population.
+        notes: I visited TP. Hồ Chí Minh in 2022 and it was a great experience.
+        googleMapsUrl: https://maps.app.goo.gl/example
+        visitCount: 3
+        itineraryCount: 2
+        memories:
+        - id: 1
+          title: Chuyến đi mùa hoa dã quỳ Đà Lạt
+          coverImagePath: travel_memories/550e8400-e29b-41d4-a716-446655440000.jpg
+          startDate: 2024-11-10
+          endDate: 2024-11-12
+          photoCount: 10
+        - id: 1
+          title: Chuyến đi mùa hoa dã quỳ Đà Lạt
+          coverImagePath: travel_memories/550e8400-e29b-41d4-a716-446655440000.jpg
+          startDate: 2024-11-10
+          endDate: 2024-11-12
+          photoCount: 10
+        itineraries:
+        - id: 1
+          title: Khám phá Đà Lạt
+          duration: 3 ngày 2 đêm
+        - id: 1
+          title: Khám phá Đà Lạt
+          duration: 3 ngày 2 đêm
+      properties:
+        id:
+          example: 1
+          format: int64
+          type: integer
+        countryCode:
+          example: VN
+          type: string
+        countryName:
+          example: Vietnam
+          type: string
+        locationName:
+          example: TP. Hồ Chí Minh
+          type: string
+        latitude:
+          example: 10.8230989
+          format: double
+          nullable: true
+          type: number
+        longitude:
+          example: 106.6296638
+          format: double
+          nullable: true
+          type: number
+        imagePath:
+          example: travel_location/550e8400-e29b-41d4-a716-446655440000.png
+          nullable: true
+          type: string
+        status:
+          allOf:
+          - $ref: "#/components/schemas/TravelLocationStatus"
+          example: visited
+        description:
+          example: TP. Hồ Chí Minh is the largest city in Vietnam by population.
+          nullable: true
+          type: string
+        notes:
+          example: I visited TP. Hồ Chí Minh in 2022 and it was a great experience.
+          nullable: true
+          type: string
+        googleMapsUrl:
+          example: https://maps.app.goo.gl/example
+          nullable: true
+          type: string
+        visitCount:
+          example: 3
+          format: int64
+          type: integer
+        itineraryCount:
+          example: 2
+          format: int64
+          type: integer
+        memories:
+          items:
+            $ref: "#/components/schemas/FetchTravelLocationByIDResponse_data_memories_inner"
+          type: array
+        itineraries:
+          items:
+            $ref: "#/components/schemas/FetchTravelLocationByIDResponse_data_itineraries_inner"
+          type: array
+      required:
+      - countryCode
+      - countryName
+      - description
+      - googleMapsUrl
+      - id
+      - imagePath
+      - itineraries
+      - itineraryCount
+      - latitude
+      - locationName
+      - longitude
+      - memories
       - notes
       - status
       - visitCount

@@ -4,6 +4,8 @@ import (
 	"context"
 	"errors"
 
+	openapi_types "github.com/oapi-codegen/runtime/types"
+
 	api "platform-go/generated/api"
 	travellocationqueryservice "platform-go/internal/usecases/travel_locations/queryservice"
 )
@@ -27,8 +29,29 @@ func (uc *FetchTravelLocationByIDUsecase) Execute(ctx context.Context, id int64)
 		return nil, ErrTravelLocationNotFound
 	}
 
+	memories := make([]api.FetchTravelLocationByIDResponseDataMemoriesInner, len(loc.Memories))
+	for i, m := range loc.Memories {
+		memories[i] = api.FetchTravelLocationByIDResponseDataMemoriesInner{
+			Id:             m.ID,
+			Title:          m.Title,
+			CoverImagePath: m.CoverImagePath,
+			StartDate:      openapi_types.Date{Time: m.StartDate},
+			EndDate:        openapi_types.Date{Time: m.EndDate},
+			PhotoCount:     m.PhotoCount,
+		}
+	}
+
+	itineraries := make([]api.FetchTravelLocationByIDResponseDataItinerariesInner, len(loc.Itineraries))
+	for i, it := range loc.Itineraries {
+		itineraries[i] = api.FetchTravelLocationByIDResponseDataItinerariesInner{
+			Id:       it.ID,
+			Title:    it.Title,
+			Duration: it.Duration,
+		}
+	}
+
 	return &api.FetchTravelLocationByIDResponse{
-		Data: api.FetchTravelLocationsResponseDataInner{
+		Data: api.FetchTravelLocationByIDResponseData{
 			Id:             loc.ID,
 			CountryCode:    loc.CountryCode,
 			CountryName:    loc.CountryName,
@@ -42,6 +65,8 @@ func (uc *FetchTravelLocationByIDUsecase) Execute(ctx context.Context, id int64)
 			GoogleMapsUrl:  loc.GoogleMapsURL,
 			VisitCount:     loc.VisitCount,
 			ItineraryCount: loc.ItineraryCount,
+			Memories:       memories,
+			Itineraries:    itineraries,
 		},
 	}, nil
 }
