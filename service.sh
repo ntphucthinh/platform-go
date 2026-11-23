@@ -81,6 +81,53 @@ case "$ACTION" in
         fi
         ;;
 
+    migrate)
+        echo "===> [Server] Đang kiểm tra và áp dụng Database Migrations..."
+        DB_USER=$(grep -E '^DB_USER=' .env | cut -d '=' -f2- | tr -d ' "\r\n')
+        DB_PASS=$(grep -E '^DB_PASS=' .env | cut -d '=' -f2- | tr -d ' "\r\n')
+        DB_HOST=$(grep -E '^DB_HOST=' .env | cut -d '=' -f2- | tr -d ' "\r\n')
+        DB_PORT=$(grep -E '^DB_PORT=' .env | cut -d '=' -f2- | tr -d ' "\r\n')
+        DB_NAME=$(grep -E '^DB_NAME=' .env | cut -d '=' -f2- | tr -d ' "\r\n')
+
+        [ -z "$DB_HOST" ] && DB_HOST="127.0.0.1"
+        [ -z "$DB_PORT" ] && DB_PORT="3306"
+
+        mysql -h "$DB_HOST" -P "$DB_PORT" -u "$DB_USER" -p"$DB_PASS" "$DB_NAME" -e "CREATE TABLE IF NOT EXISTS schema_migrations (version VARCHAR(128) NOT NULL PRIMARY KEY, applied_at DATETIME DEFAULT CURRENT_TIMESTAMP);" 2>/dev/null
+
+        for sql_file in $(ls -1 db/migrations/*.up.sql 2>/dev/null | sort); do
+            version=$(basename "$sql_file" | cut -d '_' -f1)
+            applied=$(mysql -h "$DB_HOST" -P "$DB_PORT" -u "$DB_USER" -p"$DB_PASS" "$DB_NAME" -N -s -e "SELECT count(*) FROM schema_migrations WHERE version='$version';" 2>/dev/null)
+            if [ "$applied" = "0" ]; then
+                echo "--> Đang chạy migration: $(basename "$sql_file")..."
+                mysql -h "$DB_HOST" -P "$DB_PORT" -u "$DB_USER" -p"$DB_PASS" "$DB_NAME" < "$sql_file"
+                if [ $? -eq 0 ]; then
+                    mysql -h "$DB_HOST" -P "$DB_PORT" -u "$DB_USER" -p"$DB_PASS" "$DB_NAME" -e "INSERT INTO schema_migrations (version) VALUES ('$version');" 2>/dev/null
+                    echo "--> Áp dụng thành công: $(basename "$sql_file")"
+                else
+                    echo "--> [LỖI] Migration thất bại: $(basename "$sql_file")"
+                    exit 1
+                fi
+            fi
+        done
+        echo "===> [Server] Database migrations hoàn tất!"
+        echo "===> [Server] Đang chạy seeder master data..."
+        chmod +x ./server 2>/dev/null || true
+        ./server seed-master || true
+        ;;
+
+    seed-master|seed-master-data)
+        TABLE="$2"
+        if [ -n "$TABLE" ]; then
+            echo "===> [Server] Đang chạy seeder master data cho bảng: ${TABLE}..."
+            chmod +x ./server 2>/dev/null || true
+            ./server seed-master "$TABLE"
+        else
+            echo "===> [Server] Đang chạy seeder toàn bộ master data..."
+            chmod +x ./server 2>/dev/null || true
+            ./server seed-master
+        fi
+        ;;
+
     check)
         # Dành cho cron job: nếu server chưa chạy thì tự gọi restart
         if ! pgrep -f "./server" > /dev/null 2>&1; then
@@ -90,7 +137,7 @@ case "$ACTION" in
         ;;
 
     *)
-        echo "Cách sử dụng: $0 {start|stop|restart|status|check}"
+        echo "Cách sử dụng: $0 {start|stop|restart|status|migrate|seed-master [table]|check}"
         exit 1
         ;;
 esac

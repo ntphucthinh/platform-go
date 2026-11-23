@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strings"
 
 	"github.com/joho/godotenv"
 	"gorm.io/driver/mysql"
@@ -57,6 +58,22 @@ func main() {
 	}
 
 	schemaDB := repository.NewSchemaDB(db)
+
+	for _, arg := range os.Args[1:] {
+		if arg == "--master" || arg == "--master-data" || arg == "master" {
+			if err := seeder.RunMasterSeeds(schemaDB); err != nil {
+				log.Fatalf("Master seed failed: %v", err)
+			}
+			return
+		}
+		if strings.HasPrefix(arg, "--master=") {
+			tableName := strings.TrimPrefix(arg, "--master=")
+			if err := seeder.RunMasterSeeds(schemaDB, tableName); err != nil {
+				log.Fatalf("Master seed failed: %v", err)
+			}
+			return
+		}
+	}
 
 	seeder.CreateUsers(schemaDB)
 

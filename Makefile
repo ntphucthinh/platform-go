@@ -1,4 +1,4 @@
-.PHONY: gen db-reset migrate-up run tools
+.PHONY: gen db-reset migrate-up run tools deploy build-bin migrate-remote seeder-master seed-remote-master
 
 build:
 	docker compose build
@@ -123,6 +123,13 @@ migrate-fresh:
 seeder:
 	docker compose exec platform-api go run db/seed/seed.go
 
+seeder-master:
+	@if [ -z "$(table)" ]; then \
+		docker compose exec platform-api go run db/seed/seed.go --master; \
+	else \
+		docker compose exec platform-api go run db/seed/seed.go --master=$(table); \
+	fi
+
 #--------------------- test & test-db start
 test:
 	docker compose exec platform-api go test -v ./...
@@ -155,3 +162,80 @@ test-reset-db:
 
 db-test:
 	docker compose exec platform-db-test mysql -uroot -proot platform_db_test
+
+# ==============================================================================
+# Remote Server Build & Deploy (Staging / Production)
+# ==============================================================================
+SSH_USER      ?= ymsdwuqshosting
+SSH_HOST      ?= 202.92.5.66
+SSH_PORT      ?= 65333
+SSH_KEY       ?=
+REMOTE_GO_DIR ?= ~/platform-api
+GO_BIN_NAME   ?= server
+GO_BIN        := bin/$(GO_BIN_NAME)
+
+SSH_KEY_OPT   := $(if $(SSH_KEY),-i $(SSH_KEY),)
+SSH_CMD       := ssh $(SSH_KEY_OPT) -p $(SSH_PORT)
+
+test-ssh:
+	@echo "Kiểm tra kết nối SSH tới $(SSH_USER)@$(SSH_HOST):$(SSH_PORT)..."
+	@$(SSH_CMD) $(SSH_USER)@$(SSH_HOST) "echo 'SSH connected successfully as user:' \$$(whoami)"
+
+build-bin:
+	@echo "------------------------------------------------------------------------"
+	@echo "===> Compile Go binary cho Linux amd64 (platform-go)..."
+	@echo "------------------------------------------------------------------------"
+	@mkdir -p bin
+	@cd src && CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-w -s" -o ../bin/$(GO_BIN_NAME) ./cmd/server
+	@chmod +x $(GO_BIN)
+	@echo "===> Hoàn tất build Go binary: $(GO_BIN)"
+
+deploy: build-bin
+	@echo "------------------------------------------------------------------------"
+	@echo "===> Deploying Go Backend lên $(SSH_USER)@$(SSH_HOST):$(REMOTE_GO_DIR)..."
+	@echo "------------------------------------------------------------------------"
+	@$(SSH_CMD) $(SSH_USER)@$(SSH_HOST) "mkdir -p $(REMOTE_GO_DIR)/db"
+	@echo "Dừng server cũ trước khi cập nhật binary..."
+	@$(SSH_CMD) $(SSH_USER)@$(SSH_HOST) "test -f $(REMOTE_GO_DIR)/service.sh && bash $(REMOTE_GO_DIR)/service.sh stop" || true
+	@echo "Copying Go binary..."
+	@scp $(SSH_KEY_OPT) -P $(SSH_PORT) $(GO_BIN) $(SSH_USER)@$(SSH_HOST):$(REMOTE_GO_DIR)/$(GO_BIN_NAME).new
+	@$(SSH_CMD) $(SSH_USER)@$(SSH_HOST) "mv -f $(REMOTE_GO_DIR)/$(GO_BIN_NAME).new $(REMOTE_GO_DIR)/$(GO_BIN_NAME) && chmod +x $(REMOTE_GO_DIR)/$(GO_BIN_NAME)"
+	@if [ -d "src/db/migrations" ]; then \
+		echo "Copying database migrations..."; \
+		scp $(SSH_KEY_OPT) -P $(SSH_PORT) -r src/db/migrations $(SSH_USER)@$(SSH_HOST):$(REMOTE_GO_DIR)/db/; \
+	fi
+	@echo "Syncing service.sh..."
+	@scp $(SSH_KEY_OPT) -P $(SSH_PORT) service.sh $(SSH_USER)@$(SSH_HOST):$(REMOTE_GO_DIR)/service.sh
+	@$(SSH_CMD) $(SSH_USER)@$(SSH_HOST) "chmod +x $(REMOTE_GO_DIR)/service.sh"
+	@echo "Kiểm tra file .env trên server..."
+	@if [ -f "src/.env.staging" ]; then \
+		$(SSH_CMD) $(SSH_USER)@$(SSH_HOST) "test -f $(REMOTE_GO_DIR)/.env" || \
+		(echo "Khởi tạo $(REMOTE_GO_DIR)/.env từ .env.staging..." && scp $(SSH_KEY_OPT) -P $(SSH_PORT) src/.env.staging $(SSH_USER)@$(SSH_HOST):$(REMOTE_GO_DIR)/.env); \
+	fi
+	@echo "Chạy Database Migrations trên server..."
+	@$(SSH_CMD) $(SSH_USER)@$(SSH_HOST) "bash $(REMOTE_GO_DIR)/service.sh migrate" || true
+	@echo "Chạy Seeder Master Data trên server..."
+	@$(SSH_CMD) $(SSH_USER)@$(SSH_HOST) "bash $(REMOTE_GO_DIR)/service.sh seed-master" || true
+	@echo "Starting backend trên server..."
+	@$(SSH_CMD) $(SSH_USER)@$(SSH_HOST) "bash $(REMOTE_GO_DIR)/service.sh restart" || true
+	@echo "===> Deploy Go Backend thành công!"
+
+migrate-remote:
+	@echo "------------------------------------------------------------------------"
+	@echo "===> [MIGRATE] Chạy Database Migrations trên $(SSH_USER)@$(SSH_HOST)..."
+	@echo "------------------------------------------------------------------------"
+	@if [ -d "src/db/migrations" ]; then \
+		echo "Syncing database migrations..."; \
+		scp $(SSH_KEY_OPT) -P $(SSH_PORT) -r src/db/migrations $(SSH_USER)@$(SSH_HOST):$(REMOTE_GO_DIR)/db/; \
+	fi
+	@scp $(SSH_KEY_OPT) -P $(SSH_PORT) service.sh $(SSH_USER)@$(SSH_HOST):$(REMOTE_GO_DIR)/service.sh
+	@$(SSH_CMD) $(SSH_USER)@$(SSH_HOST) "chmod +x $(REMOTE_GO_DIR)/service.sh && bash $(REMOTE_GO_DIR)/service.sh migrate"
+	@echo "===> [MIGRATE] Hoàn tất migrations trên server!"
+
+seed-remote-master:
+	@echo "------------------------------------------------------------------------"
+	@echo "===> [SEED] Chạy seeder master data $(if $(table),cho bảng $(table),toàn bộ) trên $(SSH_USER)@$(SSH_HOST)..."
+	@echo "------------------------------------------------------------------------"
+	@scp $(SSH_KEY_OPT) -P $(SSH_PORT) service.sh $(SSH_USER)@$(SSH_HOST):$(REMOTE_GO_DIR)/service.sh
+	@$(SSH_CMD) $(SSH_USER)@$(SSH_HOST) "chmod +x $(REMOTE_GO_DIR)/service.sh && bash $(REMOTE_GO_DIR)/service.sh seed-master $(table)"
+	@echo "===> [SEED] Hoàn tất seeder master data trên server!"

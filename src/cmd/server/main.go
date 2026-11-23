@@ -15,7 +15,9 @@ import (
 	"gorm.io/gorm/logger"
 
 	api "platform-go/generated/api"
+	"platform-go/db/seed/seeder"
 	"platform-go/internal/di"
+	"platform-go/internal/infrastructure/repository"
 	"platform-go/internal/infrastructure/security"
 	"platform-go/internal/middleware"
 	"platform-go/internal/pkg/app"
@@ -84,6 +86,18 @@ func main() {
 	})
 	if err != nil {
 		log.Fatalf("failed to connect database: %v", err)
+	}
+
+	schemaDB := repository.NewSchemaDB(db)
+	if len(os.Args) > 1 {
+		switch os.Args[1] {
+		case "seed-master", "seed-master-data", "--seed-master":
+			targetTables := os.Args[2:]
+			if err := seeder.RunMasterSeeds(schemaDB, targetTables...); err != nil {
+				log.Fatalf("[SEEDER ERROR] %v", err)
+			}
+			return
+		}
 	}
 
 	jwtSecret := os.Getenv("JWT_SECRET")

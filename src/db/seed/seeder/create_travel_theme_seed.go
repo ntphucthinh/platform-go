@@ -49,13 +49,12 @@ func CreateTravelThemes(db repository.DBInterface) []dbmodel.TravelTheme {
 	}
 
 	var existingThemes []dbmodel.TravelTheme
-	db.GetDB().Find(&existingThemes)
-	if len(existingThemes) >= len(themeNames) {
-		fmt.Printf("Travel theme seed data already contains %d records. Skipping travel theme seed.\n", len(existingThemes))
-		return existingThemes
+	if err := db.GetDB().Find(&existingThemes).Error; err != nil {
+		fmt.Printf("Failed to query existing travel themes: %v\n", err)
+		return nil
 	}
 
-	existingMap := make(map[string]bool)
+	existingMap := make(map[string]bool, len(existingThemes))
 	for _, t := range existingThemes {
 		existingMap[t.Name] = true
 	}
@@ -68,12 +67,16 @@ func CreateTravelThemes(db repository.DBInterface) []dbmodel.TravelTheme {
 		models = append(models, *factory.NewTravelThemeFactory().WithName(name).Build())
 	}
 
-	if len(models) > 0 {
-		if err := db.GetDB().Session(&gorm.Session{SkipHooks: true}).Create(&models).Error; err != nil {
-			panic(fmt.Sprintf("Failed to create travel theme seed data: %v", err))
-		}
-		fmt.Printf("Seeded %d travel themes successfully.\n", len(models))
+	if len(models) == 0 {
+		fmt.Printf("All %d travel theme master data records already exist. Skipping seed.\n", len(themeNames))
+		return existingThemes
 	}
+
+	if err := db.GetDB().Session(&gorm.Session{SkipHooks: true}).Create(&models).Error; err != nil {
+		fmt.Printf("Failed to create travel theme seed data: %v\n", err)
+		return existingThemes
+	}
+	fmt.Printf("Seeded %d missing travel themes successfully.\n", len(models))
 
 	var allThemes []dbmodel.TravelTheme
 	db.GetDB().Find(&allThemes)
